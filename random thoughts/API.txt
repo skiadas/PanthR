@@ -29,7 +29,7 @@ Structures are used to store information. They all contain the ``name`` key, whi
     :label:
         Longer name for the variable. Used on graphs and tables. *Optional*
     :values:
-        An array of the vector's values, used for static variables. How they are interpreted depends on the vector's type. These values will be strings in the case of nominal variables only, otherwise they are numeric. Empty, undefined and null values are all treated as missing values. *A vector needs to have either* values *or* formula *specified.*
+        An array of the vector's values, used for static variables. How they are interpreted depends on the vector's type. These values will be strings in the case of nominal variables only, otherwise they are numeric. Empty, undefined and null values are all treated as missing values. *A vector needs to have either* values *or* formula *specified.* Alternatively, all vectors could be values, but some could have a formula attribute that could be accessed to recompute a variable or simply remind the user how the values were computed.
     :formula:
         Used for dynamically computed vectors. Should be a string representing a function that would compute the variable. Should spell out in a different section the allowed operators/functions.
     :formula_native:
