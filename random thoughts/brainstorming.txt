@@ -44,6 +44,7 @@ The Web Server maintains a permanent link to a local R process (likely RServe ?)
 - An RServe process, that is started from the server process and links to it. The server process is responsible for tearing down the RServe process.
 - The server process. The server process needs to do the following:
     - Maintain a list of current clients and corresponding ids. Upon establishing a connection, each client is assigned a randomly generated 16 digit hexadecimal id, which is used to identify the client in future communications. It is also used as a 'namespace' identifier to separate data on the R server corresponding to different clients.
+        - Would be great to enable *shared* data sets, so changes by one client are seen by others.
     - The list maintains information on the time that the client established a connection, as well as the time when the client last communicated with the server. Based on this and configuration settings, the server decides when to disconnect a client.
     - Non-public servers can also link to a database process where they can store information on their clients, save certain datasets, etc.
     - Public servers purge all client related information upon disconnecting with a client.
