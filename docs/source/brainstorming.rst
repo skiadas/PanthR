@@ -1,6 +1,5 @@
-======
-PanthR
-======
+PanthR Overview
+===============
 
 PanthR is a free web-based tool for statistics. It utilizes HTML5 and Javascript to create a rich environment and perform most statistical computations, at the same time linking to an R backend for more heavy duty tasks.
 
@@ -100,4 +99,4 @@ Requests Served
 API
 ---
 
-See API.txt
+We will be establishing a "language" to be used for communication between the client and its various servers, see :doc:`API` for details.

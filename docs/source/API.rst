@@ -1,9 +1,5 @@
-======
-PanthR
-======
-
-API
----
+Language API
+============
 
 Data communication takes place in JSON format. Each JSON object needs to contain the following keys:
 
