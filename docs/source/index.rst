@@ -13,7 +13,9 @@ Contents:
 
    brainstorming
    API
-
+   Client
+   Server
+   PanthR-org
 
 Indices and tables
 ==================

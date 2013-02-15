@@ -1,0 +1,196 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Web Server &mdash; PanthR 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="PanthR 1.0 documentation" href="index.html" />
+    <link rel="next" title="www.panthr.org" href="PanthR-org.html" />
+    <link rel="prev" title="Web Client" href="Client.html" /> 
+  </head>
+  <body>
+    <div class="header-wrapper">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">PanthR 1.0 documentation</a></div>
+        <div class="rel">
+          <a href="Client.html" title="Web Client"
+             accesskey="P">previous</a> |
+          <a href="PanthR-org.html" title="www.panthr.org"
+             accesskey="N">next</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="web-server">
+<h1>Web Server<a class="headerlink" href="#web-server" title="Permalink to this headline">¶</a></h1>
+<p>The Web Server maintains a permanent link to a local R process (likely RServe ?). The following components need to be set in place on the server:</p>
+<ul>
+<li><p class="first">A configuration file <tt class="docutils literal"><span class="pre">panthr_config.json</span></tt> that administrators can use to detail information about the server. See the <tt class="docutils literal"><span class="pre">/status</span></tt> request below for required fields.</p>
+</li>
+<li><p class="first">An RServe process, that is started from the server process and listens to requests from it. The server process is responsible for tearing down the RServe process.</p>
+</li>
+<li><dl class="first docutils">
+<dt>The server process, implemented in <a class="reference external" href="http://nodejs.org/">Node.js</a>. The server process needs to do the following:</dt>
+<dd><ul class="first last simple">
+<li>Maintain a list of current clients and corresponding ids. Upon establishing a connection, each client is assigned a randomly generated unique id, which is used to identify the client in future communications (This might not be needed as the clients are in fact distinct objects on the server). It is also used as a &#8216;namespace&#8217; identifier to separate data on the R server corresponding to different clients.</li>
+<li>The list maintains information on the time that the client established a connection, as well as the time when the client last communicated with the server. Based on this and configuration settings, the server decides when to disconnect a client (A client that&#8217;s not connected for say 4 hours shouldn&#8217;t take up space).</li>
+<li>Non-public servers can also link to a database process where they can store information on their clients, save certain datasets, etc. (This should probably be thought of as an afterthought. We should find other ways for users to save and share data and results).</li>
+<li>Public servers purge all client related information upon disconnecting with a client.</li>
+<li>Servers pass most <tt class="docutils literal"><span class="pre">/data</span></tt> requests to the R server. The API for these requests is described further in the <a class="reference internal" href="API.html"><em>Language API</em></a> section. Messages are communicated in JSON.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>In theory, servers could be written that link to software other than R. As long as they support the <a class="reference internal" href="API.html"><em>Language API</em></a>.</p>
+<div class="section" id="requests-served">
+<h2>Requests Served<a class="headerlink" href="#requests-served" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">/status</span></tt></dt>
+<dd><p class="first">A GET request, returns information about the server, containing the following fields (This information should probably be saved in a configuration file).</p>
+<table class="last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">name:</th><td class="field-body">How the server wants to be known to the world.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">owner:</th><td class="field-body">The person or organization managing the server. Optional.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">location:</th><td class="field-body">Physical location of the server (city/state?).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">server_version:</th><td class="field-body">Version of the server program. This will follows a standard digit.digit format.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">api_version:</th><td class="field-body">The highest version of the API that this server supports. To account for future expansions.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">public:</th><td class="field-body">Whether the server is meant to be available to anyone who might want to use it. Public servers do not preserve any client data once a timeout occurs, or once the maximum time is exceeded.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">timeout:</th><td class="field-body">Number of seconds of inactivity that would cause a server to disconnect from a client. Should default to two hours (7200).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">max_time:</th><td class="field-body">Should default to one day (86400).</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">auth:</th><td class="field-body">Protocol required for authentication. Will need to identify meaningful values. A value of &#8216;none&#8217; should mean that no authentication is necessary. &#8216;none&#8217; should be the default value for public servers.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">max_clients:</th><td class="field-body">The number of clients that can be serviced at any given time. An integer.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">no_clients:</th><td class="field-body">Current number of active clients.</td>
+</tr>
+</tbody>
+</table>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">/connect</span></tt></dt>
+<dd><p class="first">A GET request from a client, to establish a connection to the server. The request may contain:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">id:</th><td class="field-body">An existing unique id for this client, likely obtained during a previous request. Lack of this field will establish a new connection.</td>
+</tr>
+</tbody>
+</table>
+<ul class="last simple">
+<li>A successful connection should return a 200 status code, and the message text should contain the 16 digit ID key to be used by the client in any future communication. At the same time, it establishes a websockets communication with the client.</li>
+<li>If the server cannot accept any new clients at this time, it should return a 503 status code.</li>
+<li>A failed authentication would return a 401 status code.</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">websocket</span> <span class="pre">messaging</span></tt></dt>
+<dd><p class="first">Data communication between the server and the client is done via websockets. Detailed in the <a class="reference internal" href="API.html"><em>Language API</em></a> section. These messages form the majority of client/server communication. The client would use such a message to inform the server of a change in the data set, or to request some computations from the server. Clients should try to chain data messages together, to minimize on the communication overhead.</p>
+<p class="last">TODO Need to specify the exact form for these messages.</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          <h3>Table Of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="brainstorming.html">PanthR Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="API.html">Language API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Client.html">Web Client</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Web Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#requests-served">Requests Served</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="PanthR-org.html">www.panthr.org</a></li>
+</ul>
+
+          <h3 style="margin-top: 1.5em;">Search</h3>
+          <form class="search" action="search.html" method="get">
+            <input type="text" name="q" />
+            <input type="submit" value="Go" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+            Enter search terms or a module, class or function name.
+          </p>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <a href="Client.html" title="Web Client"
+             >previous</a> |
+          <a href="PanthR-org.html" title="www.panthr.org"
+             >next</a> |
+          <a href="genindex.html" title="General Index"
+             >index</a>
+            <br/>
+            <a href="_sources/Server.txt"
+               rel="nofollow">Show Source</a>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer">
+        &copy; Copyright 2013, PanthR Group.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>
