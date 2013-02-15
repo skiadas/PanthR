@@ -1,0 +1,60 @@
+@font-face {
+	font-family: 'Icons';
+	src:url('../fonts/icomoon.eot');
+	src:url('../fonts/icomoon.eot?#iefix') format('embedded-opentype'),
+		url('../fonts/icomoon.woff') format('woff'),
+		url('../fonts/icomoon.ttf') format('truetype'),
+		url('../fonts/icomoon.svg#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+@mixin icon($uni, $color: black) {
+    &:before {
+        speak: none;
+        font: {
+            family: 'Icons';
+            style: normal;
+            size: 0.7em;
+        }
+        padding-right: 0.1em;
+        font-weight: normal;
+        vertical-align: 0.1em;
+        -webkit-font-smoothing: antialiased;
+        content: $uni;
+        color: $color;
+    };
+}
+
+@mixin icon-plus($color: black) { @include icon("\e000", $color) };
+@mixin icon-minus($color: black) { @include icon("\e001", $color) };
+@mixin icon-checkmark($color: black) { @include icon("\e002", $color) };
+@mixin icon-warning($color: black) { @include icon("\e003", $color) };
+@mixin icon-info($color: black) { @include icon("\e004", $color) };
+@mixin icon-info-2($color: black) { @include icon("\e005", $color) };
+@mixin icon-remove($color: black) { @include icon("\e006", $color) };
+@mixin icon-close($color: black) { @include icon("\e007", $color) };
+@mixin icon-lightning($color: black) { @include icon("\e008", $color) };
+@mixin icon-wrench($color: black) { @include icon("\e009", $color) };
+@mixin icon-cog($color: black) { @include icon("\e00a", $color) };
+@mixin icon-bars($color: black) { @include icon("\e00b", $color) };
+@mixin icon-bars-2($color: black) { @include icon("\e00c", $color) };
+@mixin icon-pie($color: black) { @include icon("\e00d", $color) };
+@mixin icon-undo($color: black) { @include icon("\e00e", $color) };
+@mixin icon-redo($color: black) { @include icon("\e00f", $color) };
+@mixin icon-table($color: black) { @include icon("\e010", $color) };
+@mixin icon-arrow-up-left($color: black) { @include icon("\e011", $color) };
+@mixin icon-arrow-up($color: black) { @include icon("\e012", $color) };
+@mixin icon-arrow-up-right($color: black) { @include icon("\e013", $color) };
+@mixin icon-arrow-right($color: black) { @include icon("\e014", $color) };
+@mixin icon-arrow-down-right($color: black) { @include icon("\e015", $color) };
+@mixin icon-arrow-down($color: black) { @include icon("\e016", $color) };
+@mixin icon-arrow-down-left($color: black) { @include icon("\e017", $color) };
+@mixin icon-arrow-left($color: black) { @include icon("\e018", $color) };
+@mixin icon-backward($color: black) { @include icon("\e019", $color) };
+@mixin icon-forward($color: black) { @include icon("\e01a", $color) };
+@mixin icon-play($color: black) { @include icon("\e01b", $color) };
+@mixin icon-stats($color: black) { @include icon("\e01c", $color) };
+@mixin icon-meter($color: black) { @include icon("\e01d", $color) };
+@mixin icon-calendar($color: black) { @include icon("\e01e", $color) };
+@mixin icon-envelop($color: black) { @include icon("\e01f", $color) };

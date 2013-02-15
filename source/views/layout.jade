@@ -1,0 +1,25 @@
+!!! 5
+html
+  head
+    link(href="stylesheets/screen.css"
+      media="screen, projection"
+      rel="stylesheet"
+      type="text/css")
+
+  body
+    include header
+    include navbar
+    .sidebar
+      include sidebar/objects
+      include sidebar/filters
+      include sidebar/history
+      include sidebar/outputs
+    block content
+      .content
+        ul.views
+          li Sheet
+          li Summary
+          li Outputs
+        .main
+          include main/dataview
+    include footer

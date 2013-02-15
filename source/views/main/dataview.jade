@@ -1,0 +1,18 @@
+table
+  colgroup
+    col.rownames
+    col.v1
+    col.v2
+    col.v3
+  thead
+    tr
+     th
+     - for (var i=0; i < 7; i++)
+        th(scope="col") V#{i}
+  tbody
+    -for (var j=0; j < 50; j++)
+      tr
+        td(scope="row") #{j}
+        - for (var i=0; i < 7; i++)
+          td foo#{i}.#{j}
+  
