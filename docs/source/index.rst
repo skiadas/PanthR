@@ -16,6 +16,7 @@ Contents:
    Client
    Server
    PanthR-org
+   technologies
 
 Indices and tables
 ==================
