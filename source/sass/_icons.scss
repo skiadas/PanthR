@@ -10,20 +10,18 @@
 }
 
 @mixin icon($uni, $color: black) {
-    &:before {
-        speak: none;
-        font: {
-            family: 'Icons';
-            style: normal;
-            size: 0.7em;
-        }
-        padding-right: 0.1em;
-        font-weight: normal;
-        vertical-align: 0.1em;
-        -webkit-font-smoothing: antialiased;
-        content: $uni;
-        color: $color;
-    };
+    speak: none;
+    font: {
+        family: 'Icons';
+        style: normal;
+        size: 0.7em;
+    }
+    padding-right: 0.1em;
+    font-weight: normal;
+    vertical-align: 0.1em;
+    -webkit-font-smoothing: antialiased;
+    content: $uni;
+    color: $color;
 }
 
 @mixin icon-plus($color: black) { @include icon("\e000", $color) };

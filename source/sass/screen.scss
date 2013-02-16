@@ -31,6 +31,7 @@ $sat_light: desaturate($color_light, $sat_percent);
 $sat_very_light: desaturate($color_very_light, $sat_percent);
 $sat_extreme_light: desaturate($color_extreme_light, $sat_percent);
 $white_transparent: rgba(255, 255, 255, 0);
+$color_opposite_bold: adjust_hue($color_bold, 180);
 
 @mixin custom_button($radius: 6px, $color: $color_bold, $color_grad1: lighten($color, 20%), $color_grad2: lighten($color, 40%)) {
     @include background(linear-gradient(top, $color_grad1, $color_grad2));
@@ -175,7 +176,9 @@ body {
         }
         ul {
             li {
-                @include icon-plus($color_bold);
+                &:before {
+                    @include icon-plus($color_bold);
+                }
                 display: block;
                 margin-top: 0.1em;
                 padding: 0.2em 0.1em;
@@ -186,7 +189,7 @@ body {
                 }
                 span {
                     margin-left: 0.2em;
-                    padding: 0 0.1em;
+                    padding: 0 0.2em;
                     @include custom_button;
                 }
                 .details {
@@ -198,6 +201,27 @@ body {
     }
 }
 
+.title:before {
+    background: {
+//        color: ;
+        padding: 0.2em;
+    };
+}
+.dataset .title:before {
+    @include icon-table($color_opposite_bold);
+};
+.variable.scalar .title:before {
+    @include icon-bars($color_opposite_bold);
+};
+.variable.ordinal .title:before {
+    @include icon-bars-2($color_opposite_bold);
+};
+.variable.nominal .title:before {
+    @include icon-pie($color_opposite_bold);
+};
+.variable.datetime .title:before {
+    @include icon-calendar($color_opposite_bold);
+};
 
 nav {
     display: none;
