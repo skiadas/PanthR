@@ -1,0 +1,24 @@
+$sansserif: 'Anonymous Pro', sans-serif;
+$serif: "Libre Baskerville", serif;
+* {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+}
+html * { font-family: $serif; }
+$sidewidth: 30%;
+$headerheight: 5em;
+$color_bold: hsl(210, 80%, 30%);
+$color_medium: lighten($color_bold, 20%);
+$color_light: lighten($color_bold, 40%);
+$color_very_light: lighten($color_bold, 60%);
+$color_extreme_light: lighten($color_bold, 67%);
+$sat_percent: 20%;
+$sat_bold: desaturate($color_bold, $sat_percent);
+$sat_medium: desaturate($color_medium, $sat_percent);
+$sat_light: desaturate($color_light, $sat_percent);
+$sat_very_light: desaturate($color_very_light, $sat_percent);
+$sat_extreme_light: desaturate($color_extreme_light, $sat_percent);
+$white_transparent: rgba(255, 255, 255, 0);
+$color_opposite_bold: adjust_hue($color_bold, 180);
+$color_opposite_medium: adjust_hue($color_medium, 180);
+$color_opposite_light: adjust_hue($color_light, 180);

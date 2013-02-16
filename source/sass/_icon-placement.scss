@@ -1,0 +1,20 @@
+.title:before {
+    background: {
+        padding: 0.2em;
+    };
+}
+.dataset .title:before {
+    @include icon-table($color_opposite_bold);
+};
+.variable.scalar .title:before {
+    @include icon-bars($color_opposite_bold);
+};
+.variable.ordinal .title:before {
+    @include icon-bars-2($color_opposite_bold);
+};
+.variable.nominal .title:before {
+    @include icon-pie($color_opposite_bold);
+};
+.variable.datetime .title:before {
+    @include icon-calendar($color_opposite_bold);
+};

@@ -1,0 +1,67 @@
+nav {
+//    display: none;
+    position: absolute;
+    left: $sidewidth + 1%;
+    top: $headerheight + 0.4em;
+    > .navmenu {
+        position: relative;
+        top: -2.5em;
+        left: 0;
+        border: {
+            style: solid;
+            color: $color_medium;
+            width: 1px;
+            radius: 4px;
+        };
+        @include background($color_very_light);
+        overflow: hidden;
+    }
+    * {
+        font: {
+            style: $sansserif;
+            weight: normal;
+            size: 105%;
+        };
+    }
+    h2 {
+        @include background($color_opposite_medium);
+        font: {
+            size: 130%;
+            weight: bold;
+        }
+        border: {
+            style: solid;
+            color: $color_opposite_bold;
+            width: 2px;
+            radius: 6px;
+        };
+        padding: 0.4em;
+    }
+    ul {
+        float: left;
+        padding: 0.5em;
+        li:hover {
+            @include background($color_opposite_light);
+            border-radius: 6px;
+        };
+        h3 {
+            font: {
+                weight: bold;
+                size: 120%;
+            };
+            border-bottom: {
+                color: $color_opposite_bold;
+                style: solid;
+                width: 2px;
+            };
+        }
+        li {
+            margin-top: 0.3em;
+            padding: 0.2em;
+        }
+    }
+}
+
+nav.inactive div {
+    display: none;
+}

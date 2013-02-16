@@ -1,0 +1,65 @@
+// Layout
+.header {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+.sidebar {
+    width: $sidewidth;
+    float: left;
+}
+.content {
+    width: 100% - $sidewidth;
+    margin-left: $sidewidth;
+}
+.footer {
+    clear: both;
+}
+.sidebar, .content, .footer { padding: 10px 2%; }
+
+body {
+    @include background(linear-gradient(left, 
+        $color_very_light, 
+        $color_extreme_light 2%,
+        $color_extreme_light $sidewidth - 1%,
+        $color_light $sidewidth, 
+        $color_extreme_light $sidewidth + 1%,
+        $color_extreme_light 98%,
+        $color_very_light));
+}
+.header {
+    position: relative;
+    padding: 0.1 * $headerheight;
+    .logo {
+        height: 0.8 * $headerheight;
+        float: left;
+    }
+    @include background(linear-gradient(top, $color_very_light, $color_light));
+    h1 {
+        color: $color_bold;
+        font-family: $sansserif;
+        font-weight: bold;
+        text-shadow: -2px -1px $color_light, -3px -2px $color_bold;
+        position: absolute;
+        bottom: 0;
+        left: 20%;
+        font: {
+            size: 0.9 * $headerheight;
+        };
+    }
+    border-bottom: 1px solid $color_bold;
+}
+.footer {
+    @include background(linear-gradient(top, $color_light, $color_very_light));
+    padding: 0.4em;
+    overflow: hidden;
+    height: 1.6em;
+    .copyright {
+        display: block;
+        float: right;
+        font: {
+            style: italic;
+            size: 0.8em;
+        };
+    }
+}

@@ -1,0 +1,61 @@
+//
+// Sidebar formatting
+//
+.sidebar {
+    > div {
+        margin-top: 20px;
+        border: {
+            style: solid;
+            color: $color_medium;
+            width: 1px;
+            radius: 4px;
+        };
+        @include background($color_very_light);
+        > * {
+            padding: 0.2em;
+        }
+        h2 {
+            text-align: center;
+            display: block;
+            font: {
+                family: $sansserif;
+                weight: bold;
+                color: $color_bold;
+                size: 1.2em;
+            };
+            @include background($color_light);
+            border-bottom: {
+                width: 1px;
+                style: solid;
+                color: $color_medium;
+            };
+            &:hover {
+                @include background($color_medium);
+            };
+        }
+        ul {
+            li {
+                &:before {
+                    @include icon-plus($color_bold);
+                }
+                display: block;
+                margin-top: 0.1em;
+                padding: 0.2em 0.1em;
+                > * {
+                    margin-left: 0.6em;
+                    padding: 0.2em;
+//                    padding-left: 0.3em;
+                }
+                span {
+                    margin-left: 0.2em;
+                    padding: 0 0.2em;
+                    @include custom_button;
+                }
+                .details {
+                    margin-top: 0.2em;
+                    padding-left: 0.5em;
+                }
+            }
+        }
+    }
+}
