@@ -1,18 +1,25 @@
 table
   colgroup
     col.rownames
-    col.v1
-    col.v2
-    col.v3
+    col.string
+    col.nominal
+    col.ordinal
+    col.scalar
+    col.datetime
   thead
     tr
      th
-     - for (var i=0; i < 7; i++)
-        th(scope="col") V#{i}
+     th String
+     th Nominal
+     th Ordinal
+     th Scalar
+     th DateTime
   tbody
-    -for (var j=0; j < 50; j++)
+    - for (var j=0; j < 50; j++)
       tr
-        td(scope="row") #{j}
-        - for (var i=0; i < 7; i++)
-          td foo#{i}.#{j}
-  
+        td.rownames(scope="row") #{j}
+        td.string   Foo#{j}
+        td.nominal  #{["Male","Female"][j % 2]}
+        td.ordinal  #{["Freshman","Sophomore", "Junior"][j % 3]}
+        td.scalar   #{(10/(2*j+1)).toFixed(3)}
+        td.datetime 2013/12/03

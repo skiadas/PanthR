@@ -17,13 +17,13 @@
             font: {
                 size: 110%;
             };
-            background: {
-                color: $sat_medium;
-            };   
-            box-shadow: -2px -1px 1px $sat_bold;
+            box-shadow: -2px -1px 1px transparentize($sat_bold, 0.25);
+            background-color: $color_very_light;
             &.active {
-                box-shadow: -2px -1px 1px transparentize($sat_bold, 0.25);
-                background: $color_very_light;
+                background: {
+                    color: $sat_medium;
+                };   
+                box-shadow: -2px -1px 1px $sat_bold;
             };
         }
     }
@@ -33,5 +33,37 @@
 }
 
 .main table {
-    
+    width: auto;
+    border-right: {
+        color: $sat_bold;
+        width: 1px;
+        style: solid;
+    };
+    th, tr, td {
+        padding: 0.2em 0.8em;
+        text-align: right;
+    }
+    td {
+        &.nominal, &.ordinal, &.string {
+            text-align: left;
+        }
+        &.scalar {
+            font-family: $sansserif;
+        }
+    };
+    th {
+        font: {
+            family: $sansserif;
+            weight: bold;
+        };
+        border-bottom: 1px solid $sat_bold;
+        background-color: $sat_light;
+    }
+    tr {
+        &:nth-child(even) {
+            background: {
+                color: $sat_very_light;
+            };
+        };
+    }
 }

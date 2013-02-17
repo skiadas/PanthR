@@ -1,5 +1,7 @@
-$sansserif: 'Anonymous Pro', sans-serif;
-$serif: "Libre Baskerville", serif;
+//@import url(http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Libre+Baskerville:400,700,400italic);
+@import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono|Droid+Serif:400,400italic,700|Droid+Sans:400,700);
+$sansserif: 'Droid Sans Mono', sans-serif;
+$serif: "Droid Serif", serif;
 * {
     box-sizing: border-box;
     -moz-box-sizing: border-box;

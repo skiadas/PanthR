@@ -1,4 +1,4 @@
-@import url(http://fonts.googleapis.com/css?family=Anonymous+Pro:400,700|Libre+Baskerville:400,700,400italic);
+@import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono|Droid+Serif:400,400italic,700|Droid+Sans:400,700);
 /* Welcome to Compass.
  * In this file you should write your main styles. (or centralize your imports)
  * Import this file using the following HTML or equivalent:
@@ -76,15 +76,15 @@ article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, 
   font-style: normal;
 }
 
-/* line 3, ../sass/_settings.scss */
+/* line 5, ../sass/_settings.scss */
 * {
   box-sizing: border-box;
   -moz-box-sizing: border-box;
 }
 
-/* line 7, ../sass/_settings.scss */
+/* line 9, ../sass/_settings.scss */
 html * {
-  font-family: "Libre Baskerville", serif;
+  font-family: "Droid Serif", serif;
 }
 
 /* line 2, ../sass/_layout.scss */
@@ -144,7 +144,7 @@ body {
 /* line 38, ../sass/_layout.scss */
 .header h1 {
   color: #0f4c8a;
-  font-family: "Anonymous Pro", sans-serif;
+  font-family: "Droid Sans Mono", sans-serif;
   font-weight: bold;
   text-shadow: -2px -1px #75b2f0, -3px -2px #0f4c8a;
   position: absolute;
@@ -222,7 +222,7 @@ body {
 .sidebar > div h2 {
   text-align: center;
   display: block;
-  font-family: "Anonymous Pro", sans-serif;
+  font-family: "Droid Sans Mono", sans-serif;
   font-weight: bold;
   font-color: #0f4c8a;
   font-size: 1.2em;
@@ -374,7 +374,7 @@ nav > .navmenu {
 }
 /* line 19, ../sass/_nav.scss */
 nav * {
-  font-style: "Anonymous Pro", sans-serif;
+  font-style: "Droid Sans Mono", sans-serif;
   font-weight: normal;
   font-size: 105%;
 }
@@ -435,15 +435,47 @@ nav.inactive div {
   border-color: #337fcc;
   border-bottom-width: 0;
   font-size: 110%;
+  box-shadow: -2px -1px 1px rgba(31, 76, 122, 0.75);
+  background-color: #d1e5fa;
+}
+/* line 22, ../sass/_content.scss */
+.content .views li.active {
   background-color: #337fcc;
   box-shadow: -2px -1px 1px #1f4c7a;
-}
-/* line 24, ../sass/_content.scss */
-.content .views li.active {
-  box-shadow: -2px -1px 1px rgba(31, 76, 122, 0.75);
-  background: #d1e5fa;
 }
 /* line 30, ../sass/_content.scss */
 .content .main {
   border: 1px solid black;
+}
+
+/* line 35, ../sass/_content.scss */
+.main table {
+  width: auto;
+  border-right-color: #1f4c7a;
+  border-right-width: 1px;
+  border-right-style: solid;
+}
+/* line 42, ../sass/_content.scss */
+.main table th, .main table tr, .main table td {
+  padding: 0.2em 0.8em;
+  text-align: right;
+}
+/* line 47, ../sass/_content.scss */
+.main table td.nominal, .main table td.ordinal, .main table td.string {
+  text-align: left;
+}
+/* line 50, ../sass/_content.scss */
+.main table td.scalar {
+  font-family: "Droid Sans Mono", sans-serif;
+}
+/* line 54, ../sass/_content.scss */
+.main table th {
+  font-family: "Droid Sans Mono", sans-serif;
+  font-weight: bold;
+  border-bottom: 1px solid #1f4c7a;
+  background-color: #85b2e0;
+}
+/* line 63, ../sass/_content.scss */
+.main table tr:nth-child(even) {
+  background-color: #d6e5f5;
 }
