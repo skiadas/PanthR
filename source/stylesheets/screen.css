@@ -380,7 +380,11 @@ nav * {
 }
 /* line 26, ../sass/_nav.scss */
 nav h2 {
-  background: #e68019;
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f0b375), color-stop(100%, #e68019));
+  background: -webkit-linear-gradient(#f0b375, #e68019);
+  background: -moz-linear-gradient(#f0b375, #e68019);
+  background: -o-linear-gradient(#f0b375, #e68019);
+  background: linear-gradient(#f0b375, #e68019);
   font-size: 130%;
   font-weight: bold;
   border-style: solid;

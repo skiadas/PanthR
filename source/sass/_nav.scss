@@ -24,7 +24,7 @@ nav {
         };
     }
     h2 {
-        @include background($color_opposite_medium);
+        @include background(linear-gradient($color_opposite_light,$color_opposite_medium));
         font: {
             size: 130%;
             weight: bold;
