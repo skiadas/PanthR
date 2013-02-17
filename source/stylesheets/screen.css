@@ -417,3 +417,33 @@ nav ul li {
 nav.inactive div {
   display: none;
 }
+
+/* line 2, ../sass/_content.scss */
+.content .views {
+  margin-left: 6em;
+  height: 3em;
+}
+/* line 5, ../sass/_content.scss */
+.content .views li {
+  float: left;
+  margin-left: 0.2em;
+  margin-top: 1.3em;
+  padding: 0.2em;
+  border-width: 1px;
+  border-radius: 4px 4px 0 0;
+  border-style: solid;
+  border-color: #337fcc;
+  border-bottom-width: 0;
+  font-size: 110%;
+  background-color: #337fcc;
+  box-shadow: -2px -1px 1px #1f4c7a;
+}
+/* line 24, ../sass/_content.scss */
+.content .views li.active {
+  box-shadow: -2px -1px 1px rgba(31, 76, 122, 0.75);
+  background: #d1e5fa;
+}
+/* line 30, ../sass/_content.scss */
+.content .main {
+  border: 1px solid black;
+}

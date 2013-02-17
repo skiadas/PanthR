@@ -1,0 +1,37 @@
+.content {
+    .views {
+        margin-left: 6em;
+        height: 3em;
+        li {
+            float: left;
+            margin-left: 0.2em;
+            margin-top: 1.3em;
+            padding: 0.2em;
+            border: {
+                width: 1px;
+                radius: 4px 4px 0 0;
+                style: solid;
+                color: $sat_medium;
+                bottom-width: 0;
+            };
+            font: {
+                size: 110%;
+            };
+            background: {
+                color: $sat_medium;
+            };   
+            box-shadow: -2px -1px 1px $sat_bold;
+            &.active {
+                box-shadow: -2px -1px 1px transparentize($sat_bold, 0.25);
+                background: $color_very_light;
+            };
+        }
+    }
+    .main {
+        border: 1px solid black;
+    }
+}
+
+.main table {
+    
+}
