@@ -35,9 +35,6 @@
         }
         ul {
             li {
-                &:before {
-                    @include icon-plus($color_bold);
-                }
                 display: block;
                 margin-top: 0.1em;
                 padding: 0.2em 0.1em;

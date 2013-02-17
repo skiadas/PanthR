@@ -241,25 +241,12 @@ body {
   margin-top: 0.1em;
   padding: 0.2em 0.1em;
 }
-/* line 38, ../sass/_sidebar.scss */
-.sidebar > div ul li:before {
-  speak: none;
-  font-family: 'Icons';
-  font-style: normal;
-  font-size: 0.7em;
-  padding-right: 0.1em;
-  font-weight: normal;
-  vertical-align: 0.1em;
-  -webkit-font-smoothing: antialiased;
-  content: "\e000";
-  color: #0f4c8a;
-}
-/* line 44, ../sass/_sidebar.scss */
+/* line 41, ../sass/_sidebar.scss */
 .sidebar > div ul li > * {
   margin-left: 0.6em;
   padding: 0.2em;
 }
-/* line 49, ../sass/_sidebar.scss */
+/* line 46, ../sass/_sidebar.scss */
 .sidebar > div ul li span {
   margin-left: 0.2em;
   padding: 0 0.2em;
@@ -273,7 +260,7 @@ body {
   border-style: solid;
   border-radius: 6px;
 }
-/* line 54, ../sass/_sidebar.scss */
+/* line 51, ../sass/_sidebar.scss */
 .sidebar > div ul li .details {
   margin-top: 0.2em;
   padding-left: 0.5em;
