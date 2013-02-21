@@ -65,11 +65,16 @@
 <li><dl class="first docutils">
 <dt>The server process, implemented in <a class="reference external" href="http://nodejs.org/">Node.js</a>. The server process needs to do the following:</dt>
 <dd><ul class="first last simple">
-<li>Maintain a list of current clients and corresponding ids. Upon establishing a connection, each client is assigned a randomly generated unique id, which is used to identify the client in future communications (This might not be needed as the clients are in fact distinct objects on the server). It is also used as a &#8216;namespace&#8217; identifier to separate data on the R server corresponding to different clients.</li>
-<li>The list maintains information on the time that the client established a connection, as well as the time when the client last communicated with the server. Based on this and configuration settings, the server decides when to disconnect a client (A client that&#8217;s not connected for say 4 hours shouldn&#8217;t take up space).</li>
-<li>Non-public servers can also link to a database process where they can store information on their clients, save certain datasets, etc. (This should probably be thought of as an afterthought. We should find other ways for users to save and share data and results).</li>
+<li>It maintains a database of user credentials. A user can register by simply providing a valid email address as their username, and set a password. (Possible persistent data store solutions: MongoDB, Redis)</li>
+<li>Users need to log in before they can use the server&#8217;s resources. They can still download the client, but in order to connect to the R backend they will need to set up an account and log in.</li>
+<li>Users should have the option to &#8220;keep themselves logged in&#8221; for a period of time. In that case, their login information is stored in a cookie, and the user is automatically logged in when they access the web server.</li>
+<li>User can also save their preferences how various settings (color palettes, graph symbols, table defaults, menu defaults etc). These preferences are saved the moment they are set. A user should be able to have multiple possible preference sets (e.g. one setting for printing, or separate setting for classwork vs research etc).</li>
+<li>The server uses a persistent data store to store the user&#8217;s work. It can save &#8220;Workspaces&#8221;, namely a collection of objects/reports/commands that the user has created. The user can have multiple workspaces.</li>
+<li>There is always a &#8220;Current Workspace&#8221; that the user is working on. Upon a disconnect, this workspace is preserved to be used the next time the user logs in. (Similar to a browser&#8217;s last session).</li>
+<li>The server logs into a file information about the user connection, when it is established, when messages are sent around and what types they are etc.</li>
+<li>Based on its configuration settings, the server may decide to disconnect a client after a period of inactivity.</li>
 <li>Public servers purge all client related information upon disconnecting with a client.</li>
-<li>Servers pass most <tt class="docutils literal"><span class="pre">/data</span></tt> requests to the R server. The API for these requests is described further in the <a class="reference internal" href="API.html"><em>Language API</em></a> section. Messages are communicated in JSON.</li>
+<li>Servers pass most data requests to the R server. The API for these requests is described further in the <a class="reference internal" href="API.html"><em>Language API</em></a> section. Messages are communicated in JSON.</li>
 </ul>
 </dd>
 </dl>
@@ -78,9 +83,11 @@
 <p>In theory, servers could be written that link to software other than R. As long as they support the <a class="reference internal" href="API.html"><em>Language API</em></a>.</p>
 <div class="section" id="requests-served">
 <h2>Requests Served<a class="headerlink" href="#requests-served" title="Permalink to this headline">¶</a></h2>
+<p>The web server should listen for HTTP requests, preferably on port 80, though this could potentially be customizable. It is implemented using the <a class="reference external" href="http://expressjs.com/">Express Framework</a> in <a class="reference external" href="http://expressjs.com/http://nodejs.org/">Node.js</a>.</p>
+<p>It should serve the following requests:</p>
 <dl class="docutils">
 <dt><tt class="docutils literal"><span class="pre">/status</span></tt></dt>
-<dd><p class="first">A GET request, returns information about the server, containing the following fields (This information should probably be saved in a configuration file).</p>
+<dd><p class="first">A GET request, returns information about the server, containing the following fields (This information would mostly come from a configuration file).</p>
 <table class="last docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -89,47 +96,82 @@
 </tr>
 <tr class="field-even field"><th class="field-name">owner:</th><td class="field-body">The person or organization managing the server. Optional.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">location:</th><td class="field-body">Physical location of the server (city/state?).</td>
+<tr class="field-odd field"><th class="field-name">location:</th><td class="field-body">Physical location of the server (city/state?). Optional.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">server_version:</th><td class="field-body">Version of the server program. This will follows a standard digit.digit format.</td>
+<tr class="field-even field"><th class="field-name">server_version:</th><td class="field-body">Version of the server program. This will follow a standard digit.digit format. Will likely remain at 1.0 for quite a while.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">api_version:</th><td class="field-body">The highest version of the API that this server supports. To account for future expansions.</td>
+<tr class="field-odd field"><th class="field-name">api_version:</th><td class="field-body">The highest version of the API that this server supports. To account for future expansions. Will likely remain at 1.0 for quite a while.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">public:</th><td class="field-body">Whether the server is meant to be available to anyone who might want to use it. Public servers do not preserve any client data once a timeout occurs, or once the maximum time is exceeded.</td>
+<tr class="field-even field"><th class="field-name">timeout:</th><td class="field-body">Number of seconds of inactivity that would cause a server to disconnect from a client. Should default to two hours (7200).</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">timeout:</th><td class="field-body">Number of seconds of inactivity that would cause a server to disconnect from a client. Should default to two hours (7200).</td>
+<tr class="field-odd field"><th class="field-name">max_time:</th><td class="field-body">The maximum time that a server would allow a client to connect. Should default to one day (86400). A value of <cite>null</cite> or missing field would indicate that a client could connect indefinitely.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">max_time:</th><td class="field-body">Should default to one day (86400).</td>
+<tr class="field-even field"><th class="field-name">max_users:</th><td class="field-body">The number of clients that can be serviced at any given time. An integer. A value of <cite>null</cite> or missing key would indicate no limits.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">auth:</th><td class="field-body">Protocol required for authentication. Will need to identify meaningful values. A value of &#8216;none&#8217; should mean that no authentication is necessary. &#8216;none&#8217; should be the default value for public servers.</td>
+<tr class="field-odd field"><th class="field-name">no_users:</th><td class="field-body">Current number of active clients.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">max_clients:</th><td class="field-body">The number of clients that can be serviced at any given time. An integer.</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">no_clients:</th><td class="field-body">Current number of active clients.</td>
+<tr class="field-even field"><th class="field-name">max_data:</th><td class="field-body">Data sets will be accepted only if the product of their dimensions (subject number times variable number) does not exceed this number. Value of <cite>null</cite> or missing indicates no limits.</td>
 </tr>
 </tbody>
 </table>
 </dd>
-<dt><tt class="docutils literal"><span class="pre">/connect</span></tt></dt>
-<dd><p class="first">A GET request from a client, to establish a connection to the server. The request may contain:</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">id:</th><td class="field-body">An existing unique id for this client, likely obtained during a previous request. Lack of this field will establish a new connection.</td>
-</tr>
-</tbody>
-</table>
+<dt><tt class="docutils literal"><span class="pre">/</span></tt></dt>
+<dd>A GET request that just sends the client web page <cite>index.html</cite>, with all the client javascript code necessary.</dd>
+<dt><tt class="docutils literal"><span class="pre">/login</span></tt></dt>
+<dd><p class="first">A GET request from a client, to establish a connection to the server. Established when the user choses to &#8220;log in&#8221;. The request will identify users with their credentials. We&#8217;ll need to find the best way to do that.</p>
 <ul class="last simple">
-<li>A successful connection should return a 200 status code, and the message text should contain the 16 digit ID key to be used by the client in any future communication. At the same time, it establishes a websockets communication with the client.</li>
+<li>A successful connection should return a 200 status code, and establishes a websockets communication with the client.</li>
 <li>If the server cannot accept any new clients at this time, it should return a 503 status code.</li>
 <li>A failed authentication would return a 401 status code.</li>
 </ul>
 </dd>
 <dt><tt class="docutils literal"><span class="pre">websocket</span> <span class="pre">messaging</span></tt></dt>
-<dd><p class="first">Data communication between the server and the client is done via websockets. Detailed in the <a class="reference internal" href="API.html"><em>Language API</em></a> section. These messages form the majority of client/server communication. The client would use such a message to inform the server of a change in the data set, or to request some computations from the server. Clients should try to chain data messages together, to minimize on the communication overhead.</p>
-<p class="last">TODO Need to specify the exact form for these messages.</p>
-</dd>
+<dd>Data communication between the server and the client is done via websockets, using Node.js&#8217;s <tt class="docutils literal"><span class="pre">Socket.IO</span></tt> library (<a class="reference external" href="http://socket.io/">http://socket.io/</a>). The specific objects that are exchanged that way are detailed in the <a class="reference internal" href="API.html"><em>Language API</em></a> section. These messages form the majority of client/server communication. The client would use such a message to inform the server of a change in the data set, or to request some computations from the server.</dd>
+</dl>
+<p>The following main messages will be used, beyond the standard messages for connection and disconnection:</p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">data:</th><td class="field-body">Contains a list of &#8220;data&#8221;. The format of the data is what is specified in the <a class="reference internal" href="API.html"><em>Language API</em></a> section.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">ok:</th><td class="field-body">Used to acknowledge receipt of a data message.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">ping:</th><td class="field-body">Used to test the connection. It can also be used by the server to communicate system information, for instance if the R process is overtaxed.</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<div class="section" id="sample-interaction">
+<h3>Sample Interaction<a class="headerlink" href="#sample-interaction" title="Permalink to this headline">¶</a></h3>
+<p>A possible example interaction could go as follows:</p>
+<ol class="arabic simple">
+<li>The user loads the client and connects. Client and server exchange <tt class="docutils literal"><span class="pre">connection</span></tt> messages.</li>
+<li>The user asks the client to load a new dataset. The client passes this dataset to the server via a <tt class="xref std std-token docutils literal"><span class="pre">data</span></tt> message. The server replies with an <tt class="xref std std-token docutils literal"><span class="pre">ok</span></tt> message. It also passes that dataset to RServe.</li>
+<li>At the same time, the client, anticipating the user&#8217;s needs, prepares an object for computing some numerical summaries, and another object to ask for a graph. Those stay in a queue in the client.</li>
+<li>When the client receives the <tt class="xref std std-token docutils literal"><span class="pre">ok</span></tt> from the server on its first <tt class="xref std std-token docutils literal"><span class="pre">data</span></tt> message, it sends a <tt class="xref std std-token docutils literal"><span class="pre">data</span></tt> message with the numerical summaries request. The server sends this request to RServe for processing, and in the meantime replies with an <tt class="xref std std-token docutils literal"><span class="pre">ok</span></tt> message to the client, acknowledging receipt of the message.</li>
+<li>The client now sends a <tt class="xref std std-token docutils literal"><span class="pre">data</span></tt> message to the server, with the graph object request. The server passes this over to RServe and replies with an <tt class="xref std std-token docutils literal"><span class="pre">ok</span></tt> message to the client.</li>
+<li>In the meantime, RServe has finished the numerical summaries computations, and sends them to the server. The server then sends this summaries object to the client in a <tt class="xref std std-token docutils literal"><span class="pre">data</span></tt> message. It has also heard from RServe on the graph, and adds that to a queue.</li>
+<li>The client receives the <tt class="xref std std-token docutils literal"><span class="pre">data</span></tt> message with the numerical summaries, replies with an <tt class="xref std std-token docutils literal"><span class="pre">ok</span></tt> message, and posts those summaries in the interface for the user to see (or keeps them around if the user hasn&#8217;t asked for them yet).</li>
+<li>When the server receives the <tt class="xref std std-token docutils literal"><span class="pre">ok</span></tt> message from the client, it finds the graph object in its queue and sends that in a <tt class="xref std std-token docutils literal"><span class="pre">data</span></tt> message to the client. The client replies with an <tt class="xref std std-token docutils literal"><span class="pre">ok</span></tt>.</li>
+<li>Finding his queue empty, the server sends nothing back.</li>
+<li>Every so often (20-30 seconds?), the client sends a <tt class="xref std std-token docutils literal"><span class="pre">ping</span></tt> message to the server. The server replies with a <tt class="xref std std-token docutils literal"><span class="pre">ping</span></tt> message, and at the same time contacts RServe on behalf of the user with a similar ping message. It then sends a second <tt class="xref std std-token docutils literal"><span class="pre">ping</span></tt> to the client when it hears back from RServe. The client uses those messages to estimate latency and update the login UI with that information.</li>
+</ol>
+</div>
+</div>
+<div class="section" id="server-components">
+<h2>Server Components<a class="headerlink" href="#server-components" title="Permalink to this headline">¶</a></h2>
+<p>These are the server components that need implementation:</p>
+<dl class="docutils">
+<dt><strong class="program">Rserve-client.js</strong></dt>
+<dd>A Javascript Client for RServe. This would be a Node.js module. It should have the ability to manage different users contacting RServe.</dd>
+<dt><strong class="program">panthr2r</strong></dt>
+<dd>A conversion library. It should convert PanthR Objects to R Objects, and vice versa. This would be another Node.js Javascript module.</dd>
+<dt><strong class="program">PanthR.r</strong></dt>
+<dd>An R library to implement concrete functions for the &#8220;high level&#8221; structures in the PanthR API.</dd>
+<dt><strong class="program">PanthR-server</strong></dt>
+<dd>The main Node.js application, built using Express. It authenticates users, connects to a persistent data store (MongoDB/Redis) to keep user settings and workspace info. Uses Socket.IO to exchange data messages with the clients. Uses Rserve-client.js to ask RServe for information.</dd>
 </dl>
 </div>
 </div>
@@ -147,9 +189,11 @@
 <li class="toctree-l1"><a class="reference internal" href="Client.html">Web Client</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Web Server</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#requests-served">Requests Served</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#server-components">Server Components</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="PanthR-org.html">www.panthr.org</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technologies.html">Technologies used</a></li>
 </ul>
 
           <h3 style="margin-top: 1.5em;">Search</h3>
