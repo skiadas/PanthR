@@ -17,5 +17,5 @@ Here's a rough picture of the connections.
 
 Random Thoughts
 ---------------
-- Would be great to enable *shared* data sets, so changes by one client are seen by others.
+
 
