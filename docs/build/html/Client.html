@@ -61,30 +61,114 @@
 <li><dl class="first docutils">
 <dt>The main UI. It should contain:</dt>
 <dd><dl class="first last docutils">
-<dt>Login Menu</dt>
-<dd><p class="first last">Allows connecting to a background server, with optional login credentials, or offline work. Should sit in the top right of the screen.</p>
+<dt><em class="guilabel">Login Menu</em></dt>
+<dd><p class="first last">Allows connecting to a background server, or doing offline work. Should sit in a corner of the screen, possible hidden on some screen sizes, available as a small button. Should contain information about the connection&#8217;s latency.</p>
 </dd>
-<dt>Data Editor View</dt>
-<dd><p class="first last">Typical editable spreadsheet view of the data. Should offer basic sorting (and optionally filtering/searching) functionality. This should be one of several main views the user can switch to. The user should be able to hide/reorder variables.</p>
+<dt><em class="guilabel">Main View</em></dt>
+<dd><p class="first">It consists of a tabbed view. Selecting the tabs, or interacting with items changes what you see.</p>
+<dl class="last docutils">
+<dt><em class="guilabel">Breadcrumbs</em></dt>
+<dd><p class="first">At the top of the Main window a breadcrumb view could allow navigation to different levels, starting at the top Workspace level.</p>
+<p>For example, when examining a specific variable, those breadcrumbs might show: &#8220;Workspace &gt; Objects &gt; MyDataset1 &gt; MyVariable2&#8221;. The main view would then turn into the Variable View to show information about the variable. If the user clicks on the &#8220;MyDataset1&#8221; breadcrumb, a thumbnail grid or outline view of all the set&#8217;s variables would appear, or alternatively a summary sheet for the dataset. If he clicked the Objects, then a thumbnail grid view of all the top level objects would show up. If he clicked on Workspace, he might be presented with general information on the objects and reports/outputs that are part of this Workspace, and could dig further in by selecting the appropriate type.</p>
+<p class="last">In sort, it&#8217;s a way to move up the &#8220;Workspace -&gt; Dataset -&gt; Variable&#8221; hierarchy. An alternative interface would be to simply implement a &#8220;go up a level&#8221; button, but the breadcrumbs have the advantage of showing us where we are in the hierarchy.</p>
 </dd>
-<dt>Summary View</dt>
-<dd><p class="first last">Provides brief summary of the data set, e.g. descriptives of each variable. This should be one of several main views the user can switch to. Probably use the List Inlay pattern.</p>
+<dt><em class="guilabel">Action menu</em></dt>
+<dd><p class="first">The bottom of the Main View could perhaps contain an Action menu, a list of buttons that would perform the actions required, and would perhaps change depending on the view. This should allow users to perform many of the operations without having to open the main menu.</p>
+<p class="last">The following two are the &#8220;tabs&#8221; one can choose from. Each of those tab views would appear different depending on what kind of object it was showing. Some of the combinations might be redundant.</p>
 </dd>
-<dt>Active Element Info</dt>
-<dd><p class="first last">Shows information on the currently selected column and element. E.g. basic variable summaries, z-scores for that value within its column, basic graph, etc. This should probably be optional.</p>
+<dt><em class="guilabel">Edit View</em></dt>
+<dd><p class="first">This is a form that allows &#8220;editing&#8221; of the object.</p>
+<ul class="last simple">
+<li>For a dataset this would be a standard spreadsheet view of the data. Should offer basic sorting (and optionally filtering/searching) functionality, and any entry would be editable.</li>
+<li>For a variable, this would offer on one side a long column view of the variable&#8217;s values, and on the other parameters that could be set for the variable, e.g. the type of the variable, number of decimal points to show, dollar signs in front, date format etc. It would contain a table with the values and their frequencies, as well as value labels for them, and this would be editable. If space permits, in a corner, a small summary of the variable might be visible (mean/st.dev, a graph etc).</li>
+<li>For an output/report, this would be the dialog for the output, allowing edits/additions etc.</li>
+<li>For a workspace, this would allow the user to rename the workspace, export it, create a new one etc. It would provide lists of objects and outputs that are in the workspace, and the user could delete/add objects, combine objects, create a new workspace from a subset of the objects etc.</li>
+<li>For filters, this would be essentially the edit window used to specify what the filter does.</li>
+</ul>
 </dd>
-<dt>Application Menu</dt>
-<dd><p class="first last">Typical menu where users can select commands to execute. Consider using Fat Menus. Would probably contain the following menus:
-- File: New, Open, Save, Import, Export
-- Data: New Variable, New Filter
-- Reports: Graph, Table, Test
-- Settings: Graph, Table, Test, Save, Load</p>
+<dt><em class="guilabel">Summary View</em></dt>
+<dd><p class="first">Provides summary of the object. &#8220;summary&#8221; might not be the correct word. Examples:</p>
+<ul class="simple">
+<li>For a dataset, this would be either a list of the variables with minimal info about them, or a thumbnail grid of the variables with minimal info about them. User would be able to select variables and act on them to generate reports. It may also contain somewhere summary information about the dataset, like number of variables, number of rows, other peripheral info about the dataset.</li>
+<li>For a variable, this could contain a small table of statistics, coupled with an interactive graph of the variable.</li>
+<li>For an output/report, this would be the visual result for the report, graph, table whatnot. For tests, it maybe contain some diagnostic graphs.</li>
+<li>One should be able to get a Summary View of all outputs/reports. This would be a thumbnail view or outline view, that would allow you to see all reports at once, select multiple reports for mass exporting etc.</li>
+<li>For a workspace, this would provide a thumbnail view or outline view of the objects and reports in it. Very similar to the Edit View for workspaces.</li>
+<li>One should also be able to get a Summary View of all Workspaces. They would use it to for instance switch to a new workspace, set a default workspace, delete a no-longer needed workspace, etc.</li>
+<li>There could be a thumbnail/outline view of all filters.</li>
+</ul>
+<p class="last">Perhaps instead of &#8220;Summary&#8221; view we could have &#8220;Outline&#8221; vs &#8220;Thumbnail&#8221; views as different tab options. Though those make less sense for outputs/reports.</p>
 </dd>
-<dt>Filters List</dt>
-<dd><p class="first last">Contains information about all filters on the data. Includes both active and non/active filters. Users can activate/deactivate filters, create new filters, remove existing filters, rename filters. Filters would be expressions that select a subset of rows. Probably implemented by a List Inlay pattern.</p>
+</dl>
 </dd>
-<dt>Reports List</dt>
-<dd><p class="first last">List Inlay of the selected reports for this dataset. Each report can be clicked for a bigger version, saved/exported. Ideally should be able to set some custom settings on it. Reports can be Graphs, Tables, Tests.</p>
+<dt><em class="guilabel">Sidebar</em></dt>
+<dd><p class="first">The sidebar is a customizable view that the user may choose to hide or show, on which he/she can add &#8220;components&#8221;. Each component is essentially duplicating a feature that could have been present in the main view. A user should be able to get their work done even in the absence of the sidebar.</p>
+<p>Here&#8217;s a list of possible &#8220;components&#8221;:</p>
+<ul class="last simple">
+<li>Objects list</li>
+<li>Outputs list</li>
+<li>Filters list</li>
+<li>Summary (shows a summary of active element)</li>
+<li>Graph (shows a graph of active element)</li>
+<li>Smart preview</li>
+</ul>
+</dd>
+<dt><em class="guilabel">Application Menu</em></dt>
+<dd><p class="first">Typical menu where users can select commands to execute. Consider using Fat Menus. Could either be activated by one button, or provide the first level of menus as a list.</p>
+<p>Possible menus:</p>
+<ul class="last">
+<li><dl class="first docutils">
+<dt>Workspace   (Perhaps should be merged with File)</dt>
+<dd><ul class="first last simple">
+<li>Import</li>
+<li>Export</li>
+<li>New</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>File  (Used to load/save datasets or possibly individual variables)</dt>
+<dd><ul class="first last simple">
+<li>Import</li>
+<li>Export</li>
+<li>New</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Data</dt>
+<dd><ul class="first last simple">
+<li>Add...  (New variables, new Filters)</li>
+<li>Merge</li>
+<li>Reshape</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Report</dt>
+<dd><ul class="first last simple">
+<li>Descriptive</li>
+<li>Test</li>
+<li>Graph</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Settings</dt>
+<dd><ul class="first last simple">
+<li>Interface</li>
+<li>Descriptive</li>
+<li>Test</li>
+<li>Graph</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
 </dd>
 </dl>
 </dd>
@@ -105,6 +189,8 @@
 <li class="toctree-l1"><a class="reference internal" href="API.html">Language API</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Web Client</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Server.html">Web Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PanthR-org.html">www.panthr.org</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technologies.html">Technologies used</a></li>
 </ul>
 
           <h3 style="margin-top: 1.5em;">Search</h3>

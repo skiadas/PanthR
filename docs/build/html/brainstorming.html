@@ -60,17 +60,14 @@
 <p>PanthR consists of 3 logical components:</p>
 <ul class="simple">
 <li>A <a class="reference internal" href="Client.html"><em>Web Client</em></a> written in Javascript. This client utilizes web workers to manage dataset computations. It manages datasets, graphs and other reports. It can work &#8220;offline&#8221;, or by linking to a web server.</li>
-<li>A <a class="reference internal" href="Server.html"><em>Web Server</em></a> that locally connects to a local R server. The server receives client requests, creates a separate &#8220;id&#8221; for each client, delegates tasks to the R server, and sends results back to the client. Multiple organizations can run private or public servers, providing size limits for how many clients they can serve. The main page of the PanthR project should keep a list of all those &#8220;public mirrors&#8221;, allowing clients to choose which mirror to try to connect to. Ideally <cite>Servers</cite> should be implemented in multiple programming languages, to suit the needs of each institution&#8217;s IT department.</li>
+<li>A <a class="reference internal" href="Server.html"><em>Web Server</em></a> that locally connects to a local R server. The server receives client requests, creates a separate &#8220;id&#8221; for each client, delegates tasks to the R server, and sends results back to the client. Multiple organizations can run a server, providing size limits for how many users they can serve. The main page of the PanthR project should keep a list of all those &#8220;mirrors&#8221;, allowing users to connect to a mirror closer to them.</li>
 <li>An established <a class="reference internal" href="API.html"><em>Language API</em></a> for the communication between client and server. This interface should contain a rich enough syntax to allow the description of any typical task related to a dataset. It should probably contain a versioning system, allowing the possibility of updating the interface to offer more functionality. A client/server could then decide what level of this interface to support.</li>
-<li>A central location, <a class="reference internal" href="PanthR-org.html"><em>www.panthr.org</em></a>, to act effectively as a distribution center.</li>
+<li>A central location, <a class="reference internal" href="PanthR-org.html"><em>www.panthr.org</em></a>, to act effectively as a distribution center. At this stage of the project, we ill have only one server and it will act as the distribution center as well.</li>
 </ul>
 <p>Here&#8217;s a rough picture of the connections.</p>
 <img alt="https://docs.google.com/drawings/d/17r-9nYO2rvgvkjlTy9jkZOWDJKfFrZVpADurVDZ95-s/pub?w=480&amp;h=360" src="https://docs.google.com/drawings/d/17r-9nYO2rvgvkjlTy9jkZOWDJKfFrZVpADurVDZ95-s/pub?w=480&amp;h=360" />
 <div class="section" id="random-thoughts">
 <h2>Random Thoughts<a class="headerlink" href="#random-thoughts" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>Would be great to enable <em>shared</em> data sets, so changes by one client are seen by others.</li>
-</ul>
 </div>
 </div>
 
@@ -90,6 +87,7 @@
 <li class="toctree-l1"><a class="reference internal" href="Client.html">Web Client</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Server.html">Web Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="PanthR-org.html">www.panthr.org</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technologies.html">Technologies used</a></li>
 </ul>
 
           <h3 style="margin-top: 1.5em;">Search</h3>
