@@ -1,107 +1,147 @@
 Structures
 ==========
 
-Structures are used to store information. They all contain the ``name`` key, which is used to refer to them from other variables. Internally, all these structures should be following an "observable" pattern, so other entities can be notified of any changes. This information does not have to be part of the published API though.
+Structures are used to store information. 
 
-:vector:
-    Typical building block, represents a variable. Vectors can be either "static", where a list of *values* is specified, or "dynamic" where a process for computing them is provided. Vectors would contain the following keys:
+Internally, most if not all of these structures should be following an "observable" pattern, so other entities can be notified of any changes. This information does not have to be part of the published API though. Structures are split into many subgroups.
 
-    :name:
-        Name for the variable. Need to specify rules for how this is converted to a valid R variable name.
-    :label:
-        Longer name for the variable. Used on graphs and tables. *Optional*
-    :values:
-        An array of the vector's values, used for static variables. How they are interpreted depends on the vector's type. These values will be strings in the case of nominal variables only, otherwise they are numeric. Empty, undefined and null values are all treated as missing values. *A vector needs to have either* values *or* formula *specified.* Alternatively, all vectors could be values, but some could have a formula attribute that could be accessed to recompute a variable or simply remind the user how the values were computed.
-    :formula:
-        Used for dynamically computed vectors. Should be a string representing a function that would compute the variable. Should spell out in a different section the allowed operators/functions.
-    :formula_native:
-        Should be used by the different implementations for holding a "compiled" version of the function computing the variable. Should be ignored during data transfer.
-    :missing:
-        An array of values that will be treated as missing values. *Optional*
-    :type:
-        The type of variable: ordinal, nominal, scalar, datetime. The type of variable determines the remaining keys:
+Data Objects
+------------
+
+Data Objects are used to contain information. All sorts of information.
+
+.. _variable:
+ 
+Variable
+++++++++
+
+Represents a variable/vector. Variables can be either "static", where a list of *values* is specified, or "dynamic" where a process for computing them is provided (see :doc:`Commands`). Variables may be on their own or appear inside a dataset.
+
+Variables would contain the following keys:
+
+:values:
+    An array of the variable's values, used for static variables. How they are interpreted depends on the variable's "mode". These values will be strings in the case of nominal variables only, otherwise they are numeric. Empty, undefined and null values are all treated as missing values. In case where a variable is specified by a formula, this field may be initially empty, but it will be filled using the formula. In their implementation, formula-based variables need to  observe the objects involved in their formula, and recompute themselves when those objects are altered.
+
+:formula:
+    Used for dynamically computed variables. Should be a :doc:`Command <Commands>` object.
+
+:formula_native:
+    Should be used by the different implementations for holding a "compiled" version of the function computing the variable. Should be ignored during data transfer. Probably doesn't even need to be mentioned in the API.
+
+:missing:
+    An array of values that will be treated as missing values. *Optional*. Perhaps instead of allowing an array of missing values, we would allow the user to designate some values as missing and then actually replace them with null values.
+
+:mode:
+    The type of variable: string, ordinal, nominal, scalar, datetime. The type of variable determines the remaining keys:
+
+    ``string``:
+        No extra fields needed.
+        
+    ``scalar``:
     
-        ``scalar:``
+        :decimals:
+            Number of decimal points.
+        :format:
+            An alternative to decimal points, this would allow for scientific or currency formats. TODO: Hash out the details, use of the standard "format formats" out there.
+    
+    ``nominal``,
+    ``ordinal``:
+
+        :factors:
+            The distinct numerical values that could appear in the values array.
+        :labels:
+            An array of the value labels for the factors appearing in the values array, starting with the label for the number 1.
+    
+    ``datetime``:
+        Date/time values are internally represented as seconds from the beginning of 1970 UTC, also known as Unix Epoch.
         
-            :decimals:
-                Number of decimal points.
-        
-        ``ordinal:``
-        
-            :labels:
-                An array of the value labels for the numbers appearing in the values array, starting with the label for the number 1.
-        
-        ``datetime:``
-            Date values are represented as seconds from the beginning of 1970 UTC, also known as Unix Epoch.
+        :format:
+            A string representing how the datetime values should be formatted. Need to provide some rules here, but should probably follow a subset of C's strformat. Initial suggestion:
             
-            :timezone:
-                Need to find a way to represent this
-                
-            :format:
-                A string representing how the datetime values should be formatted. Need to provide some rules here, but should probably follow a subset of C's strformat. Initial suggestion:
-                
-                :y:
-                    Year, 2 digits
-                :Y:
-                    Year, 4 digits
-                :b:
-                    Month, abbreviated
-                :B:
-                    Month, long
-                :m:
-                    Month, numeric
-                :d:
-                    Day of month, numeric
-                :a:
-                    Weekday, abbreviated
-                :A:
-                    Weekday, full
-                :H:
-                    Hours, 24hour clock
-                :I:
-                    Hours, 12hour clock
-                :M:
-                    Minutes
-                :S:
-                    Seconds
-                :p:
-                    a.m. or p.m.
-                :others:
-                    inserted as is
+            :y:
+                Year, 2 digits
+            :Y:
+                Year, 4 digits
+            :b:
+                Month, abbreviated
+            :B:
+                Month, long
+            :m:
+                Month, numeric
+            :d:
+                Day of month, numeric
+            :a:
+                Weekday, abbreviated
+            :A:
+                Weekday, full
+            :H:
+                Hours, 24hour clock
+            :I:
+                Hours, 12hour clock
+            :M:
+                Minutes
+            :S:
+                Seconds
+            :p:
+                a.m. or p.m.
+            :others:
+                inserted as is
 
-:dataset:
-    Organizational structure to hold variable vectors together.
+    ``filter``:
     
-    :name:
-        Name of the data set
-    :label:
-        Used in graphs/tables/tests
-    :variables:
-        Array of the variable vectors in the dataset. Could contain either the objects themselves or the names of the variables.
-    :filters:
-        Array of the names of filters currently active in the dataset.
+        These are boolean valued variables, that are treated separately. See :ref:`filter`.
 
-:filter:
-    Filters are expressions that can be used to select a subset of the rows in the dataset.
-    
-    :name:
-        Name for the filter, that can be used to refer to it.
-    :label:
-        Used on visualizations of the filter.
-    :variables:
-        Array of names of the variables involved in this filter's formula
-    :formula:
-        A string describing a boolean-valued function determining the rows to be filtered.
-    :formula_native:
-        A native implementation of the formula. Not for transmission.
+Dataset
++++++++
 
-:report:
+Simply holds equal length variables together.
+
+:variables:
+    Array of the variable vectors in the dataset. Could contain either the objects themselves or the names of the variables.
+:rownames:
+    Optional string variable to use as row names.
+:filters:
+    Array of the names of filters currently active in the dataset.
+
+List
+++++
+
+Should only be used in a case where variables of unequal length should be grouped together. Ideally we shouldn't need to use lists much.
+
+
+Workspace
++++++++++
+
+Not strictly speaking a Data Object per se. Workspaces are used to encompass multiple other objects that form a coherent project whole. Whenever a user creates a new object, it's added to the current workspace.
+
+:objects:
+    A list of the objects contained in this Workspace.
+:next_hash:
+    The next available number to be used as a hash. Should start with the value 1 for a new Workspace, and increment by 1 for every new object created.
+
+Document
+++++++++
+
+Placed here for future implementations, or if we have time/inclination. A document would be a character string which can be thought of as constituting a "paper". It would be the analog of Sweave in our case. Imagine a document written using reStructuredText or Markdown, with specific "directives" in it to include math equations, graphs, tables, variable values etc. In future versions (or maybe simply later in the process) we could have a small "editor" in place, where users could generate a "lab report" related to their data. This can be converted to a Word document, or PDF, HTML, or be sent straight to a printer etc.
+
+    :attachments:
+        For the case of self-contained documents, i.e. those not part of a Workspace but exported on their own, the attachments part would include the appropriate objects to interpret the directives in the document. It will be a list of key-value pairs, the keys being the names of the objects. For instance if a graph is included in the document, the exact image of the graph should be provided in the attachments.
+
+.. _filter:
+
+Filter
+++++++
+    Filters are expressions that can be used to select a subset of the rows in the dataset. A filter is essentially a :ref:`variable` with boolean values. It shares the same keys as variable.
+
+Result Objects
+--------------
+
+These objects are used to store all kinds of results: Tables, descriptive statistics, graphs etc. More so, they contain not just the results, but enough information to reproduce the results. The dialog for creating such an object can be generated from the object itself.
+
+Report
+++++++
     A report of descriptives or frequencies for a part of the dataset. TODO: Need to add some examples of the report syntax.
     
-    :name:
-        Name of the table, used to refer to it internally.
-    :label:
-        Visual title for the table.
     :type:
         The type of report. We need to expand on this. For now: ``frequency``, ``descriptives``. The remaining keys partly depend on the type.
     :variables:
@@ -111,16 +151,14 @@ Structures are used to store information. They all contain the ``name`` key, whi
     :targets:
         Array of expressions to be used for producing the table's columns. Each expression can be either a variable, in which case the appropriate values from that variable are added together to produce the column's values, or an object with a single key. The key is used as the name for the column, while the key's value is a function whose evaluation produces the column's value.
 
-:test:
+Test
+++++
     A structure containing information about a performed statistical test. TODO: Add its fields
 
-:graph:
+Graph
++++++
     Generic structure representing graphs.
     
-    :name:
-        Used internally.
-    :label:
-        Graph Title.
     :type:
         Principal type of graph. Other components can be added, but this determines the basic look. Possible types: ``scatter``, ``bar``, ``dot``, ``box``, ``hist``, ``quantile``. Should add more in the future.
     :variables:
@@ -151,7 +189,7 @@ Structures are used to store information. They all contain the ``name`` key, whi
     These are individual components to be tacked on existing graphs.
     
     :type:
-        One of: ``grid``, ``abline``, ``legend``, ``fit``, ``labels``. Possibly should add more. The remaining options depend on the type.
-    TODO
+        One of: ``grid``, ``abline``, ``legend``, ``fit``, ``labels``. Possibly should add more. The remaining options depend on the type. TODO
+
 
 TODO: Maybe add structures to hold textual information, and "document" type structures. People should be able to create reports right there and then, given the appropriate interface.
