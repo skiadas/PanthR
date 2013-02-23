@@ -1,0 +1,385 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Structures &mdash; PanthR 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="PanthR 1.0 documentation" href="index.html" />
+    <link rel="up" title="Language API" href="API.html" />
+    <link rel="next" title="Commands" href="Commands.html" />
+    <link rel="prev" title="Language API" href="API.html" /> 
+  </head>
+  <body>
+    <div class="header-wrapper">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">PanthR 1.0 documentation</a></div>
+        <div class="rel">
+          <a href="API.html" title="Language API"
+             accesskey="P">previous</a> |
+          <a href="Commands.html" title="Commands"
+             accesskey="N">next</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="structures">
+<h1>Structures<a class="headerlink" href="#structures" title="Permalink to this headline">¶</a></h1>
+<p>Structures are used to store information.</p>
+<p>Internally, most if not all of these structures should be following an &#8220;observable&#8221; pattern, so other entities can be notified of any changes. This information does not have to be part of the published API though. Structures are split into many subgroups.</p>
+<div class="section" id="data-objects">
+<h2>Data Objects<a class="headerlink" href="#data-objects" title="Permalink to this headline">¶</a></h2>
+<p>Data Objects are used to contain information. All sorts of information.</p>
+<div class="section" id="variable">
+<span id="id1"></span><h3>Variable<a class="headerlink" href="#variable" title="Permalink to this headline">¶</a></h3>
+<p>Represents a variable/vector. Variables can be either &#8220;static&#8221;, where a list of <em>values</em> is specified, or &#8220;dynamic&#8221; where a process for computing them is provided (see <a class="reference internal" href="Commands.html"><em>Commands</em></a>). Variables may be on their own or appear inside a dataset.</p>
+<p>Variables would contain the following keys:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">values:</th><td class="field-body"><p class="first">An array of the variable&#8217;s values, used for static variables. How they are interpreted depends on the variable&#8217;s &#8220;mode&#8221;. These values will be strings in the case of nominal variables only, otherwise they are numeric. Empty, undefined and null values are all treated as missing values. In case where a variable is specified by a formula, this field may be initially empty, but it will be filled using the formula. In their implementation, formula-based variables need to  observe the objects involved in their formula, and recompute themselves when those objects are altered.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">formula:</th><td class="field-body"><p class="first">Used for dynamically computed variables. Should be a <a class="reference internal" href="Commands.html"><em>Command</em></a> object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">formula_native:</th><td class="field-body"><p class="first">Should be used by the different implementations for holding a &#8220;compiled&#8221; version of the function computing the variable. Should be ignored during data transfer. Probably doesn&#8217;t even need to be mentioned in the API.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">missing:</th><td class="field-body"><p class="first">An array of values that will be treated as missing values. <em>Optional</em>. Perhaps instead of allowing an array of missing values, we would allow the user to designate some values as missing and then actually replace them with null values.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">mode:</th><td class="field-body"><p class="first">The type of variable: string, ordinal, nominal, scalar, datetime. The type of variable determines the remaining keys:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">string</span></tt>:</dt>
+<dd><p class="first last">No extra fields needed.</p>
+</dd>
+</dl>
+<p><tt class="docutils literal"><span class="pre">scalar</span></tt>:</p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">decimals:</th><td class="field-body">Number of decimal points.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">format:</th><td class="field-body">An alternative to decimal points, this would allow for scientific or currency formats. TODO: Hash out the details, use of the standard &#8220;format formats&#8221; out there.</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">nominal</span></tt>,
+<tt class="docutils literal"><span class="pre">ordinal</span></tt>:</p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">factors:</th><td class="field-body">The distinct numerical values that could appear in the values array.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">labels:</th><td class="field-body">An array of the value labels for the factors appearing in the values array, starting with the label for the number 1.</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">datetime</span></tt>:</dt>
+<dd><p class="first">Date/time values are internally represented as seconds from the beginning of 1970 UTC, also known as Unix Epoch.</p>
+<table class="last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">format:</th><td class="field-body"><p class="first">A string representing how the datetime values should be formatted. Need to provide some rules here, but should probably follow a subset of C&#8217;s strformat. Initial suggestion:</p>
+<table class="last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">y:</th><td class="field-body">Year, 2 digits</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Y:</th><td class="field-body">Year, 4 digits</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">b:</th><td class="field-body">Month, abbreviated</td>
+</tr>
+<tr class="field-even field"><th class="field-name">B:</th><td class="field-body">Month, long</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">m:</th><td class="field-body">Month, numeric</td>
+</tr>
+<tr class="field-even field"><th class="field-name">d:</th><td class="field-body">Day of month, numeric</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">a:</th><td class="field-body">Weekday, abbreviated</td>
+</tr>
+<tr class="field-even field"><th class="field-name">A:</th><td class="field-body">Weekday, full</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">H:</th><td class="field-body">Hours, 24hour clock</td>
+</tr>
+<tr class="field-even field"><th class="field-name">I:</th><td class="field-body">Hours, 12hour clock</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">M:</th><td class="field-body">Minutes</td>
+</tr>
+<tr class="field-even field"><th class="field-name">S:</th><td class="field-body">Seconds</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">p:</th><td class="field-body">a.m. or p.m.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">others:</th><td class="field-body">inserted as is</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd>
+</dl>
+<p><tt class="docutils literal"><span class="pre">filter</span></tt>:</p>
+<blockquote class="last">
+<div><p>These are boolean valued variables, that are treated separately. See <a class="reference internal" href="#filter"><em>Filter</em></a>.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="dataset">
+<h3>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h3>
+<p>Simply holds equal length variables together.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">variables:</th><td class="field-body">Array of the variable vectors in the dataset. Could contain either the objects themselves or the names of the variables.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">rownames:</th><td class="field-body">Optional string variable to use as row names.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">filters:</th><td class="field-body">Array of the names of filters currently active in the dataset.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="list">
+<h3>List<a class="headerlink" href="#list" title="Permalink to this headline">¶</a></h3>
+<p>Should only be used in a case where variables of unequal length should be grouped together. Ideally we shouldn&#8217;t need to use lists much.</p>
+</div>
+<div class="section" id="workspace">
+<h3>Workspace<a class="headerlink" href="#workspace" title="Permalink to this headline">¶</a></h3>
+<p>Not strictly speaking a Data Object per se. Workspaces are used to encompass multiple other objects that form a coherent project whole. Whenever a user creates a new object, it&#8217;s added to the current workspace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">objects:</th><td class="field-body">A list of the objects contained in this Workspace.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">next_hash:</th><td class="field-body">The next available number to be used as a hash. Should start with the value 1 for a new Workspace, and increment by 1 for every new object created.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="document">
+<h3>Document<a class="headerlink" href="#document" title="Permalink to this headline">¶</a></h3>
+<p>Placed here for future implementations, or if we have time/inclination. A document would be a character string which can be thought of as constituting a &#8220;paper&#8221;. It would be the analog of Sweave in our case. Imagine a document written using reStructuredText or Markdown, with specific &#8220;directives&#8221; in it to include math equations, graphs, tables, variable values etc. In future versions (or maybe simply later in the process) we could have a small &#8220;editor&#8221; in place, where users could generate a &#8220;lab report&#8221; related to their data. This can be converted to a Word document, or PDF, HTML, or be sent straight to a printer etc.</p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">attachments:</th><td class="field-body">For the case of self-contained documents, i.e. those not part of a Workspace but exported on their own, the attachments part would include the appropriate objects to interpret the directives in the document. It will be a list of key-value pairs, the keys being the names of the objects. For instance if a graph is included in the document, the exact image of the graph should be provided in the attachments.</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="filter">
+<span id="id2"></span><h3>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div>Filters are expressions that can be used to select a subset of the rows in the dataset. A filter is essentially a <a class="reference internal" href="#variable"><em>Variable</em></a> with boolean values. It shares the same keys as variable.</div></blockquote>
+</div>
+</div>
+<div class="section" id="result-objects">
+<h2>Result Objects<a class="headerlink" href="#result-objects" title="Permalink to this headline">¶</a></h2>
+<p>These objects are used to store all kinds of results: Tables, descriptive statistics, graphs etc. More so, they contain not just the results, but enough information to reproduce the results. The dialog for creating such an object can be generated from the object itself.</p>
+<div class="section" id="report">
+<h3>Report<a class="headerlink" href="#report" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>A report of descriptives or frequencies for a part of the dataset. TODO: Need to add some examples of the report syntax.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">type:</th><td class="field-body">The type of report. We need to expand on this. For now: <tt class="docutils literal"><span class="pre">frequency</span></tt>, <tt class="docutils literal"><span class="pre">descriptives</span></tt>. The remaining keys partly depend on the type.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">variables:</th><td class="field-body">Array of names of one or more variables that the report refers to. Used to determine the variables on the rows of the table.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">panel_variables:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Array of names of variables to be used as panel variables. A separate table will be created for each category combination from these variables.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">targets:</th><td class="field-body">Array of expressions to be used for producing the table&#8217;s columns. Each expression can be either a variable, in which case the appropriate values from that variable are added together to produce the column&#8217;s values, or an object with a single key. The key is used as the name for the column, while the key&#8217;s value is a function whose evaluation produces the column&#8217;s value.</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="test">
+<h3>Test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div>A structure containing information about a performed statistical test. TODO: Add its fields</div></blockquote>
+</div>
+<div class="section" id="graph">
+<h3>Graph<a class="headerlink" href="#graph" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>Generic structure representing graphs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">type:</th><td class="field-body"><p class="first">Principal type of graph. Other components can be added, but this determines the basic look. Possible types: <tt class="docutils literal"><span class="pre">scatter</span></tt>, <tt class="docutils literal"><span class="pre">bar</span></tt>, <tt class="docutils literal"><span class="pre">dot</span></tt>, <tt class="docutils literal"><span class="pre">box</span></tt>, <tt class="docutils literal"><span class="pre">hist</span></tt>, <tt class="docutils literal"><span class="pre">quantile</span></tt>. Should add more in the future.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">variables:</th><td class="field-body"><p class="first">A vector of 2 names of variables to be used for the x and y axes respectively. If a third variable is present, it will be used a a grouping variable.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">panel_variables:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first">Array of names of variables used to create separate panels. First entry represents column panels, second entry row panels, higher entries produce multiple graphs. Use NULL to skip entries.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">xaxis:</th><td class="field-body"><p class="first">Object representing details of the x-axis, to overwrite default choices. The defautl options are determined from the variable representing the x-axis. Possible keys:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">label:</th><td class="field-body">Used to overwrite the x-axis label.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">limits:</th><td class="field-body">Vector of length 2 containing explicit range endpoints.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">ticks:</th><td class="field-body">Either a vector containing the tick points or an object containing <tt class="docutils literal"><span class="pre">values</span></tt> and <tt class="docutils literal"><span class="pre">labels</span></tt>.</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">yaxis:</th><td class="field-body"><p class="first">Same as <tt class="docutils literal"><span class="pre">xaxis</span></tt>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">components:</th><td class="field-body"><p class="first">An array of extra &#8220;components&#8221; to add. Each array entry should be a <tt class="docutils literal"><span class="pre">graph_comp</span></tt>.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">graph_settings:</th><td class="field-body"><p class="first last">A <tt class="docutils literal"><span class="pre">graph_settings</span></tt> object, sets parameters for colors, line widths, lengths etc.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">graph_settings:</th><td class="field-body"><p class="first">TODO</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">graph_comp:</th><td class="field-body"><p class="first">These are individual components to be tacked on existing graphs.</p>
+<table class="last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">type:</th><td class="field-body">One of: <tt class="docutils literal"><span class="pre">grid</span></tt>, <tt class="docutils literal"><span class="pre">abline</span></tt>, <tt class="docutils literal"><span class="pre">legend</span></tt>, <tt class="docutils literal"><span class="pre">fit</span></tt>, <tt class="docutils literal"><span class="pre">labels</span></tt>. Possibly should add more. The remaining options depend on the type. TODO</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p>TODO: Maybe add structures to hold textual information, and &#8220;document&#8221; type structures. People should be able to create reports right there and then, given the appropriate interface.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          <h3>Table Of Contents</h3>
+          <ul>
+<li class="toctree-l1"><a class="reference internal" href="brainstorming.html">PanthR Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="API.html">Language API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Client.html">Web Client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Server.html">Web Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PanthR-org.html">www.panthr.org</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technologies.html">Technologies used</a></li>
+</ul>
+
+          <h3 style="margin-top: 1.5em;">Search</h3>
+          <form class="search" action="search.html" method="get">
+            <input type="text" name="q" />
+            <input type="submit" value="Go" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+            Enter search terms or a module, class or function name.
+          </p>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <a href="API.html" title="Language API"
+             >previous</a> |
+          <a href="Commands.html" title="Commands"
+             >next</a> |
+          <a href="genindex.html" title="General Index"
+             >index</a>
+            <br/>
+            <a href="_sources/Structures.txt"
+               rel="nofollow">Show Source</a>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer">
+        &copy; Copyright 2013, PanthR Group.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>
