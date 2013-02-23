@@ -4,14 +4,14 @@ Language API
 Data communication takes place in JSON format. Each JSON object needs to contain the following keys:
 
     :id:
-        The established id for the client.
-    :commands:
-        An array of one more more objects, each representing a "command". The various available commands listed below.
-        We need to arrange things so that addons can create new commands. Ideally this should be done in two levels, in Javascript as well as R.
+        The established id/hash for the client.
+    :objects:
+        An array of one more more objects, each representing an "object". The various available object listed below.
+        We need to arrange things so that addons can create new "objects". Ideally this should be done in two levels, in Javascript as well as R.
 
-Commands
+Objects
 ~~~~~~~~
-Each command has a specific list of expected keys. Any other keys will be ignored. Commands fit in two main types: Structures, and Executes. All commands are represented in the API as a JSON object, with the ``command`` key holding the command's name.
+Each object has a specific list of expected keys. Any other keys will be ignored.  All objects are represented in the API as a JSON object, with the ``type`` key holding the objects's type. Objects fit into the following broad types:
 
 Structures
 ++++++++++
