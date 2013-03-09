@@ -3,20 +3,23 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to PanthR's documentation!
-==================================
+Welcome to PanthR!
+=================
+PanthR is indented to provide a web-based free alternative to statistical software, powered by the `R language <http://www.r-project.org>`_.
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
-   brainstorming
+   Overview
    API
    Client
    Server
    PanthR-org
    technologies
+   PossibleStudentProjects
+   Settings
 
 Indices and tables
 ==================

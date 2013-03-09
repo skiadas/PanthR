@@ -57,8 +57,24 @@
             
   <div class="section" id="structures">
 <h1>Structures<a class="headerlink" href="#structures" title="Permalink to this headline">¶</a></h1>
+<p>(This is work in progress. Please sign your questions with &#64;username for easier searching) &#64;skiadas</p>
 <p>Structures are used to store information.</p>
 <p>Internally, most if not all of these structures should be following an &#8220;observable&#8221; pattern, so other entities can be notified of any changes. This information does not have to be part of the published API though. Structures are split into many subgroups.</p>
+<p>The main structures are as follows. Most user actions will result in the creation of one of those objects.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name"><a class="reference internal" href="#data-objects">Data Objects</a>:</th><td class="field-body">Used to store standard data.</td>
+</tr>
+<tr class="field-even field"><th class="field-name"><a class="reference internal" href="#output-objects">Output Objects</a>:</th><td class="field-body">Used to describe key operations. When a user wants to perform a test/create a table/make a graph, such an object is created. Transferring this object to the server will likely make the server execute the object.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name"><a class="reference internal" href="#result-objects">Result Objects</a>:</th><td class="field-body">Used inside Output Objects to store the actual output desired.</td>
+</tr>
+<tr class="field-even field"><th class="field-name"><a class="reference internal" href="#other-objects">Other Objects</a>:</th><td class="field-body">E.g. general preference settings.</td>
+</tr>
+</tbody>
+</table>
 <div class="section" id="data-objects">
 <h2>Data Objects<a class="headerlink" href="#data-objects" title="Permalink to this headline">¶</a></h2>
 <p>Data Objects are used to contain information. All sorts of information.</p>
@@ -77,6 +93,28 @@
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">formula_native:</th><td class="field-body"><p class="first">Should be used by the different implementations for holding a &#8220;compiled&#8221; version of the function computing the variable. Should be ignored during data transfer. Probably doesn&#8217;t even need to be mentioned in the API.</p>
+<ul>
+<li><dl class="first docutils">
+<dt>Could use some clarification. Does this refer to the fact that the formulas will differ between R and javascript? &#64;altermattw</dt>
+<dd><ul class="first">
+<li><p class="first">Yes this needs to be reworked a bit based on my thoughts after writing a lot of the commands section. But the main thinking is this: variables constructed from some combination of other variables will tend to be nested JSON objects. That object would be fed into a simple parser to create a function that given some inputs for the parameters would compute the variable. For example something like adding three variables would in the API be converted to an object like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">TargetVariablesName</span><span class="p">,</span>
+    <span class="n">values</span><span class="p">:</span> <span class="n">CachedArrayOfComputedValues</span><span class="p">,</span>
+    <span class="n">formula</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="s">&quot;add&quot;</span><span class="p">,</span>
+        <span class="n">arguments</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;var1Name&quot;</span><span class="p">,</span> <span class="s">&quot;var2Name&quot;</span><span class="p">,</span> <span class="s">&quot;var3Name&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p class="last">A parser could turn that into a function that would be computing the resulting variable from those incoming ones. On the R end this could be as easy as &#8220;var1Name + var2Name + var3Name&#8221;. We want to avoid having to revisit the parser if one of the values in var1Name changes. &#64;skiadas</p>
+</dd>
+</dl>
+</li>
+</ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">missing:</th><td class="field-body"><p class="first">An array of values that will be treated as missing values. <em>Optional</em>. Perhaps instead of allowing an array of missing values, we would allow the user to designate some values as missing and then actually replace them with null values.</p>
@@ -108,7 +146,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">factors:</th><td class="field-body">The distinct numerical values that could appear in the values array.</td>
+<tr class="field-odd field"><th class="field-name">factors:</th><td class="field-body">The distinct numerical values that could appear in the values array for a nominal or ordinal factor. Both Nominal and Ordinal variables encode their values as numeric, but the order of those values only really matters for factors.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">labels:</th><td class="field-body">An array of the value labels for the factors appearing in the values array, starting with the label for the number 1.</td>
 </tr>
@@ -163,9 +201,9 @@
 </table>
 </dd>
 </dl>
-<p><tt class="docutils literal"><span class="pre">filter</span></tt>:</p>
+<p><tt class="docutils literal"><span class="pre">filter</span></tt> or <tt class="docutils literal"><span class="pre">logical</span></tt> (we should settle on a name):</p>
 <blockquote class="last">
-<div><p>These are boolean valued variables, that are treated separately. See <a class="reference internal" href="#filter"><em>Filter</em></a>.</p>
+<div><p>These are boolean valued variables, that are treated separately. See <a class="reference internal" href="#filter">Filter</a>.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -187,6 +225,11 @@
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section" id="model">
+<h3>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h3>
+<p>Meant to represent regression models, anova models, repeated measures models etc. We should probably be using R&#8217;s formula paradigm for our models.</p>
+<p>TODO: Fill in details here. Determine how this should interact with tests</p>
 </div>
 <div class="section" id="list">
 <h3>List<a class="headerlink" href="#list" title="Permalink to this headline">¶</a></h3>
@@ -219,61 +262,406 @@
 </tbody>
 </table>
 </div></blockquote>
+<ul class="simple">
+<li>The &#8220;model&#8221; level (referring to the data-model-view hierarchy) of statistical results could be designed so that all output except plot images are represented in a &#8220;document&#8221; format that could be accessed with an editor. Most results would be very simple documents: a title, and then the output, usually printed as a table. But a user could edit the output to add notes.</li>
+<li>Feature: If a user drags one result (e.g., a table) onto another result (e.g., output from a regression), a document is created which contains both of those. The user can add his/her own text.  Additional objects can be dragged into the document. (&#64;altermattw)</li>
+</ul>
 </div>
 <div class="section" id="filter">
 <span id="id2"></span><h3>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<div>Filters are expressions that can be used to select a subset of the rows in the dataset. A filter is essentially a <a class="reference internal" href="#variable"><em>Variable</em></a> with boolean values. It shares the same keys as variable.</div></blockquote>
+<p>Filters are expressions that can be used to select a subset of the rows in the dataset. A filter is essentially a <a class="reference internal" href="#variable">Variable</a> with boolean values. It shares the same keys as variable.</p>
 </div>
 </div>
-<div class="section" id="result-objects">
-<h2>Result Objects<a class="headerlink" href="#result-objects" title="Permalink to this headline">¶</a></h2>
-<p>These objects are used to store all kinds of results: Tables, descriptive statistics, graphs etc. More so, they contain not just the results, but enough information to reproduce the results. The dialog for creating such an object can be generated from the object itself.</p>
-<div class="section" id="report">
-<h3>Report<a class="headerlink" href="#report" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<div><p>A report of descriptives or frequencies for a part of the dataset. TODO: Need to add some examples of the report syntax.</p>
+<div class="section" id="output-objects">
+<span id="output-object"></span><h2>Output Objects<a class="headerlink" href="#output-objects" title="Permalink to this headline">¶</a></h2>
+<p>Output Objects contain all the necessary information to generate a dialog box for a type of output, as well as to construct the resulting output. They do not contain the actual result. But they do all contain a <tt class="docutils literal"><span class="pre">result</span></tt> key which holds the result structure as a <a class="reference external" href="result_object">Result Object</a>. This key will be omitted in the descriptions below.</p>
+<ul>
+<li><dl class="first docutils">
+<dt>Question: How do <em>Output Objects</em> differ from <em>Commands</em>? &#64;altermattw</dt>
+<dd><ul class="first last simple">
+<li>An Output Objects can almost be called Dialog Objects; they essentially hold the information of what kind of result the user is trying to obtain, and ways to go back to the menu that created that object. <em>Commands</em> are more like everyday functions, like those you would find on the right side of the Compute Variable menu in SPSS. You would be using commands for example inside a <a class="reference internal" href="#descriptive">Descriptive</a> object to specify what descriptives you want to show. To put it another way, most if not all of the Commands belong to the jsstats library, while Output Objects are more tied to the UI. &#64;skiadas</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Question: Because Result Objects are stored inside of Output Objects, it seems like a primary function of an Output Object <em>is</em> to contain the results of a dialog. It also contains the dialog entries that produced the results, so that a user could click on the result and be given the option of recalling the dialog to make changes. So perhaps its two primary functions are 1) to store the results, and 2) to link the results to dialog entries to facilitate easy recall of the dialog. Because the dialog entries will logically correspond directly to a command that will generate the results, the Output Object could also be considered to store those commands. &#64;altermattw</dt>
+<dd><ul class="first last simple">
+<li>Yes perhaps we don&#8217;t need Result Objects at all, and maybe we can attach the various &#8220;export&#8221; and print functionality to Output Objects instead. What I was thinking was along the lines that for instance both Crosstabs and Descriptive objects would have the same Result Object, a Tabular object, and that object would know how to present itself in html code, or to export itself to Word or to a plain text format etc. Similarly while different Graph types might vary a bit on their dialog interface, the corresponding result object has an underlying function to generate the graph and knows how to use that function to create a JPG or PDF or Canvas version of the graph, how to scale it to different resolutions etc. Output Objects on the other hand are tied to the Dialogs, and deal with the components necessary to construct the function that then constructs the actual result that we see printed on the page. Maybe I&#8217;m adding an extra layer of abstraction that&#8217;s not needed there, not sure. &#64;skiadas</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>For example, an &#8220;crosstabs&#8221; output object contains information about what variables we want involved in the crosstabs table, whether we want any percentages computed, etc. The &#8220;crosstabs&#8221; result object, detailed in the next section, contains the actual table of values. A &#8220;graph&#8221; output object contains information about the components and other settings of the graph, the &#8220;graph&#8221; result object is the actual graph itself, in some image format or as a canvas object in Javascript.</p>
+<p>The ui implementations should have a way to generate a dialog out of an output object and vice versa. The server/stats implementations should have a way to construct the results object out of the output object.</p>
+<p>All outputs share some keys:</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">type:</th><td class="field-body">The type of report. We need to expand on this. For now: <tt class="docutils literal"><span class="pre">frequency</span></tt>, <tt class="docutils literal"><span class="pre">descriptives</span></tt>. The remaining keys partly depend on the type.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">variables:</th><td class="field-body">Array of names of one or more variables that the report refers to. Used to determine the variables on the rows of the table.</td>
-</tr>
 <tr class="field-odd field"><th class="field-name" colspan="2">panel_variables:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Array of names of variables to be used as panel variables. A separate table will be created for each category combination from these variables.</td>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Array of names of variables to be used as panel variables. All computations will be done separately for each multi-group defined by the values of the panel variables. A separate table will be created for each category combination from these variables.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">targets:</th><td class="field-body">Array of expressions to be used for producing the table&#8217;s columns. Each expression can be either a variable, in which case the appropriate values from that variable are added together to produce the column&#8217;s values, or an object with a single key. The key is used as the name for the column, while the key&#8217;s value is a function whose evaluation produces the column&#8217;s value.</td>
+<tr class="field-even field"><th class="field-name" colspan="2">panel_placement:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">An array of length matching the panel_variables. Each entry can be &#8220;row&#8221;, &#8220;column&#8221; or &#8220;panel&#8221; depending on whether the different group values should create different panels, or whether they would form an extension of the rows/columns. See the examples for more explanation.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">filters:</th><td class="field-body">An array of any filters to be used to select a subset of cases.</td>
 </tr>
 </tbody>
 </table>
-</div></blockquote>
-</div>
-<div class="section" id="test">
-<h3>Test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<div>A structure containing information about a performed statistical test. TODO: Add its fields</div></blockquote>
-</div>
-<div class="section" id="graph">
-<h3>Graph<a class="headerlink" href="#graph" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<div><p>Generic structure representing graphs.</p>
+<div class="section" id="crosstab">
+<h3>Crosstab<a class="headerlink" href="#crosstab" title="Permalink to this headline">¶</a></h3>
+<p>A table or possibly a series of tables, providing cross-tabular information.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">type:</th><td class="field-body"><p class="first">Principal type of graph. Other components can be added, but this determines the basic look. Possible types: <tt class="docutils literal"><span class="pre">scatter</span></tt>, <tt class="docutils literal"><span class="pre">bar</span></tt>, <tt class="docutils literal"><span class="pre">dot</span></tt>, <tt class="docutils literal"><span class="pre">box</span></tt>, <tt class="docutils literal"><span class="pre">hist</span></tt>, <tt class="docutils literal"><span class="pre">quantile</span></tt>. Should add more in the future.</p>
+<tr class="field-odd field"><th class="field-name">row_variables:</th><td class="field-body">Array of names of one or more variables used to form the rows of the table. Multiple variables will be considered as completely separate entities, just placed next to each other in the table. These are expected to be categorical (ordinal/nominal).</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">column_variables:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">Array of names of one or more variables used to form the columns of the table. Multiple variables will be considered as completely separate entities, just placed next to each other in the table. These may be ordinal/nominal or scalar. Column variables are treated differently if they are scalars. They are treated as indicating a count.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">relative:</th><td class="field-body">A nonempty array indicating whether to show counts for each combination, or whether to do percentages relative to the row variable&#8217;s values, the column variable&#8217;s values, the panels or the entire set. Possible values: &#8220;count&#8221; (default), &#8220;row&#8221;, &#8220;column&#8221;, &#8220;panel&#8221;, &#8220;dataset&#8221;. For example to show counts and row percentages, we would use <tt class="docutils literal"><span class="pre">[&quot;count&quot;,&quot;row&quot;]</span></tt>. See the examples for details.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">totals:</th><td class="field-body">Whether to include row, column and/or panel totals. A (possibly empty) array containing any of the following: &#8220;row&#8221;, &#8220;column&#8221;, &#8220;panel&#8221;, &#8220;dataset&#8221;.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="examples">
+<h4>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h4>
+<p>Consider the following dataset</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">A</th>
+<th class="head">B</th>
+<th class="head">C</th>
+<th class="head">D</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>M</td>
+<td>Y</td>
+<td>23</td>
+<td>4</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>Y</td>
+<td>12</td>
+<td>3</td>
+</tr>
+<tr class="row-even"><td>M</td>
+<td>N</td>
+<td>10</td>
+<td>6</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>N</td>
+<td>4</td>
+<td>10</td>
+</tr>
+<tr class="row-even"><td>M</td>
+<td>Y</td>
+<td>6</td>
+<td>4</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>Y</td>
+<td>3</td>
+<td>13</td>
+</tr>
+<tr class="row-even"><td>M</td>
+<td>N</td>
+<td>11</td>
+<td>16</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>Y</td>
+<td>0</td>
+<td>8</td>
+</tr>
+<tr class="row-even"><td>M</td>
+<td>Y</td>
+<td>3</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>Then a crosstabs with A as row variable, and B as column variable would produce:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="24%" />
+<col width="29%" />
+<col width="35%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="2">Table</th>
+<th class="head">B.Y</th>
+<th class="head">B.N</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td rowspan="2">A</td>
+<td>M</td>
+<td>3</td>
+<td>2</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>3</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+<p>A crosstabs with A as row variable, C and D as column variables, with <tt class="docutils literal"><span class="pre">[&quot;count&quot;,&quot;column&quot;]</span></tt> as the setting for <tt class="docutils literal"><span class="pre">relative</span></tt>, with <tt class="docutils literal"><span class="pre">[&quot;column&quot;]</span></tt> as the setting for <tt class="docutils literal"><span class="pre">totals</span></tt>, and with no panel variables, would produce:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="5%" />
+<col width="26%" />
+<col width="26%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Table</th>
+<th class="head">C</th>
+<th class="head">D</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td rowspan="5">A</td>
+<td rowspan="2">M</td>
+<td>Count</td>
+<td>53</td>
+<td>32</td>
+</tr>
+<tr class="row-odd"><td>Perc</td>
+<td>73.6%</td>
+<td>48.5%</td>
+</tr>
+<tr class="row-even"><td rowspan="2">F</td>
+<td>Count</td>
+<td>19</td>
+<td>34</td>
+</tr>
+<tr class="row-odd"><td>Perc</td>
+<td>26.4%</td>
+<td>51.5%</td>
+</tr>
+<tr class="row-even"><td colspan="2">Tot</td>
+<td>72</td>
+<td>66</td>
+</tr>
+</tbody>
+</table>
+<p>A crosstabs with A as row variable, C and D as column variables, and B as a panel variable with column panel placement, would yield:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="15%" />
+<col width="19%" />
+<col width="22%" />
+<col width="22%" />
+<col width="15%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="2" rowspan="2">Table</th>
+<th class="head" colspan="2">B.Y</th>
+<th class="head" colspan="2">B.N</th>
+</tr>
+<tr class="row-even"><th class="head">C</th>
+<th class="head">D</th>
+<th class="head">C</th>
+<th class="head">D</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-odd"><td rowspan="2">A</td>
+<td>M</td>
+<td>32</td>
+<td>10</td>
+<td>21</td>
+<td>22</td>
+</tr>
+<tr class="row-even"><td>F</td>
+<td>15</td>
+<td>24</td>
+<td>4</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="descriptive">
+<h3>Descriptive<a class="headerlink" href="#descriptive" title="Permalink to this headline">¶</a></h3>
+<p>Another table-producing object but aimed more at producing descriptive statistics instead. At its core it is given one or more variables, and asked to compute certain descriptive statistics on them, or any other form of aggregation. Perhaps consider calling these Aggregate instead.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">variables:</th><td class="field-body">An array of the names of the variables to be used.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">descriptives:</th><td class="field-body">An array of <a class="reference internal" href="Commands.html"><em>Commands</em></a> that express the descriptive statistic we are after. But any aggregating function could be used just as well.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">direction:</th><td class="field-body">&#8220;row&#8221; or &#8220;column&#8221;, depending as to whether the variables will be laid out across the different rows, with descriptives across the columns, or vice versa.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="example">
+<h4>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
+<p>Consider the following dataset</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">A</th>
+<th class="head">B</th>
+<th class="head">C</th>
+<th class="head">D</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>M</td>
+<td>Y</td>
+<td>23</td>
+<td>4</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>Y</td>
+<td>12</td>
+<td>3</td>
+</tr>
+<tr class="row-even"><td>M</td>
+<td>N</td>
+<td>10</td>
+<td>6</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>N</td>
+<td>4</td>
+<td>10</td>
+</tr>
+<tr class="row-even"><td>M</td>
+<td>Y</td>
+<td>6</td>
+<td>4</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>Y</td>
+<td>3</td>
+<td>13</td>
+</tr>
+<tr class="row-even"><td>M</td>
+<td>N</td>
+<td>11</td>
+<td>16</td>
+</tr>
+<tr class="row-odd"><td>F</td>
+<td>Y</td>
+<td>0</td>
+<td>8</td>
+</tr>
+<tr class="row-even"><td>M</td>
+<td>Y</td>
+<td>3</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>Then a Descriptive with variables [&#8220;C&#8221;,&#8221;D&#8221;], direction &#8220;row&#8221;, panel variable &#8220;A&#8221; with panel placement row, and descriptives [&#8220;mean&#8221;, &#8220;sd&#8221;, &#8220;count&#8221;] would produce the following table:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="13%" />
+<col width="17%" />
+<col width="30%" />
+<col width="30%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="2">Table</th>
+<th class="head">mean</th>
+<th class="head">std.dev</th>
+<th class="head">count</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td rowspan="2">A.M</td>
+<td>C</td>
+<td>10.6</td>
+<td>7.635</td>
+<td>5</td>
+</tr>
+<tr class="row-odd"><td>D</td>
+<td>6.4</td>
+<td>5.55</td>
+<td>5</td>
+</tr>
+<tr class="row-even"><td rowspan="2">A.F</td>
+<td>C</td>
+<td>...</td>
+<td>...</td>
+<td>4</td>
+</tr>
+<tr class="row-odd"><td>D</td>
+<td>...</td>
+<td>...</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>Or possibly the C&#8217;s for the different M&#8217;s next to each other? We&#8217;ll need to find a way to express that if we want both possibilities, else we&#8217;ll need to default to one.</p>
+</div>
+</div>
+<div class="section" id="test">
+<h3>Test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h3>
+<p>A structure containing information about performing a statistical test.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">mode:</th><td class="field-body">The test&#8217;s name (1-sample, 2-sample, anova, etc). TODO: Need to provide concrete list of tests and their input information, though I imagine we&#8217;ll keep on adding.</td>
+</tr>
+</tbody>
+</table>
+<p>Each test would have its own list of keys, depending on its inputs. But likely the following should suffice for most test (though their form might vary for each test):</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">variables:</th><td class="field-body">The (possible array of) variable(s) that the test refers to.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">null:</th><td class="field-body">The null hypothesis. Its possible form will vary from test to test.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">alternative:</th><td class="field-body">The alternative hypothesis. Its possible form will vary from test to test.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="graph">
+<h3>Graph<a class="headerlink" href="#graph" title="Permalink to this headline">¶</a></h3>
+<p>Generic structure representing graphs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">mode:</th><td class="field-body"><p class="first">Principal type of graph. Other components can be added, but this determines the basic look. Possible types: <tt class="docutils literal"><span class="pre">scatter</span></tt>, <tt class="docutils literal"><span class="pre">bar</span></tt>, <tt class="docutils literal"><span class="pre">dot</span></tt>, <tt class="docutils literal"><span class="pre">box</span></tt>, <tt class="docutils literal"><span class="pre">hist</span></tt>, <tt class="docutils literal"><span class="pre">quantile</span></tt>. Should perhaps add more in the future.</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">variables:</th><td class="field-body"><p class="first">A vector of 2 names of variables to be used for the x and y axes respectively. If a third variable is present, it will be used a a grouping variable.</p>
+<tr class="field-even field"><th class="field-name">variables:</th><td class="field-body"><p class="first">A vector of the names of variables to be used for the x and y axes respectively. Third or higher variables would represent grouping variables.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name" colspan="2">panel_variables:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body"><p class="first">Array of names of variables used to create separate panels. First entry represents column panels, second entry row panels, higher entries produce multiple graphs. Use NULL to skip entries.</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">xaxis:</th><td class="field-body"><p class="first">Object representing details of the x-axis, to overwrite default choices. The defautl options are determined from the variable representing the x-axis. Possible keys:</p>
+<tr class="field-odd field"><th class="field-name">xaxis:</th><td class="field-body"><p class="first">List representing details of the x-axis, to overwrite default choices. The default options are determined from the variable representing the x-axis. Possible keys:</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -282,7 +670,7 @@
 </tr>
 <tr class="field-even field"><th class="field-name">limits:</th><td class="field-body">Vector of length 2 containing explicit range endpoints.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">ticks:</th><td class="field-body">Either a vector containing the tick points or an object containing <tt class="docutils literal"><span class="pre">values</span></tt> and <tt class="docutils literal"><span class="pre">labels</span></tt>.</td>
+<tr class="field-odd field"><th class="field-name">ticks:</th><td class="field-body">Either a vector containing the tick point numbers or an object containing <tt class="docutils literal"><span class="pre">values</span></tt> and <tt class="docutils literal"><span class="pre">labels</span></tt>.</td>
 </tr>
 </tbody>
 </table>
@@ -291,37 +679,46 @@
 <tr class="field-even field"><th class="field-name">yaxis:</th><td class="field-body"><p class="first">Same as <tt class="docutils literal"><span class="pre">xaxis</span></tt>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">components:</th><td class="field-body"><p class="first">An array of extra &#8220;components&#8221; to add. Each array entry should be a <tt class="docutils literal"><span class="pre">graph_comp</span></tt>.</p>
+<tr class="field-odd field"><th class="field-name">components:</th><td class="field-body"><p class="first">An array of extra &#8220;components&#8221; to add. Each array entry should be a <a class="reference internal" href="#graph-component">Graph Component</a>.</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">graph_settings:</th><td class="field-body"><p class="first last">A <tt class="docutils literal"><span class="pre">graph_settings</span></tt> object, sets parameters for colors, line widths, lengths etc.</p>
+<tr class="field-even field"><th class="field-name">settings:</th><td class="field-body"><p class="first last">A <tt class="docutils literal"><span class="pre">graph_settings</span></tt> object, sets parameters for colors, line widths, lengths etc. These are meant to overwrite general graph settings that are globally defined by the user.</p>
 </td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="graph-component">
+<h3>Graph Component<a class="headerlink" href="#graph-component" title="Permalink to this headline">¶</a></h3>
+<p>These are individual components to be tacked on existing graphs.</p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">mode:</th><td class="field-body">One of: <tt class="docutils literal"><span class="pre">grid</span></tt>, <tt class="docutils literal"><span class="pre">abline</span></tt>, <tt class="docutils literal"><span class="pre">legend</span></tt>, <tt class="docutils literal"><span class="pre">fit</span></tt>, <tt class="docutils literal"><span class="pre">labels</span></tt>, <tt class="docutils literal"><span class="pre">text</span></tt>. Possibly should add more. The remaining options depend on the type. TODO</td>
 </tr>
 </tbody>
 </table>
 </div></blockquote>
+</div>
+</div>
+<div class="section" id="result-objects">
+<span id="id3"></span><h2>Result Objects<a class="headerlink" href="#result-objects" title="Permalink to this headline">¶</a></h2>
+<p>These objects are used to store all kinds of results: Tables, descriptive statistics, graphs etc.
+They tend to not be on their own, but as part of a corresponding <a class="reference external" href="output_object">Output Object</a>.</p>
+</div>
+<div class="section" id="other-objects">
+<h2>Other Objects<a class="headerlink" href="#other-objects" title="Permalink to this headline">¶</a></h2>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">graph_settings:</th><td class="field-body"><p class="first">TODO</p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">graph_comp:</th><td class="field-body"><p class="first">These are individual components to be tacked on existing graphs.</p>
-<table class="last docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">type:</th><td class="field-body">One of: <tt class="docutils literal"><span class="pre">grid</span></tt>, <tt class="docutils literal"><span class="pre">abline</span></tt>, <tt class="docutils literal"><span class="pre">legend</span></tt>, <tt class="docutils literal"><span class="pre">fit</span></tt>, <tt class="docutils literal"><span class="pre">labels</span></tt>. Possibly should add more. The remaining options depend on the type. TODO</td>
-</tr>
-</tbody>
-</table>
-</td>
+<tr class="field-odd field"><th class="field-name">settings:</th><td class="field-body">Preference settings for how things should appear etc. For now see <a class="reference internal" href="Settings.html"><em>Settings</em></a> for details.</td>
 </tr>
 </tbody>
 </table>
 <p>TODO: Maybe add structures to hold textual information, and &#8220;document&#8221; type structures. People should be able to create reports right there and then, given the appropriate interface.</p>
-</div>
 </div>
 </div>
 
@@ -333,12 +730,18 @@
         <div class="sidebar">
           <h3>Table Of Contents</h3>
           <ul>
-<li class="toctree-l1"><a class="reference internal" href="brainstorming.html">PanthR Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">PanthR Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="API.html">Language API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Client.html">Web Client</a></li>
 <li class="toctree-l1"><a class="reference internal" href="Server.html">Web Server</a></li>
 <li class="toctree-l1"><a class="reference internal" href="PanthR-org.html">www.panthr.org</a></li>
 <li class="toctree-l1"><a class="reference internal" href="technologies.html">Technologies used</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html">Dataset Importer/Exporter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html#node-js-rserve-interface">Node.js &#8211; RServe interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html#node-js-user-account-management">Node.js user account management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html#node-js-main-express-server-application">Node.js main Express server application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html#graph-and-graph-editor-objects">Graph and Graph Editor objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Settings.html">Settings</a></li>
 </ul>
 
           <h3 style="margin-top: 1.5em;">Search</h3>

@@ -1,0 +1,205 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Dataset Importer/Exporter &mdash; PanthR 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="PanthR 1.0 documentation" href="index.html" />
+    <link rel="next" title="Settings" href="Settings.html" />
+    <link rel="prev" title="Technologies used" href="technologies.html" /> 
+  </head>
+  <body>
+    <div class="header-wrapper">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">PanthR 1.0 documentation</a></div>
+        <div class="rel">
+          <a href="technologies.html" title="Technologies used"
+             accesskey="P">previous</a> |
+          <a href="Settings.html" title="Settings"
+             accesskey="N">next</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <p>Thoughts on components that we could have students program:</p>
+<div class="section" id="dataset-importer-exporter">
+<h1>Dataset Importer/Exporter<a class="headerlink" href="#dataset-importer-exporter" title="Permalink to this headline">¶</a></h1>
+<p>This would be a Javascript library that would manage reading and writing datasets in various formats, converting to and from PanthR&#8217;s JSON format.</p>
+<p>It should be able to read and write in as many of the following formats:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Comma-Separated, Tab-separated</li>
+<li>Excel (both old if possible, and new)</li>
+<li>SPSS</li>
+<li>HTML table (possibly even read out from an entire HTML page)</li>
+<li>R object (rda)</li>
+<li>Fixed Column format</li>
+<li>General XML structures?</li>
+</ul>
+</div></blockquote>
+<div class="section" id="importing">
+<h2>Importing<a class="headerlink" href="#importing" title="Permalink to this headline">¶</a></h2>
+<p>When importing:</p>
+<ul class="simple">
+<li>The library should accept information about the format, but it should also be in a position to &#8220;sniff out&#8221; as much as possible about the file without any information.</li>
+<li>The library should return not just the dataset in whatever form it deciphered it, but also information about what choices it had to make, possible problems it encountered etc.</li>
+<li>It should also be able to accept back the object it returned, with any possible modifications in the settings the user/ui did, and try to parse it again. For example, the library has just tried to read this file, and found a column that looked like dates in a yyyy/mm/dd format. It would return that information, along with formats for other columns, as part of its reply. The user/ui might then tell right back to the library that it was in fact a yyyy/dd/mm format. The library would then return the correct format.</li>
+<li>The library should be able to handle numeric data even if it is in a currency form (with a currency symbol up front), it should be able to handle using commas to separate thousands, or using the european format where comma is used for the decimal spot and dots for the thousands. This holds for exporting as well.</li>
+<li>It should be able to accept both strings and io-streams as inputs. Similarly it should be able to output as either string or io-stream.</li>
+</ul>
+</div>
+<div class="section" id="exporting">
+<h2>Exporting<a class="headerlink" href="#exporting" title="Permalink to this headline">¶</a></h2>
+<p>Users should be able to set row names, column names, column formats, etc.</p>
+</div>
+</div>
+<div class="section" id="node-js-rserve-interface">
+<h1>Node.js &#8211; RServe interface<a class="headerlink" href="#node-js-rserve-interface" title="Permalink to this headline">¶</a></h1>
+<p>RServe is designed to provide access to R through TCP/IP. It handles different clients, and provides them with their own namespace.</p>
+<p>We need to communicate with this RServe process from Node.js. This node.js package should be able to:</p>
+<ul class="simple">
+<li>Start up and shut down RServe</li>
+<li>Monitor RServe&#8217;s performance to the extent possible</li>
+<li>Pose itself to RServe as distinct clients to manage different namespaces for each user. Depending on how RServe is set up at the moment, this may require a rewrite to parts of RServe.</li>
+<li>It should manage queues of requests coming in and out. Messages need to be processed in the same order they arrive. Given Node.js&#8217;s asynchronous nature, this may require some careful thought.</li>
+</ul>
+</div>
+<div class="section" id="node-js-user-account-management">
+<h1>Node.js user account management<a class="headerlink" href="#node-js-user-account-management" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Each user should be able to create an account by simply providing an email and choosing a password. Account verification would be done through that email.</li>
+<li>User preferences and settings should be stored on the server, along with the current workspace session information.</li>
+<li>Users should be able to save &#8220;workspaces&#8221; on the server.</li>
+<li>Optionally, users should be able to &#8220;link&#8221; their account with a Dropbox or similar account.</li>
+</ul>
+</div>
+<div class="section" id="node-js-main-express-server-application">
+<h1>Node.js main Express server application<a class="headerlink" href="#node-js-main-express-server-application" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Maintains basic info about the server, and serves it on status requests.</li>
+<li>When a user asks for a connection, the client interface page is sent via HTTP, and a Web Sockets connection is established.</li>
+<li>Language API messages are sent across this Web Sockets connection. The server maintains a queue for messages coming from the client and then passed to the RServer, and a queue of messages coming from the RServer and passed to the client.</li>
+<li>The server needs to be able to maintain the state the client was in when the client breaks a connection.</li>
+</ul>
+</div>
+<div class="section" id="graph-and-graph-editor-objects">
+<h1>Graph and Graph Editor objects<a class="headerlink" href="#graph-and-graph-editor-objects" title="Permalink to this headline">¶</a></h1>
+<p>The Graph object needs to do a couple of things:</p>
+<ul class="simple">
+<li>It learns what it needs to do from a <em>Graph Output Object</em> or a <em>Graph Results Object</em>.</li>
+<li>It handles a Canvas HTML element on which it can draw itself.</li>
+<li>It should handle the various different plot types, as well as the various graph components one could add to a graph.</li>
+<li>Users should be able to interact with elements of the graph and get information about where in the data those values come from.</li>
+</ul>
+<p>A supplementary, but possibly simpler, component to this is an R library, that would accept and handle a Graph Output Object, and would be able to return this object in various image formats. This would in particular require translating the various graphing parameters to things R would understand.</p>
+<p>The Graph Editor Object needs to provide the user with an intuitive way to build a graph together.</p>
+<ul class="simple">
+<li>It has a way to set graph type, x and y variables, filters, grouping variables, other parameters</li>
+<li>Includes a preview of the graph.</li>
+<li>It should have a toolbar providing graph components to add, as well as edit windows for each of those components.</li>
+<li>A user should be able to edit existing components by either picking them off a list or by clicking on them in the preview.</li>
+</ul>
+<p>Look in the <a class="reference internal" href="Structures.html"><em>Structures</em></a> page for details on what the graph and graph component settings would be.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          <h3>Table Of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">PanthR Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="API.html">Language API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Client.html">Web Client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Server.html">Web Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PanthR-org.html">www.panthr.org</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technologies.html">Technologies used</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Dataset Importer/Exporter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#importing">Importing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#exporting">Exporting</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#node-js-rserve-interface">Node.js &#8211; RServe interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#node-js-user-account-management">Node.js user account management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#node-js-main-express-server-application">Node.js main Express server application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#graph-and-graph-editor-objects">Graph and Graph Editor objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Settings.html">Settings</a></li>
+</ul>
+
+          <h3 style="margin-top: 1.5em;">Search</h3>
+          <form class="search" action="search.html" method="get">
+            <input type="text" name="q" />
+            <input type="submit" value="Go" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+            Enter search terms or a module, class or function name.
+          </p>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <a href="technologies.html" title="Technologies used"
+             >previous</a> |
+          <a href="Settings.html" title="Settings"
+             >next</a> |
+          <a href="genindex.html" title="General Index"
+             >index</a>
+            <br/>
+            <a href="_sources/PossibleStudentProjects.txt"
+               rel="nofollow">Show Source</a>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer">
+        &copy; Copyright 2013, PanthR Group.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

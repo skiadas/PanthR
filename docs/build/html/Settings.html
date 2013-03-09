@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Settings &mdash; PanthR 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/agogo.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="PanthR 1.0 documentation" href="index.html" />
+    <link rel="prev" title="Dataset Importer/Exporter" href="PossibleStudentProjects.html" /> 
+  </head>
+  <body>
+    <div class="header-wrapper">
+      <div class="header">
+        <div class="headertitle"><a
+          href="index.html">PanthR 1.0 documentation</a></div>
+        <div class="rel">
+          <a href="PossibleStudentProjects.html" title="Dataset Importer/Exporter"
+             accesskey="P">previous</a> |
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a>
+        </div>
+       </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="content">
+        <div class="document">
+            
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="settings">
+<h1>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h1>
+<p>Meant for a discussion on what should be customizable and how. This is very much brainstorming for now.</p>
+<p>Add your thoughts, marking them with a (&#64;username) at the end.</p>
+<div class="section" id="graph-settings">
+<h2>Graph Settings<a class="headerlink" href="#graph-settings" title="Permalink to this headline">¶</a></h2>
+<p>These should determine how graph parameters should be displayed.</p>
+<p>Users should be able to define parameters at 3 levels:</p>
+<ul>
+<li><p class="first">First level would be general settings. Those would work for all graphs.</p>
+</li>
+<li><dl class="first docutils">
+<dt>At a second level would be settings corresponding to different output formats. Those would be thought of as overwriting first level settings: If a value is not specified in the output format, the first level value is used. There would be four different formats:</dt>
+<dd><ul class="first last simple">
+<li>&#8220;screen&#8221; for settings on how the graph would appear on screen.</li>
+<li>&#8220;small&#8221; for settings on how the graph should appear on smaller screens (tablets).</li>
+<li>&#8220;file&#8221; for settings on how the graph should be saved. For example the dimensions might be different. We might want to also include here default file format, and/or different dimensions for different file formats.</li>
+<li>&#8220;print&#8221; for settings on how the graph should appear in a printout. These might be redundant, the &#8220;file&#8221; option might be good enough for that.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">At a third level, the direct functions that would result in a printing or the specific output objects could have specific settings, that would overwrite every other setting.</p>
+</li>
+</ul>
+<p>A list of possible parameters. We should consider some ways of organizing them.</p>
+<ul>
+<li><p class="first">overall dimensions x, y for the graph</p>
+</li>
+<li><p class="first">margins on the 4 sides</p>
+</li>
+<li><p class="first">colors: A list of colors that would be used in that order wherever different colors are needed. We should allow people an easy way to provide standard scales. These would be used both as fill colors and when different line colors are needed.</p>
+</li>
+<li><p class="first">point-icons: A list of point icons to be used when multiple point types are needed.</p>
+</li>
+<li><p class="first">line-styles: A list of line styles to be used when multiple line styles are needed.</p>
+</li>
+<li><dl class="first docutils">
+<dt>line: Settings for how a line should appear. Sub-settings in it would be:</dt>
+<dd><ul class="first last simple">
+<li>width: in pixels probably</li>
+<li>style: &#8220;solid&#8221;, &#8220;dashed&#8221;, &#8220;dotted&#8221; etc</li>
+<li>color: main color for lines</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>point: Settings for how points should appear. Sub-settings would be:</dt>
+<dd><ul class="first last simple">
+<li>size: in pixels</li>
+<li>icons: some way to specify type of icon, square, triangle etc</li>
+<li>color: main color for points</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>text: Overall settings for the appearance of text. Subsettings could be:</dt>
+<dd><ul class="first last simple">
+<li>size: Font size in pixels</li>
+<li>family: Font family (Times New Roman etc). We can use a lot of web-fonts for the screen versions, we should figure out a way to only offer a reasonable set of choices there.</li>
+<li>style: normal/italic/bold/bold italic</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>bar: Basic settings to be used for the bars (histogram/bargraph etc)</dt>
+<dd><ul class="first last simple">
+<li>color: To be used for the boundaries. If absent, line color is used.</li>
+<li>fill: To be used for filling in.</li>
+<li>width: To be used for the boundary width.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">background-color: to be used on the overall background of graphs.</p>
+</li>
+</ul>
+<p>Question: Should we bother with &#8220;patterns&#8221; for background? Or is it not relevant given most modern visualization and printing tools? My vote would be towards not allowing them. (&#64;skiadas)</p>
+</div>
+<div class="section" id="table-settings">
+<h2>Table Settings<a class="headerlink" href="#table-settings" title="Permalink to this headline">¶</a></h2>
+<p>These should affect how tables would appear.</p>
+<p>Q: Perhaps these are too much and we should offer only a few customization options for tables. (&#64;skiadas)</p>
+<dl class="docutils">
+<dt>-text: Determines settings for table text.</dt>
+<dd><ul class="first last simple">
+<li>size: Font size in pixels</li>
+<li>family: Font family (Times New Roman etc). We can use a lot of web-fonts for the screen versions, we should figure out a way to only offer a reasonable set of choices there.</li>
+<li>style: normal/italic/bold/bold italic</li>
+<li>color: Text color</li>
+<li>header: Specifies text settings for the header</li>
+</ul>
+</dd>
+</dl>
+<ul>
+<li><dl class="first docutils">
+<dt>border: Specifies border lines. Standard border subsettings.</dt>
+<dd><ul class="first last simple">
+<li>cell: Specifies border lines separating inner cells.</li>
+<li>header: Specifies border lines separating header cells from inner cells.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>background-color: Overall background color</dt>
+<dd><ul class="first last simple">
+<li>header: Specifies background color for the headers.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="ui-settings">
+<h2>UI Settings<a class="headerlink" href="#ui-settings" title="Permalink to this headline">¶</a></h2>
+<p>They affect how the application&#8217;s UI would show up. Some things to include:</p>
+<ul class="simple">
+<li>Whether the sidebar would be there or not, and what things it would contain.</li>
+<li>Whether menus would be simplified or not.</li>
+<li>A list of &#8220;plugins&#8221; to use (e.g. for specific disciplines).</li>
+<li>We might want to consider setting up global text settings, that would be inherited in both graphs and tables.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="sidebar">
+          <h3>Table Of Contents</h3>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">PanthR Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="API.html">Language API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Client.html">Web Client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Server.html">Web Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PanthR-org.html">www.panthr.org</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technologies.html">Technologies used</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html">Dataset Importer/Exporter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html#node-js-rserve-interface">Node.js &#8211; RServe interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html#node-js-user-account-management">Node.js user account management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html#node-js-main-express-server-application">Node.js main Express server application</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html#graph-and-graph-editor-objects">Graph and Graph Editor objects</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Settings</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#graph-settings">Graph Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#table-settings">Table Settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ui-settings">UI Settings</a></li>
+</ul>
+</li>
+</ul>
+
+          <h3 style="margin-top: 1.5em;">Search</h3>
+          <form class="search" action="search.html" method="get">
+            <input type="text" name="q" />
+            <input type="submit" value="Go" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+          </form>
+          <p class="searchtip" style="font-size: 90%">
+            Enter search terms or a module, class or function name.
+          </p>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+    <div class="footer-wrapper">
+      <div class="footer">
+        <div class="left">
+          <a href="PossibleStudentProjects.html" title="Dataset Importer/Exporter"
+             >previous</a> |
+          <a href="genindex.html" title="General Index"
+             >index</a>
+            <br/>
+            <a href="_sources/Settings.txt"
+               rel="nofollow">Show Source</a>
+        </div>
+
+        <div class="right">
+          
+    <div class="footer">
+        &copy; Copyright 2013, PanthR Group.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+        </div>
+        <div class="clearer"></div>
+      </div>
+    </div>
+
+  </body>
+</html>

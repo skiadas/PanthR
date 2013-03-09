@@ -21,8 +21,7 @@ In theory, servers could be written that link to software other than R. As long 
 
 Requests Served
 ~~~~~~~~~~~~~~~
-The web server should listen for HTTP requests, preferably on port 80, though this could potentially be customizable. It is implemented using the `Express Framework <http://expressjs.com/>`_ in `Node.js <http://expressjs.com/
-http://nodejs.org/>`_.
+The web server should listen for HTTP requests, preferably on port 80, though this could potentially be customizable. It is implemented using the `Express Framework <http://expressjs.com/>`_ in `Node.js <http://nodejs.org/>`_.
 
 It should serve the following requests:
 
@@ -61,7 +60,7 @@ It should serve the following requests:
     - A failed authentication would return a 401 status code.
 
 ``websocket messaging``
-    Data communication between the server and the client is done via websockets, using Node.js's ``Socket.IO`` library (`<http://socket.io/>`_). The specific objects that are exchanged that way are detailed in the :doc:`API` section. These messages form the majority of client/server communication. The client would use such a message to inform the server of a change in the data set, or to request some computations from the server.
+    Data communication between the server and the client is done via websockets, using Node.js's `Socket.IO <http://socket.io/>`_ library. The specific objects that are exchanged that way are detailed in the :doc:`API` section. These messages form the majority of client/server communication. The client would use such a message to inform the server of a change in the data set, or to request some computations from the server.
 
 The following main messages will be used, beyond the standard messages for connection and disconnection:
     
