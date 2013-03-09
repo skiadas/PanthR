@@ -7,6 +7,7 @@ Data communication takes place in JSON format. Each JSON object needs to contain
         The established id/hash for the client.
     :objects:
         An array of one more more objects, each representing an "object". The various available object listed in the subsections.
+        
         We need to arrange things so that addons can create new "objects". Ideally this should be done in two levels, in Javascript as well as R.
 
 Each object has a specific list of expected keys. Any other keys will be ignored.  All objects are represented in the API as a JSON object, with a ``type`` key holding the objects's type.
@@ -14,7 +15,7 @@ Each object has a specific list of expected keys. Any other keys will be ignored
 Each object typically includes at least the following keys:
 
 :hash:
-    A number used to identify an object within its workspace. Objects may change name but should retain their hash. This could simply start with 1 for the first created object in the workspace, and increase from there. Numbers corresponding to deleted objects are not recovered.
+    A number used to identify an object within its workspace. Objects may change name but should retain their hash. This could simply start with 1 for the first created object in the workspace, and increase from there. Numbers corresponding to deleted objects are not recovered. Alternatively, hashes could be used to identify these objects within the databases, in which case they need to be unique across all workspaces and all users.
 :type:
     The type of the object, e.g. variable, dataset, graph etc.
 :name:
