@@ -1,0 +1,5 @@
+This folder contains the source files for the PanthR documentation.
+
+To add to the documentation, add .rst files in the source directory, and add links to them the toctree sections in index.rst or whatever their enclosing file is meant to be (see API.txt as another example).
+
+To compile the documentation, you will need to have Python available in your computer, with the Sphinx package installed. After that, run `make html` from this docs folder. The resulting html documentation will be in the build/html folder. Other targets than html are also available.
