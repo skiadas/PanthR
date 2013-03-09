@@ -6,18 +6,35 @@ The Web Server maintains a permanent link to a local R process (likely RServe ?)
 - A configuration file ``panthr_config.json`` that administrators can use to detail information about the server. See the ``/status`` request below for required fields.
 - An RServe process, that is started from the server process and listens to requests from it. The server process is responsible for tearing down the RServe process.
 - The server process, implemented in `Node.js <http://nodejs.org/>`_. The server process needs to do the following:
-    - It maintains a database of user credentials. A user can register by simply providing a valid email address as their username, and set a password. (Possible persistent data store solutions: MongoDB, Redis)
+    - It maintains a database of user credentials. A user can register by simply providing a valid email address as their username, and set a password. (Possible persistent data store solutions: MongoDB, Redis, some other database). Account verification should take place via that email address.
     - Users need to log in before they can use the server's resources. They can still download the client, but in order to connect to the R backend they will need to set up an account and log in.
     - Users should have the option to "keep themselves logged in" for a period of time. In that case, their login information is stored in a cookie, and the user is automatically logged in when they access the web server.
-    - User can also save their preferences how various settings (color palettes, graph symbols, table defaults, menu defaults etc). These preferences are saved the moment they are set. A user should be able to have multiple possible preference sets (e.g. one setting for printing, or separate setting for classwork vs research etc).
-    - The server uses a persistent data store to store the user's work. It can save "Workspaces", namely a collection of objects/reports/commands that the user has created. The user can have multiple workspaces. 
+    - User can also save their preferences how various settings (color palettes, graph symbols, table defaults, menu defaults etc). These preferences are saved the moment they are set. A user should be able to have multiple possible preference sets (e.g. one setting for printing, or separate setting for classwork vs research etc). See :doc:`Settings`.
+    - The server uses a persistent data store to store the user's work. It can save "Workspaces", namely a collection of objects/reports/commands that the user has created. The user can have multiple workspaces for the various projects.
     - There is always a "Current Workspace" that the user is working on. Upon a disconnect, this workspace is preserved to be used the next time the user logs in. (Similar to a browser's last session).
-    - The server logs into a file information about the user connection, when it is established, when messages are sent around and what types they are etc.
+    - The server logs information about the user connection, when it is established, when messages are sent around and what types they are etc.
     - Based on its configuration settings, the server may decide to disconnect a client after a period of inactivity.
     - Public servers purge all client related information upon disconnecting with a client.
     - Servers pass most data requests to the R server. The API for these requests is described further in the :doc:`API` section. Messages are communicated in JSON.
 
-In theory, servers could be written that link to software other than R. As long as they support the :doc:`API`.
+In theory, servers could be written that link to software other than R. As long as they support the :doc:`API`. Our commands and syntax however are largely influenced by R.
+
+Configuration
+~~~~~~~~~~~~~
+
+``panth_config.json`` is a file that should reside at the root of the server application. It is a JSON file with exactly one object, whose properties are parameters to set, which determine the operation of the server. Most of these properties are public and are returned by the server upon a ``/status`` request. See that section for those. This section describes some private information.
+
+:user_validation:
+    This is the filepath to a script file that performs the validation of whether a user with a specific email account is allowed to create an account. It would be expected to receive as input the user's email account, and return 1 if the user is allowed to create the account and 0 otherwise. Organizations that want to host their own servers can thus restrict access to users with email accounts in the organization, or perhaps even more restrictive. We should provide a sample script using hanover.edu, that people could then alter to fit their needs.
+
+:allow_full_r:
+    This would be a boolean variable indicating whether the server allows users access to arbitrary R commands. This should default to false, and come with very serious warnings about the dangers of altering it. On a first incarnation of the project we should not allow this at all.
+
+:extensions:
+    An dictionary, with keys specifying the names of available extensions, and the values specifying filepaths to files implementing those extensions. We will need to specify those file formats if we want to implement extensions this way, leave as placeholder for now. the ``/status`` request should return an array keyed by the extension key, containing the list of names of those extensions, without the filepath information (or possibly pass them as is?).
+
+:port:
+    Which port number the server should listen to. It would default to 80.
 
 Requests Served
 ~~~~~~~~~~~~~~~
@@ -39,7 +56,7 @@ It should serve the following requests:
     :api_version:
         The highest version of the API that this server supports. To account for future expansions. Will likely remain at 1.0 for quite a while.
     :timeout:
-        Number of seconds of inactivity that would cause a server to disconnect from a client. Should default to two hours (7200).
+        Number of seconds of inactivity that would cause a server to disconnect from a client. Should default to one hour (3600).
     :max_time:
         The maximum time that a server would allow a client to connect. Should default to one day (86400). A value of `null` or missing field would indicate that a client could connect indefinitely.
     :max_users:

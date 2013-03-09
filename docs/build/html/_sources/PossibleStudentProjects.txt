@@ -1,3 +1,6 @@
+Possible Student Projects
+=========================
+
 Thoughts on components that we could have students program:
 
 Dataset Importer/Exporter

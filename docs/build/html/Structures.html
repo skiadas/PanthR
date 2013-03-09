@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Structures &mdash; PanthR 1.0 documentation</title>
+    <title>2.1. Structures &mdash; PanthR 1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/agogo.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -27,9 +27,9 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="top" title="PanthR 1.0 documentation" href="index.html" />
-    <link rel="up" title="Language API" href="API.html" />
-    <link rel="next" title="Commands" href="Commands.html" />
-    <link rel="prev" title="Language API" href="API.html" /> 
+    <link rel="up" title="2. Language API" href="API.html" />
+    <link rel="next" title="2.2. Commands" href="Commands.html" />
+    <link rel="prev" title="2. Language API" href="API.html" /> 
   </head>
   <body>
     <div class="header-wrapper">
@@ -37,9 +37,9 @@
         <div class="headertitle"><a
           href="index.html">PanthR 1.0 documentation</a></div>
         <div class="rel">
-          <a href="API.html" title="Language API"
+          <a href="API.html" title="2. Language API"
              accesskey="P">previous</a> |
-          <a href="Commands.html" title="Commands"
+          <a href="Commands.html" title="2.2. Commands"
              accesskey="N">next</a> |
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a>
@@ -56,7 +56,7 @@
           <div class="body">
             
   <div class="section" id="structures">
-<h1>Structures<a class="headerlink" href="#structures" title="Permalink to this headline">¶</a></h1>
+<h1>2.1. Structures<a class="headerlink" href="#structures" title="Permalink to this headline">¶</a></h1>
 <p>(This is work in progress. Please sign your questions with &#64;username for easier searching) &#64;skiadas</p>
 <p>Structures are used to store information.</p>
 <p>Internally, most if not all of these structures should be following an &#8220;observable&#8221; pattern, so other entities can be notified of any changes. This information does not have to be part of the published API though. Structures are split into many subgroups.</p>
@@ -76,10 +76,10 @@
 </tbody>
 </table>
 <div class="section" id="data-objects">
-<h2>Data Objects<a class="headerlink" href="#data-objects" title="Permalink to this headline">¶</a></h2>
+<h2>2.1.1. Data Objects<a class="headerlink" href="#data-objects" title="Permalink to this headline">¶</a></h2>
 <p>Data Objects are used to contain information. All sorts of information.</p>
 <div class="section" id="variable">
-<span id="id1"></span><h3>Variable<a class="headerlink" href="#variable" title="Permalink to this headline">¶</a></h3>
+<span id="id1"></span><h3>2.1.1.1. Variable<a class="headerlink" href="#variable" title="Permalink to this headline">¶</a></h3>
 <p>Represents a variable/vector. Variables can be either &#8220;static&#8221;, where a list of <em>values</em> is specified, or &#8220;dynamic&#8221; where a process for computing them is provided (see <a class="reference internal" href="Commands.html"><em>Commands</em></a>). Variables may be on their own or appear inside a dataset.</p>
 <p>Variables would contain the following keys:</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -211,7 +211,7 @@
 </table>
 </div>
 <div class="section" id="dataset">
-<h3>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h3>
+<h3>2.1.1.2. Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h3>
 <p>Simply holds equal length variables together.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -227,16 +227,16 @@
 </table>
 </div>
 <div class="section" id="model">
-<h3>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h3>
+<h3>2.1.1.3. Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h3>
 <p>Meant to represent regression models, anova models, repeated measures models etc. We should probably be using R&#8217;s formula paradigm for our models.</p>
 <p>TODO: Fill in details here. Determine how this should interact with tests</p>
 </div>
 <div class="section" id="list">
-<h3>List<a class="headerlink" href="#list" title="Permalink to this headline">¶</a></h3>
+<h3>2.1.1.4. List<a class="headerlink" href="#list" title="Permalink to this headline">¶</a></h3>
 <p>Should only be used in a case where variables of unequal length should be grouped together. Ideally we shouldn&#8217;t need to use lists much.</p>
 </div>
 <div class="section" id="workspace">
-<h3>Workspace<a class="headerlink" href="#workspace" title="Permalink to this headline">¶</a></h3>
+<h3>2.1.1.5. Workspace<a class="headerlink" href="#workspace" title="Permalink to this headline">¶</a></h3>
 <p>Not strictly speaking a Data Object per se. Workspaces are used to encompass multiple other objects that form a coherent project whole. Whenever a user creates a new object, it&#8217;s added to the current workspace.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -250,7 +250,7 @@
 </table>
 </div>
 <div class="section" id="document">
-<h3>Document<a class="headerlink" href="#document" title="Permalink to this headline">¶</a></h3>
+<h3>2.1.1.6. Document<a class="headerlink" href="#document" title="Permalink to this headline">¶</a></h3>
 <p>Placed here for future implementations, or if we have time/inclination. A document would be a character string which can be thought of as constituting a &#8220;paper&#8221;. It would be the analog of Sweave in our case. Imagine a document written using reStructuredText or Markdown, with specific &#8220;directives&#8221; in it to include math equations, graphs, tables, variable values etc. In future versions (or maybe simply later in the process) we could have a small &#8220;editor&#8221; in place, where users could generate a &#8220;lab report&#8221; related to their data. This can be converted to a Word document, or PDF, HTML, or be sent straight to a printer etc.</p>
 <blockquote>
 <div><table class="docutils field-list" frame="void" rules="none">
@@ -268,12 +268,12 @@
 </ul>
 </div>
 <div class="section" id="filter">
-<span id="id2"></span><h3>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h3>
+<span id="id2"></span><h3>2.1.1.7. Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h3>
 <p>Filters are expressions that can be used to select a subset of the rows in the dataset. A filter is essentially a <a class="reference internal" href="#variable">Variable</a> with boolean values. It shares the same keys as variable.</p>
 </div>
 </div>
 <div class="section" id="output-objects">
-<span id="output-object"></span><h2>Output Objects<a class="headerlink" href="#output-objects" title="Permalink to this headline">¶</a></h2>
+<span id="output-object"></span><h2>2.1.2. Output Objects<a class="headerlink" href="#output-objects" title="Permalink to this headline">¶</a></h2>
 <p>Output Objects contain all the necessary information to generate a dialog box for a type of output, as well as to construct the resulting output. They do not contain the actual result. But they do all contain a <tt class="docutils literal"><span class="pre">result</span></tt> key which holds the result structure as a <a class="reference external" href="result_object">Result Object</a>. This key will be omitted in the descriptions below.</p>
 <ul>
 <li><dl class="first docutils">
@@ -311,7 +311,7 @@
 </tbody>
 </table>
 <div class="section" id="crosstab">
-<h3>Crosstab<a class="headerlink" href="#crosstab" title="Permalink to this headline">¶</a></h3>
+<h3>2.1.2.1. Crosstab<a class="headerlink" href="#crosstab" title="Permalink to this headline">¶</a></h3>
 <p>A table or possibly a series of tables, providing cross-tabular information.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -329,7 +329,7 @@
 </tbody>
 </table>
 <div class="section" id="examples">
-<h4>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h4>
+<h4>2.1.2.1.1. Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h4>
 <p>Consider the following dataset</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -500,7 +500,7 @@
 </div>
 </div>
 <div class="section" id="descriptive">
-<h3>Descriptive<a class="headerlink" href="#descriptive" title="Permalink to this headline">¶</a></h3>
+<h3>2.1.2.2. Descriptive<a class="headerlink" href="#descriptive" title="Permalink to this headline">¶</a></h3>
 <p>Another table-producing object but aimed more at producing descriptive statistics instead. At its core it is given one or more variables, and asked to compute certain descriptive statistics on them, or any other form of aggregation. Perhaps consider calling these Aggregate instead.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -515,7 +515,7 @@
 </tbody>
 </table>
 <div class="section" id="example">
-<h4>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
+<h4>2.1.2.2.1. Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
 <p>Consider the following dataset</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -624,7 +624,7 @@
 </div>
 </div>
 <div class="section" id="test">
-<h3>Test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h3>
+<h3>2.1.2.3. Test<a class="headerlink" href="#test" title="Permalink to this headline">¶</a></h3>
 <p>A structure containing information about performing a statistical test.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -649,7 +649,7 @@
 </table>
 </div>
 <div class="section" id="graph">
-<h3>Graph<a class="headerlink" href="#graph" title="Permalink to this headline">¶</a></h3>
+<h3>2.1.2.4. Graph<a class="headerlink" href="#graph" title="Permalink to this headline">¶</a></h3>
 <p>Generic structure representing graphs.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -689,7 +689,7 @@
 </table>
 </div>
 <div class="section" id="graph-component">
-<h3>Graph Component<a class="headerlink" href="#graph-component" title="Permalink to this headline">¶</a></h3>
+<h3>2.1.2.5. Graph Component<a class="headerlink" href="#graph-component" title="Permalink to this headline">¶</a></h3>
 <p>These are individual components to be tacked on existing graphs.</p>
 <blockquote>
 <div><table class="docutils field-list" frame="void" rules="none">
@@ -704,12 +704,12 @@
 </div>
 </div>
 <div class="section" id="result-objects">
-<span id="id3"></span><h2>Result Objects<a class="headerlink" href="#result-objects" title="Permalink to this headline">¶</a></h2>
+<span id="id3"></span><h2>2.1.3. Result Objects<a class="headerlink" href="#result-objects" title="Permalink to this headline">¶</a></h2>
 <p>These objects are used to store all kinds of results: Tables, descriptive statistics, graphs etc.
 They tend to not be on their own, but as part of a corresponding <a class="reference external" href="output_object">Output Object</a>.</p>
 </div>
 <div class="section" id="other-objects">
-<h2>Other Objects<a class="headerlink" href="#other-objects" title="Permalink to this headline">¶</a></h2>
+<h2>2.1.4. Other Objects<a class="headerlink" href="#other-objects" title="Permalink to this headline">¶</a></h2>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -729,19 +729,19 @@ They tend to not be on their own, but as part of a corresponding <a class="refer
         </div>
         <div class="sidebar">
           <h3>Table Of Contents</h3>
-          <ul>
-<li class="toctree-l1"><a class="reference internal" href="Overview.html">PanthR Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="API.html">Language API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Client.html">Web Client</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Server.html">Web Server</a></li>
-<li class="toctree-l1"><a class="reference internal" href="PanthR-org.html">www.panthr.org</a></li>
-<li class="toctree-l1"><a class="reference internal" href="technologies.html">Technologies used</a></li>
-<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html">Dataset Importer/Exporter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html#node-js-rserve-interface">Node.js &#8211; RServe interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html#node-js-user-account-management">Node.js user account management</a></li>
-<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html#node-js-main-express-server-application">Node.js main Express server application</a></li>
-<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html#graph-and-graph-editor-objects">Graph and Graph Editor objects</a></li>
-<li class="toctree-l1"><a class="reference internal" href="Settings.html">Settings</a></li>
+          <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Overview.html">1. PanthR Overview</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="API.html">2. Language API</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">2.1. Structures</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Commands.html">2.2. Commands</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Client.html">3. Web Client</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Server.html">4. Web Server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PanthR-org.html">5. www.panthr.org</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technologies.html">6. Technologies used</a></li>
+<li class="toctree-l1"><a class="reference internal" href="PossibleStudentProjects.html">7. Possible Student Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Settings.html">8. Settings</a></li>
 </ul>
 
           <h3 style="margin-top: 1.5em;">Search</h3>
@@ -762,9 +762,9 @@ They tend to not be on their own, but as part of a corresponding <a class="refer
     <div class="footer-wrapper">
       <div class="footer">
         <div class="left">
-          <a href="API.html" title="Language API"
+          <a href="API.html" title="2. Language API"
              >previous</a> |
-          <a href="Commands.html" title="Commands"
+          <a href="Commands.html" title="2.2. Commands"
              >next</a> |
           <a href="genindex.html" title="General Index"
              >index</a>
