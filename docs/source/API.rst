@@ -9,8 +9,6 @@ Data communication takes place in JSON format. Each JSON object needs to contain
         An array of one more more objects, each representing an "object". The various available object listed in the subsections.
         We need to arrange things so that addons can create new "objects". Ideally this should be done in two levels, in Javascript as well as R.
 
-Objects
-~~~~~~~~
 Each object has a specific list of expected keys. Any other keys will be ignored.  All objects are represented in the API as a JSON object, with a ``type`` key holding the objects's type.
 
 Each object typically includes at least the following keys:
