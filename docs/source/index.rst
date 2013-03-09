@@ -4,13 +4,14 @@
    contain the root `toctree` directive.
 
 Welcome to PanthR!
-=================
+==================
 PanthR is indented to provide a web-based free alternative to statistical software, powered by the `R language <http://www.r-project.org>`_.
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
+   :numbered:
 
    Overview
    API
