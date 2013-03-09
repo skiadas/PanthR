@@ -23,6 +23,8 @@ Each object typically includes at least the following keys:
     An optional, longer, more human-readable, name.
 :description:
     This could be a few lines accompanying the object. Typically not shown, but a user could use this to explain something about this object (e.g. where the data came from etc).
+:comments:
+    Used for collaboration, this would be an array of "comments", each identifying the user that made the comment. Would be restricted to users having write access to the object, or perhaps should be allowed also for users having only read access. We would need to work out exactly how this should show up in the interface.
 
 For the sake of brevity, and since they would appear in each object, these keys will be omitted from the object descriptions below.
 
