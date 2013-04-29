@@ -8,4 +8,3 @@ users db object:
    
 -db.deleteUser(userObject)
 -db.findUser(id) --id is email--
--
