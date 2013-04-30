@@ -1,8 +1,6 @@
-/**
- * New node file
- */
+
 var mongodb = require('mongodb');
-var server = new mongodb.Server('localhost',:27017, {auto_reconnect: true});
+var server = new mongodb.Server('localhost', 27017, {auto_reconnect: true});
 
 
 //intitalize function
@@ -25,6 +23,7 @@ function init(dbObject)
 	}
 }
 
+
 //method 
 // open database connection
 db.open(function(err, db)
@@ -39,11 +38,9 @@ db.open(function(err, db)
 	      
 }
 
-function createUser(userObject)
+function createUser(user)
 {
-	var user = userObject;
-	db.collection('users').insert({
-	  id:user.id, fname: user.fname, lname: user.lname, nickname: user.nickname}, 
+	db.collection('users').insert(user, 
 	  function(err, result) {    
 	    if (err) throw err;    
 	    if (result) console.log('Added!');
