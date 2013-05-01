@@ -19,4 +19,4 @@ var a = new User({_id:'beitzr14',fname:'john', lname:'doe'});
 console.log(a instanceof User);
 console.log(a.print()); 
 
-exports = User;
+module.exports = User;
