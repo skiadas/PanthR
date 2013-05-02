@@ -30,6 +30,9 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
+app.get('/register', routes.register);
+app.get('/login', routes.login);
+app.post('/login', routes.authenticate);
 var prefixes = ['user'];
 prefixes.forEach(function(prefix) {
     map.mapRoute(app, prefix);
