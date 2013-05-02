@@ -5,7 +5,7 @@
 
 var express = require('express')
   , routes = require('./routes')
-  , user = require('./routes/user')
+  , map = require('./maproutecontroller')
   , http = require('http')
   , path = require('path');
 
@@ -30,7 +30,10 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/users', user.list);
+var prefixes = ['user'];
+prefixes.forEach(function(prefix) {
+    map.mapRoute(app, prefix);
+});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
