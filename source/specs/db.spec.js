@@ -9,13 +9,13 @@
  // load up db module that RJ made
  // create a test db 
  var mongodb = require('mongodb');
- var server = new mongodb.Server('localhost',:27017, {auto_reconnect: true});
+ var server = new mongodb.Server('localhost',27017, {auto_reconnect: true});
  
  // create my own testing database
- var db = new mongdb.Db('testingdb', server);
+ var db = new mongodb.Db('testingdb', server);
  
  // load module to test
- var dbmod = require('db');
+ var dbmod = require('../libs/db.js');
  
  beforeEach(function() {
  
