@@ -10,8 +10,8 @@ var server = new mongodb.Server('localhost', 27017, {
 // if it doesnt find calls function to initialize standard
 
 function init(callback) {
-   if (this.db) {
-      process.nextTick(callback (undefined, this.db));
+   if (this.db) { 
+      callback (null, this.db)
    } else {
       this.db = 'opening';
       var newdb = new mongodb.Db('panthrdb', server);
@@ -23,7 +23,7 @@ function init(callback) {
             that.db = db
          }   
          if (callback) {
-            process.nextTick(callback(err, db));
+            callback(err, db);
          }
          return;
       })
@@ -40,7 +40,7 @@ function createUser(user, callback) {
             console.log(message, user.email);
          }
          if (callback) {
-            process.nextTick(callback(err, result));
+            callback(err, result);
          }
          return;
      }
@@ -70,18 +70,17 @@ function findUser(email, callback) {
       collection.findOne({
          email: email
       }, function (err, result) {
-         if (err) {
-            if (callback){
-               process.nextTick(callback(err, result));
-               console.log("Did not find user!");
+         if (result === null) {
+            console.log("Did not find user!", email);
+            if (callback) {
+               callback(err, result);
                return;
             } else {
-            throw err;
-            }            
+               throw err;
+            }
          }
-         
          if (callback) {
-            process.nextTick(callback(err, result));
+            callback(err, result);
          }
          console.log('Found User!', result);
          return result;
@@ -95,8 +94,6 @@ module.exports = {
    findUser: findUser
 };
 
-//module.exports.init(undefined, function (err, result) {
-//   module.exports.createUser({
-//      email: 'b@a.com'
-//  }, function (err, result) {})
+//module.exports.init(function (err, result) {
+//   module.exports.findUser( 'a@a.com', function (err, result) {})
 //});
