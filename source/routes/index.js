@@ -4,17 +4,25 @@
  */
 
 exports.index = function(req, res) {
-  res.render('index', { title: 'Express' });
+   res.render('index', { title: 'Express' });
 };
 exports.register = function(req, res) {
-    // Brings up registration screen (could be static?)
-    res.send('registration page');
+   // Brings up registration screen (could be static?)
+   res.render('register', { title: 'Register'});
 };
+exports.createUser = function (req, res) {
+   console.log('createUser got Called');
+   res.send('hello');
+   return;
+};
+exports.forgotPwd = function (req, res) {
+   res.render('forgotPwd', {title: "Forgot Password"});
+}
 exports.login = function(req, res) {
-    // Brings up login screen (could be static?)
-    res.send('login page');
+   // Brings up login screen (could be static?)
+   res.render('login', {email: req.cookies.email});
 };
 exports.authenticate = function(req, res) {
-    // Need to add login authentication code here probably
-    res.send('authentication. should not be a regular page');
+   // Need to add login authentication code here probably
+   res.send('authentication. should not be a regular page');
 };
