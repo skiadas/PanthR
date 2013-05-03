@@ -9,7 +9,7 @@ var server = new mongodb.Server('localhost', 27017, {
 // if known contects database object (ex. testing)
 // if it doesnt find calls function to initialize standard
 
-function init(dbObject) {
+function init(dbObject, callback) {
    if (this.db) {
       this.db.close()
    }
@@ -18,26 +18,14 @@ function init(dbObject) {
    newdb.open(function (err, db) {
       if (err) throw err;
       that.db = db
+      if (callback) {
+         callback(err, that.db);
+      }
    })
    return this;
 }
 
-// open database connection
-
-function open() {
-   db.open(function (err, db) {
-      if (!err) {
-         // access or create
-         db.collection('users', function (err, collection) {
-            if (err) throw err;
-            if (collection) console.log('Were In!');
-         });
-      };
-   });
-   return this;
-}
-
-function createUser(user) {
+function createUser(user, callback) {
    if (this.db) {
       this.db.collection('users', function (err, collection) {
          collection.findOne({
@@ -47,12 +35,18 @@ function createUser(user) {
                collection.insert(user, function (err, result) {
                   if (err) throw err;
                   console.log('Added user!', user.email);
+                  if (callback) {
+                     callback(err, result);
+                  }
                })
             } else {
                collection.update(dbUser, {
                   $set: user
                }, function (err, result) {
                   console.log('Update User!', user.email);
+                  if (callback) {
+                     callback(err, result);
+                  }
                })
             }
          })
@@ -63,11 +57,30 @@ function createUser(user) {
    return this;
 }
 
+/*function findUser(email, callback) {
+   this.db.collection('users', function (err, collection) {
+      collection.findOne({
+         email: email
+      }, function (err, result) {
+         if (err) throw err;
+         console.log('Found User!');
+         var found = result;
+         if (callback) {
+            callback(err, result);
+         }
+      })
+   })
+   return found;
+}*/
+
 module.exports = {
    init: init,
    createUser: createUser,
-   open: open
+   findUser: findUser
 };
 
-//module.exports.init()
-//setTimeout(function() {module.exports.createUser({email: 'b@a.com', name: 'Ron'})},1000);
+module.exports.init(undefined, function (err, result) {
+   module.exports.findUser({
+      email: 'b@a.com'
+   }, function (err, result) {})
+});
