@@ -5,7 +5,6 @@
 
 var express = require('express')
   , routes = require('./routes')
-  , map = require('./maproutecontroller')
   , passport = require('passport')
   , flash = require('connect-flash')
   , LocalStrategy = require('passport-local').Strategy
