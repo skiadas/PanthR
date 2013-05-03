@@ -40,7 +40,7 @@ function createUser(user, callback) {
             console.log(message, user.email);
          }
          if (callback) {
-            callback(err, result);
+            process.nextTick(callback(err, result));
          }
          return;
      }
@@ -72,7 +72,7 @@ function findUser(email, callback) {
       }, function (err, result) {
          if (err) {
             if (callback){
-               callback(err, result);
+               process.nextTick(callback(err, result));
                console.log("Did not find user!");
                return;
             } else {
@@ -81,7 +81,7 @@ function findUser(email, callback) {
          }
          
          if (callback) {
-            callback(err, result);
+            process.nextTick(callback(err, result));
          }
          console.log('Found User!', result);
          return result;
@@ -95,8 +95,8 @@ module.exports = {
    findUser: findUser
 };
 
-module.exports.init(undefined, function (err, result) {
-   module.exports.createUser({
-      email: 'b@a.com'
-   }, function (err, result) {})
-});
+//module.exports.init(undefined, function (err, result) {
+//   module.exports.createUser({
+//      email: 'b@a.com'
+//  }, function (err, result) {})
+//});
