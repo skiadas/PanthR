@@ -65,6 +65,9 @@ passport.deserializeUser(function(email, done) {
 // ROUTES
 app.get('/', routes.index);
 app.get('/register', routes.register);
+app.post('/register', routes.createUser);
+app.get('/forgotPwd', routes.forgotPwd);
+app.post('/forgotPwd', routes.login);
 app.get('/login', routes.login);
 app.post('/login', 
     passport.authenticate('local', { successRedirect: '/user',
