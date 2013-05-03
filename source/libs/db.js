@@ -9,69 +9,85 @@ var server = new mongodb.Server('localhost', 27017, {
 // if known contects database object (ex. testing)
 // if it doesnt find calls function to initialize standard
 
-function init(dbObject, callback) {
+function init(callback) {
    if (this.db) {
-      this.db.close()
+      process.nextTick(callback (undefined, this.db));
+   } else {
+      this.db = 'opening';
+      var newdb = new mongodb.Db('panthrdb', server);
+      var that = this;
+      newdb.open(function (err, db) {
+         if (err) {
+            console.log(err);
+         } else {
+            that.db = db
+         }   
+         if (callback) {
+            process.nextTick(callback(err, db));
+         }
+         return;
+      })
    }
-   var newdb = dbObject || new mongodb.Db('panthrdb', server);
-   var that = this;
-   newdb.open(function (err, db) {
-      if (err) throw err;
-      that.db = db
-      if (callback) {
-         callback(err, that.db);
-      }
-   })
    return this;
 }
 
 function createUser(user, callback) {
+   myCb = function (message) {
+      return function(err, result){ 
+         if (err) {
+            console.log(err);
+         } else { 
+            console.log(message, user.email);
+         }
+         if (callback) {
+            callback(err, result);
+         }
+         return;
+     }
+   }
    if (this.db) {
       this.db.collection('users', function (err, collection) {
          collection.findOne({
             email: user.email
          }, function (err, dbUser) {
             if (!dbUser) {
-               collection.insert(user, function (err, result) {
-                  if (err) throw err;
-                  console.log('Added user!', user.email);
-                  if (callback) {
-                     callback(err, result);
-                  }
-               })
-            } else {
+               collection.insert(user, myCb ('Added User!'))
+            } else {                  
                collection.update(dbUser, {
                   $set: user
-               }, function (err, result) {
-                  console.log('Update User!', user.email);
-                  if (callback) {
-                     callback(err, result);
-                  }
-               })
+               }, myCb ('Updated user!'));
             }
          })
       });
    } else {
-      throw new Error('db not open');
+      console.log('db not open');
    }
    return this;
 }
 
-/*function findUser(email, callback) {
+function findUser(email, callback) {
    this.db.collection('users', function (err, collection) {
       collection.findOne({
          email: email
       }, function (err, result) {
-         if (err) throw err;
-         console.log('Found User!');
-         var found = result;
+         if (err) {
+            if (callback){
+               callback(err, result);
+               console.log("Did not find user!");
+               return;
+            } else {
+            throw err;
+            }            
+         }
+         
          if (callback) {
             callback(err, result);
          }
+         console.log('Found User!', result);
+         return result;
       })
    })
-   return found;
-}*/
+}
 
 module.exports = {
    init: init,
@@ -80,7 +96,7 @@ module.exports = {
 };
 
 module.exports.init(undefined, function (err, result) {
-   module.exports.findUser({
+   module.exports.createUser({
       email: 'b@a.com'
    }, function (err, result) {})
 });
