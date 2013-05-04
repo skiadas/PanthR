@@ -6,14 +6,15 @@
 var express = require('express')
   , routes = require('./routes')
   , passport = require('passport')
-  , flash = require('connect-flash')
   , LocalStrategy = require('passport-local').Strategy
-  , http = require('http')
+  , flash = require('connect-flash')
   , path = require('path')
+  , http = require('http')
   , server = http.createServer(app)
+  , io = require('socket.io').listen(server)
   , User = require('./libs/user');
-
 var app = express();
+
 
 // all environments
 app.set('port', process.env.PORT || 3000);
