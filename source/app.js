@@ -10,6 +10,7 @@ var express = require('express')
   , LocalStrategy = require('passport-local').Strategy
   , http = require('http')
   , path = require('path')
+  , server = http.createServer(app)
   , User = require('./libs/user');
 
 var app = express();
@@ -35,7 +36,9 @@ if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-// AUTHORIZATION SETUP
+//
+// PASSPORT AUTHORIZATION SETUP
+//
 passport.use(new LocalStrategy({
   usernameField: 'email',
   passwordField: 'password'
@@ -62,7 +65,9 @@ passport.deserializeUser(function(email, done) {
   });
 });
 
+//
 // ROUTES
+//
 app.get('/', routes.index);
 app.get('/register', routes.register);
 app.post('/register', routes.createUser);
@@ -81,6 +86,9 @@ app.get('/user',
 );
 
 
-http.createServer(app).listen(app.get('port'), function(){
+//
+// START SERVER
+//
+server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
