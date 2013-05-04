@@ -13,6 +13,7 @@ var express = require('express')
   , app = express()
   , server = http.createServer(app)
   , io = require('socket.io').listen(server)
+  , PubSub = require('./libs/pubsub')
   , User = require('./libs/user');
 
 
@@ -95,6 +96,9 @@ io.sockets.on('connection', function (socket) {
   socket.on('my other event', function (data) {
     console.log(data);
   });
+  PubSub.subscribe('/Test/new', function(msg) {
+      socket.send(msg);
+  })
 });
 // 
 // START SERVER
@@ -102,3 +106,12 @@ io.sockets.on('connection', function (socket) {
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
+
+// Testing Pubsub
+// FIXME TODO Should remove this eventually. It is simply here to test the PubSub mechanism
+var loop = function(counter, interval) {
+    console.log('Publishing: '+ counter);
+    PubSub.publish('/Test/new', ['message ' + counter]);
+    setTimeout(loop, interval, counter + 1, interval);
+}
+loop(0, 6000);

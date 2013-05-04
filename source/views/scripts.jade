@@ -8,4 +8,7 @@ script(src="/socket.io/socket.io.js")
 |     console.log(data);
 |     socket.emit('my other event', { my: 'data' });
 |   });
+|   socket.on('message', function(msg) {
+|      console.log(msg);
+|   });
 | </script>
