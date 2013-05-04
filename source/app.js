@@ -10,10 +10,10 @@ var express = require('express')
   , flash = require('connect-flash')
   , path = require('path')
   , http = require('http')
+  , app = express()
   , server = http.createServer(app)
   , io = require('socket.io').listen(server)
   , User = require('./libs/user');
-var app = express();
 
 
 // all environments
@@ -86,10 +86,19 @@ app.get('/user',
                                      failureFlash: true })
 );
 
-
-//
+// 
+// SOCKET.IO SETUP
+// 
+io.sockets.on('connection', function (socket) {
+    // TODO change this code
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
+});
+// 
 // START SERVER
-//
+// 
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
