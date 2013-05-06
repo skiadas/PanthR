@@ -51,7 +51,7 @@ function updateUser(user, changes, callback) {
          collection.findOne({
             email: user.email
          }, function (err, dbUser) {
-            if (dbUser){
+            if (dbUser) {
                collection.update(dbUser, {
                   $set: changes
                }, myCb('Updated user!', user, callback));
@@ -63,10 +63,10 @@ function updateUser(user, changes, callback) {
    } else {
       console.log('db not open');
    }
-   return this; 
+   return this;
 }
 
-function createUser(user, callback) { 
+function createUser(user, callback) {
    if (this.db) {
       this.db.collection('users', function (err, collection) {
          collection.findOne({
@@ -85,11 +85,14 @@ function createUser(user, callback) {
    return this;
 }
 
-function findUser(email, callback) {
+function findUser(email, fields, callback) {
+   if (fields instanceof Function) {
+      callback = fields;
+      fields = {};
+   }
    this.db.collection('users', function (err, collection) {
-      collection.findOne({
-         email: email
-      }, function (err, result) {
+      collection.findOne(
+         email, fields, function (err, result) {
          if (result === null) {
             console.log("Did not find user!", email);
             if (callback) {
@@ -142,5 +145,5 @@ module.exports = {
 //module.exports.init();
 
 //module.exports.init(function (err, result) {
-//   module.exports.updateUser({email: 'b@a.com'}, { lname: 'doer'}, function (err, result) {})
-//});   
+//   module.exports.findUser({email: 'b@a.com'}, function (err, result) {})
+//});
