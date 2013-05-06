@@ -16,6 +16,10 @@ User.delete = function (email, callback) {
    return db.deleteUser(email, callback);
 }
 
+User.checkExisting = function (user, callback) {
+   return db.findUser(user.email, {nick: 1, email: 1, password: 1}, callback);
+}
+
 User.prototype = {
    print: function () {
       return this.fname + ' ' + this.lname
