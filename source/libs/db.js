@@ -141,6 +141,6 @@ module.exports = {
 
 //module.exports.init();
 
-module.exports.init(function (err, result) {
-   module.exports.updateUser({email: 'b@a.com'}, { lname: 'doer'}, function (err, result) {})
-});   
+//module.exports.init(function (err, result) {
+//   module.exports.updateUser({email: 'b@a.com'}, { lname: 'doer'}, function (err, result) {})
+//});   
