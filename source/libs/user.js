@@ -16,6 +16,14 @@ User.delete = function (email, callback) {
    return db.deleteUser(email, callback);
 }
 
+User.checkExisting = function (user, callback) {
+   return db.findUser(user.email, {
+      nick: 1,
+      email: 1,
+      password: 1
+   }, callback);
+}
+
 User.prototype = {
    print: function () {
       return this.fname + ' ' + this.lname
@@ -30,15 +38,15 @@ User.prototype = {
    save: function (callback) {
       db.createUser(this, callback);
       return this;
-   }//,
+   } //,
    //friends: function (, callback) {
-      //
+   //
    //},
    //accessWorkspaces: function (, callback) {
-      //
+   //
    //},
    //defaultWorkspace: function (, callback) {
-      //
+   //
    //},
 
 };
@@ -52,6 +60,3 @@ var a = new User({
 console.log(a instanceof User);
 console.log(a.print());
 module.exports = User;
-
-
-

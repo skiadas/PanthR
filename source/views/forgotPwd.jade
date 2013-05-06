@@ -1,7 +1,15 @@
-!!!5
+!!! 5
 html
+  head
+    link(href="stylesheets/screen.css"
+      media="screen, projection"
+      rel="stylesheet"
+      type="text/css")
+
   title Forgot Password
-  body Forgot Password?
+  body 
+    include header
+    h1 Forgot Password?
     form(name="reset",
       action="reset")
       <br \>
@@ -15,4 +23,7 @@ html
         input(type="reset", 
           name="res", 
            value="Reset", 
-           id="res") 
+           id="res")
+  include footer
+  include scripts
+   

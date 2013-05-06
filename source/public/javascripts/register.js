@@ -1,0 +1,1 @@
+// Javascript code to do user registration.
