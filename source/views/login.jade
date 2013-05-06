@@ -1,7 +1,15 @@
-!!!5
+!!! 5
 html
+  head
+    link(href="stylesheets/screen.css"
+      media="screen, projection"
+      rel="stylesheet"
+      type="text/css")
+      
   title PanthR Login
-  body PanthR Login
+  body 
+    include header
+    h1 PanthR Login
     form(name="simple login", 
       action="Login")
       br
@@ -16,7 +24,7 @@ html
           id="pwd")
       br
       label(for="button1")
-        <br \>
+        br
         input(type="submit", 
           name="login", 
            value="Login", 
@@ -25,4 +33,6 @@ html
     a(href="/forgotPwd") Forgot Password? 
     br
     a(href="/register") Register!
+  include footer
+  include scripts
       
