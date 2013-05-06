@@ -1,7 +1,15 @@
-!!!5
+!!! 5
 html
+  head
+    link(href="stylesheets/screen.css"
+      media="screen, projection"
+      rel="stylesheet"
+      type="text/css")
+
   title Register
-  body Register for PanthR
+  body
+    include header
+    h1 Register for PanthR
     form(name="reg",
       action="register")
       <br \>
@@ -25,4 +33,7 @@ html
         input(type="submit", 
           name="submit", 
            value="Submit", 
-           id="submit") 
+           id="submit")
+  include footer
+  include scripts
+  
