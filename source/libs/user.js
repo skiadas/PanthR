@@ -1,4 +1,5 @@
 var db = require('./db');
+var crypto = require('crypto');
 
 var User = function (obj) {
    for (i in obj) {
@@ -29,14 +30,25 @@ User.prototype = {
       return this.fname + ' ' + this.lname
    },
    validPassword: function (password) {
-      var salt = this.salt;
+      var salt = this.password.salt;
       var hashpassword = crypto.createHash('sha512')
          .update(salt + password)
          .digest('hex');
-      return (user.password === hashpassword);
+      return (user.password.hash === hashpassword);
    },
    save: function (callback) {
       db.createUser(this, callback);
+      return this;
+   },
+   encriptPassword: function () {
+      var salt = Math.round((new Date().valueOf() * Math.random())) + '';
+      var hashpassword = crypto.createHash('sha512')
+         .update(salt + this.password)
+         .digest('hex');
+      this.password = {
+         salt: salt,
+         hash: hashpassword
+      };
       return this;
    } //,
    //friends: function (, callback) {
