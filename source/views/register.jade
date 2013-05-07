@@ -12,22 +12,25 @@ html
     h1 Register for PanthR
     form(name="reg",
       action="register"
-      method="POST")
+      method="post")
       br
       label(for="email") Email  
         input(type="text", 
           name="email", 
           id="email") 
+        span
       br
       label(for="nick") Nickname  
         input(type="text", 
           name="nick", 
           id="nick") 
+        span
       br 
       label(for="password") Password  
         input(type="password", 
           name="password", 
-          id="password") 
+          id="password")
+        span
       br 
       label(for="sub")
         br

@@ -2,8 +2,7 @@ var mockery = require('mockery');
 mockery.enable();
 
 describe("A database connection", function () {
-
-
+    
     // inquiring mongodb module 
     // load up db module that RJ made
     // create a test db 
@@ -14,8 +13,16 @@ describe("A database connection", function () {
 
     // create my own testing database
     var db = new mongodb.Db('testingdb', server);
-
-    beforeEach(function () {
+    
+    // making a spy on the callback function
+    var testCallBack = null;
+        
+    beforeEach(function () {        
+        testCallBack = {
+            callback: function(arg1, arg2) {                
+            }
+        };
+        spyOn(testCallBack, 'callback');
         mockery.registerAllowable('../libs/db.js', true);
     });
 
@@ -24,7 +31,7 @@ describe("A database connection", function () {
     });
 
     // create my own mock 
-    it("Create mock database!", function () {
+    it("Create mock database!", function (done) {
         var mongodbmock = {
             Server: function (host, port, optional) {
                 expect(host).toEqual('localhost');
@@ -36,7 +43,7 @@ describe("A database connection", function () {
             },
             Db: function(databaseName, config){
                 expect(databaseName).toEqual('panthrdb');
-                expect(config).toEqual(server);
+                expect(config).toEqual(server);                
                 return db;
             }
         };
@@ -48,24 +55,50 @@ describe("A database connection", function () {
         expect(dbmod.init).toBeDefined();
         // expect dbmod has a function called 'init'
         expect(dbmod.init).toEqual(jasmine.any(Function));
-        dbmod.init();
+        dbmod.init(function(){
+            done();            
+        });
+        //expect(dbmod.init).toNotEqual(jasmine.any(Function));
         mockery.deregisterMock('mongodb');
     });
-
-    /*
- // check whether it has an init() function
- it("should have an init() function", function() {
-    // expect dbmod has a defined property named 'init' 
-    expect(dbmod.init).toBeDefined();
-    // expect dbmod has a function called 'init'
-    expect(dbmod.init).toEqual(jasmine.any(Function))
- }); 
- 
- // check whether the createUser() function exists and actually creates a new user
- it("should have a createUser() function", function() {
- 
     
- });
- */
+    // set up a spy funct   ion -> check if the function gets called and what arguments have been passed
+    
+    it("Tracks that the spy was called and its numbers of calls", function() {
+        // create my own function
+        
+        // turn it into a spy function
+        
+        // asynchronous test, wait until the callback function get called
+        
+        // ask if it has been called and what arguments it passes
+        
+     
+        runs(function() {
+            flag = false;
+            console.log('BEING RUN');
+            //testCallBack.callback(null, )
+            setTimeout(function() {
+                flag = true;
+            }, 100);
+        });
+    
+        waitsFor(function() {
+            var dbmod = require('../libs/db.js');
+            dbmod.init(testCallBack.callback);
+            return flag;
+        }, "The callback should be called", 150);
+    
+        runs(function() {
+            expect(testCallBack.callback).toHaveBeenCalled();
+            //expect(flag).toEqual(true);
+        });
+    });        
+    
+    
+ // check whether the createUser() function exists and actually creates a new user
+    it("should have a createUser() function", function() {
+    
+    });
 
 });
