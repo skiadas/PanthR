@@ -16,7 +16,7 @@ function init(callback) {
       this.db = 'opening';
       var newdb = new mongodb.Db('panthrdb', server);
       var that = this;
-      newdb.open(function (err, db) {
+      newdb.open(function(err, db) {
          if (err) {
             console.log(err);
          } else {
@@ -32,7 +32,7 @@ function init(callback) {
 }
 
 function myCb(message, user, callback) {
-   return function (err, result) {
+   return function(err, result) {
       if (err) {
          console.log(err);
       } else {
@@ -47,10 +47,10 @@ function myCb(message, user, callback) {
 
 function updateUser(user, changes, callback) {
    if (this.db) {
-      this.db.collection('users', function (err, collection) {
+      this.db.collection('users', function(err, collection) {
          collection.findOne({
             email: user.email
-         }, function (err, dbUser) {
+         }, function(err, dbUser) {
             if (dbUser) {
                collection.update(dbUser, {
                   $set: changes
@@ -68,10 +68,10 @@ function updateUser(user, changes, callback) {
 
 function createUser(user, callback) {
    if (this.db) {
-      this.db.collection('users', function (err, collection) {
+      this.db.collection('users', function(err, collection) {
          collection.findOne({
             email: user.email
-         }, function (err, dbUser) {
+         }, function(err, dbUser) {
             if (!dbUser) {
                collection.insert(user, myCb('Added User!', user, callback))
             } else {
@@ -90,9 +90,10 @@ function findUser(email, fields, callback) {
       callback = fields;
       fields = {};
    }
-   this.db.collection('users', function (err, collection) {
-      collection.findOne(
-         email, fields, function (err, result) {
+   this.db.collection('users', function(err, collection) {
+      collection.findOne({
+         email: email
+      }, fields, function(err, result) {
          if (result === null) {
             console.log("Did not find user!", email);
             if (callback) {
@@ -112,10 +113,10 @@ function findUser(email, fields, callback) {
 }
 
 function deleteUser(email, callback) {
-   this.db.collection('users', function (err, collection) {
+   this.db.collection('users', function(err, collection) {
       collection.remove({
          email: email
-      }, function (err, removed) {
+      }, function(err, removed) {
          if (err) {
             console.log('user not deleted!', err);
             if (callback) {
