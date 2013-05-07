@@ -1,23 +1,33 @@
 var db = require('./db');
 var crypto = require('crypto');
 
-var User = function (obj) {
-   for (i in obj) {
-      if (obj.hasOwnProperty(i)) {
-         this[i] = obj[i];
+var User = function(obj) {
+      for (i in obj) {
+         if (obj.hasOwnProperty(i)) {
+            this[i] = obj[i];
+         }
       }
-   }
-}
+    }
+    
+    
+    
+User.find = function(email, callback) {
+   return db.findUser(email, function(err, user) {
+      if (!err) {
+         user = new User(user);
+      }
+      if (callback) {
+         callback(err, user);
+      }
+      return this;
+   });
+};
 
-User.find = function (email, callback) {
-   return db.findUser(email, callback);
-}
-
-User.delete = function (email, callback) {
+User.delete = function(email, callback) {
    return db.deleteUser(email, callback);
 }
 
-User.checkExisting = function (user, callback) {
+User.checkExisting = function(user, callback) {
    return db.findUser(user.email, {
       nick: 1,
       email: 1,
@@ -26,25 +36,21 @@ User.checkExisting = function (user, callback) {
 }
 
 User.prototype = {
-   print: function () {
+   print: function() {
       return this.fname + ' ' + this.lname
    },
-   validPassword: function (password) {
+   validPassword: function(password) {
       var salt = this.password.salt;
-      var hashpassword = crypto.createHash('sha512')
-         .update(salt + password)
-         .digest('hex');
+      var hashpassword = crypto.createHash('sha512').update(salt + password).digest('hex');
       return (user.password.hash === hashpassword);
    },
-   save: function (callback) {
+   save: function(callback) {
       db.createUser(this, callback);
       return this;
    },
-   encriptPassword: function () {
+   encriptPassword: function() {
       var salt = Math.round((new Date().valueOf() * Math.random())) + '';
-      var hashpassword = crypto.createHash('sha512')
-         .update(salt + this.password)
-         .digest('hex');
+      var hashpassword = crypto.createHash('sha512').update(salt + this.password).digest('hex');
       this.password = {
          salt: salt,
          hash: hashpassword
