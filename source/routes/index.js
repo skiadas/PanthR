@@ -1,28 +1,58 @@
-
 /*
  * GET home page.
  */
+User = require('../libs/user');
 
-exports.index = function(req, res) {
-   res.render('index', { title: 'Express' });
+exports.index = function (req, res) {
+   res.render('index', {
+      title: 'Express'
+   });
 };
-exports.register = function(req, res) {
+exports.register = function (req, res) {
    // Brings up registration screen (could be static?)
-   res.render('register', { title: 'Register'});
+   res.render('register', {
+      title: 'Register'
+   });
 };
 exports.createUser = function (req, res) {
-   console.log('createUser got Called');
-   res.send('hello');
+   var user = new User({
+      email: req.body.email,
+      nick: req.body.nick,
+      password: req.body.password
+   });
+   if (!User.checkExisting(user, function (err, result) {})) {
+      user.encriptPassword().save(function (err, result) {});
+   }
+   res.render('index', {
+      title: 'Express'
+   });
    return;
 };
 exports.forgotPwd = function (req, res) {
-   res.render('forgotPwd', {title: "Forgot Password"});
+   res.render('forgotPwd', {
+      title: "Forgot Password"
+   });
 }
-exports.login = function(req, res) {
+exports.login = function (req, res) {
    // Brings up login screen (could be static?)
-   res.render('login', {email: req.cookies.email});
+   res.render('login', {
+      title: 'login'
+  });
 };
-exports.authenticate = function(req, res) {
+exports.authenticate = function (req, res) {
    // Need to add login authentication code here probably
-   res.send('authentication. should not be a regular page');
+      var user = new User({
+      email: req.body.email,
+      nick: req.body.nick,
+      password: req.body.password
+   });
+   if (user.validPassword(req.body.password)) {
+      res.render('index', {
+         title: 'Express'
+      });
+   } else {
+      res.render('login', {
+         title: 'Login'
+      });
+   }
 };
