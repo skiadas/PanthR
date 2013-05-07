@@ -42,7 +42,7 @@ User.prototype = {
    validPassword: function(password) {
       var salt = this.password.salt;
       var hashpassword = crypto.createHash('sha512').update(salt + password).digest('hex');
-      return (user.password.hash === hashpassword);
+      return (this.password.hash === hashpassword);
    },
    save: function(callback) {
       db.createUser(this, callback);
@@ -70,11 +70,15 @@ User.prototype = {
 };
 
 var a = new User({
-   email: 'a1@a.com',
-   fname: 'john',
-   lname: 'doe'
+   email: 'a@a.com',
+   nick: 'john',
+   password: 'pass'
 });
 
-console.log(a instanceof User);
-console.log(a.print());
+setTimeout(function(){
+    a.encriptPassword().save();
+    console.log("Created dummy user");
+}, 2000);
+
+
 module.exports = User;

@@ -66,6 +66,10 @@ passport.deserializeUser(function(email, done) {
     done(err, user);
   });
 });
+passport.ensureAuthenticated = function(req, res, next) {
+  if (req.isAuthenticated()) { return next(); }
+  res.redirect('/login')
+}
 
 //
 // ROUTES
@@ -83,9 +87,8 @@ app.post('/login',
                                      failureFlash: true })
 );
 app.get('/user', 
-    passport.authenticate('local', { successRedirect: '/user',
-                                     failureRedirect: '/login',
-                                     failureFlash: true })
+    passport.ensureAuthenticated,
+    routes.index
 );
 
 // 
@@ -118,4 +121,4 @@ var loop = function(counter, interval) {
     PubSub.publish('/Test/new', ['message ' + counter]);
     setTimeout(loop, interval, counter + 1, interval);
 }
-loop(0, 6000);
+// loop(0, 6000);

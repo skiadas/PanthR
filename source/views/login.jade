@@ -10,8 +10,9 @@ html
   body 
     include header
     h1 PanthR Login
+    p= message
     form(name="simple login", 
-      action="Login"
+      action="/login",
       method="POST")
       br
       label(for="email") Email  
@@ -19,17 +20,17 @@ html
           name="email", 
           id="email") 
       br 
-      label(for="pwd") Password 
+      label(for="password") Password 
         input(type="password", 
-          name="pwd", 
-          id="pwd")
+          name="password", 
+          id="password")
       br
-      label(for="button1")
+      label(for="submit")
         br
         input(type="submit", 
-          name="login", 
+          name="submit", 
            value="Login", 
-           id="login")            
+           id="submit")            
     a(href="/forgotPwd") Forgot Password? 
     br
     a(href="/register") Register!

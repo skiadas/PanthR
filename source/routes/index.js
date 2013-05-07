@@ -36,7 +36,7 @@ exports.forgotPwd = function(req, res) {
 exports.login = function(req, res) {
     // Brings up login screen (could be static?)
     res.render('login', {
-        title: 'login'
+        title: 'login', message: req.flash('error') || ""
     });
 };
 exports.authenticate = function(req, res) {
