@@ -3,7 +3,6 @@ var server = new mongodb.Server('localhost', 27017, {
    auto_reconnect: true
 });
 
-
 // intitalize function
 // input: takes a database object
 // if known contects database object (ex. testing)
@@ -24,6 +23,10 @@ function init(callback) {
          }
          if (callback) {
             callback(err, db);
+         }
+         while (requests.length != 0) {
+            var now = requests.shift()
+            doRequest.apply(this, now);
          }
          return;
       })
@@ -135,8 +138,22 @@ function deleteUser(email, callback) {
    })
 }
 
+function doRequest(collectionName, methodName, args, callback) {
+   if (!this.db) {
+      this.requests.push([collectionName, methodName, args, callback]);
+   } else {
+      args.push(callback);
+      this.db.collection(collectionName, function(err, collection) {
+         collection[methodName].apply(collection, args);
+      });
+   }
+}
+
 module.exports = {
+   db: null,
+   requests: [],
    init: init,
+   doRequest: doRequest,
    createUser: createUser,
    findUser: findUser,
    updateUser: updateUser
@@ -144,7 +161,10 @@ module.exports = {
 
 
 //module.exports.init();
-
-//module.exports.init(function (err, result) {
-//   module.exports.findUser({email: 'b@a.com'}, function (err, result) {})
-//});
+module.exports.init(function(err, result) {
+   module.exports.doRequest('users', 'findOne', [{
+      email: 'a@a.com'
+   }], function(err, user) {
+      console.log(user);
+   })
+});
