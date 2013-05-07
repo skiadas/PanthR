@@ -90,15 +90,79 @@ describe("A database connection", function () {
         }, "The callback should be called", 150);
     
         runs(function() {
-            expect(testCallBack.callback).toHaveBeenCalled();
-            //expect(flag).toEqual(true);
+            expect(testCallBack.callback).toHaveBeenCalled();            
         });
     });        
     
     
  // check whether the createUser() function exists and actually creates a new user
     it("should have a createUser() function", function() {
-    
+        var dbmod = require('../libs/db.js');
+        var user = {email: 'fjsakfksal'};        
+        
+        // findOne finds an existing user, ignores insert
+        var collectionMockPos = {
+            findOne: function (arg1, arg2) {
+                expect(arg1).toEqual({email:user.email});
+                expect(arg2).toEqual(jasmine.any(Function)); 
+                arg2(null, user);                                       
+            },
+            insert: function(arg1, arg2){
+                expect(arg1).toEqual(user);                                             
+            }
+        };
+        
+        // findOne does not find an existing user, proceeds to insert
+        var collectionMockNeg = {
+            findOne: function (arg1, arg2) {
+                expect(arg1).toEqual({email:user.email});
+                expect(arg2).toEqual(jasmine.any(Function)); 
+                arg2(null, null);                                              
+            },
+            insert: function(arg1, arg2){
+                expect(arg1).toEqual(user);                                             
+            }
+        };
+        
+        var collectionMockForDBPos = {
+            collection: function(arg1, arg2) {
+                expect(arg1).toEqual('users');
+                expect(arg2).toEqual(jasmine.any(Function));
+                arg2(null, collectionMockPos);                                
+            }
+        };
+        
+        var collectionMockForDBNeg = {
+            collection: function(arg1, arg2) {
+                expect(arg1).toEqual('users');
+                expect(arg2).toEqual(jasmine.any(Function));
+                arg2(null, collectionMockNeg);                                
+            }
+        };        
+        
+        dbmod.db = collectionMockForDBPos;
+        
+        // expect dbmod has a defined property named 'createUser' 
+        expect(dbmod.createUser).toBeDefined();
+        // expect dbmod has a function called 'createUser'
+        expect(dbmod.createUser).toEqual(jasmine.any(Function));                         
+        
+        spyOn(dbmod.db, 'collection').andCallThrough();
+        spyOn(collectionMockPos, 'findOne').andCallThrough();
+        spyOn(collectionMockPos, 'insert').andCallThrough();
+        dbmod.createUser(user);
+        expect(dbmod.db.collection).toHaveBeenCalled();               
+        expect(collectionMockPos.findOne).toHaveBeenCalled();        
+        
+        dbmod.db = collectionMockForDBNeg;        
+        spyOn(collectionMockNeg, 'insert').andCallThrough();
+        dbmod.createUser(user);                        
+        expect(collectionMockNeg.insert).toHaveBeenCalled();
+        
+        //expect(dbmod.db.collection).toHaveBeenCalled();
+        //var dbCollection = dbmod.db.collection(); 
+        // need two mock objects, one for db and one for collection
+        // then test all methods of these two mock objects
     });
 
 });
