@@ -26,3 +26,7 @@ exports.authenticate = function(req, res) {
    // Need to add login authentication code here probably
    res.send('authentication. should not be a regular page');
 };
+exports.check_available = function(req, res) {
+    // TODO: Actually check if this email and username are valid.
+    res.send({email: true, nick: true});
+}

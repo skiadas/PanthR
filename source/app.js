@@ -71,6 +71,7 @@ passport.deserializeUser(function(email, done) {
 // ROUTES
 //
 app.get('/', routes.index);
+app.get('/checkAvailable', routes.check_available);
 app.get('/register', routes.register);
 app.post('/register', routes.createUser);
 app.get('/forgotPwd', routes.forgotPwd);
