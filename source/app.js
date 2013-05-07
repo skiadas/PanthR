@@ -14,7 +14,8 @@ var express = require('express')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server)
   , PubSub = require('./libs/pubsub')
-  , User = require('./libs/user');
+  , User = require('./libs/user')
+  , db = require('./libs/db');
 
 
 // all environments
@@ -106,6 +107,9 @@ io.sockets.on('connection', function (socket) {
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
+
+//Open DB
+db.init();
 
 // Testing Pubsub
 // FIXME TODO Should remove this eventually. It is simply here to test the PubSub mechanism
