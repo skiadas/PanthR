@@ -11,7 +11,8 @@ html
     include header
     h1 PanthR Login
     form(name="simple login", 
-      action="Login")
+      action="Login"
+      method="POST")
       br
       label(for="email") Email  
         input(type="text", 
@@ -28,8 +29,7 @@ html
         input(type="submit", 
           name="login", 
            value="Login", 
-           id="button1"
-           action="post")            
+           id="login")            
     a(href="/forgotPwd") Forgot Password? 
     br
     a(href="/register") Register!
