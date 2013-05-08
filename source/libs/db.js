@@ -183,9 +183,10 @@ function addFriend(user, friend, circlesArray, callback) {
 ///circles could have been added 
 //need a way to tell it any circles
 
-function removeFriend(user, friend, circleArray, callback) {
-   var friendStr = 'friends.' + friend._id.toHexString();
-}
+//function removeFriend(user, friend, circleArray, callback) {
+//   var friendStr = 'friends.' + friend._id.toHexString();
+//}
+
 //tagFriend into a list of circls
 
 function tagFriend(user, friend, circleArray, callback) {
@@ -212,8 +213,8 @@ function tagFriend(user, friend, circleArray, callback) {
    console.log('query', queryObj);
    this.doRequest('users', 'update', [findStr, queryObj], callback);
 }
-//remove friend  from circle
 
+//remove friend  from circle
 function unTagFriend(user, friend, circleArray, callback) {
    var friendStr = 'friends.' + friend._id.toHexString() ;
    var queryObj = {
@@ -252,7 +253,7 @@ module.exports = {
    unTagFriend: unTagFriend
 };
 //module.exports.init();
-module.exports.init(function(err, result) {
+/*module.exports.init(function(err, result) {
    module.exports.findUser('a@a.com', {
       email: 1,
       nick: 1,
@@ -271,4 +272,4 @@ module.exports.init(function(err, result) {
          })
       });
    });
-});
+});*/
