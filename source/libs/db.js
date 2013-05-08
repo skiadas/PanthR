@@ -10,7 +10,9 @@ var server = new mongodb.Server('localhost', 27017, {
 
 function init(callback) {
    if (this.db) {
-      callback(null, this.db)
+       if (callback) {
+           callback(null, this.db);
+       }
    } else {
       this.db = 'opening';
       var newdb = new mongodb.Db('panthrdb', server);
@@ -24,9 +26,12 @@ function init(callback) {
          if (callback) {
             callback(err, db);
          }
-         while (requests.length != 0) {
-            var now = requests.shift()
-            doRequest.apply(this, now);
+         var requests = this.requests;
+         if (requests) {
+             while (requests.length != 0) {
+                var now = requests.shift()
+                doRequest.apply(this, now);
+             }
          }
          return;
       })
