@@ -22,12 +22,12 @@ exports.createUser = function(req, res) {
         password: req.body.password
     });
     if (!User.checkExisting(user, function(err, result) {})) {
-        user.encriptPassword().save(function(err, result) {});
+        user.encriptPassword().save(function(err, result) {
+            res.redirect('/');
+        });
+    } else {
+        res.redirect('register');
     }
-    res.render('index', {
-        title: 'Express'
-    });
-    return;
 };
 exports.forgotPwd = function(req, res) {
     res.render('forgotPwd', {
