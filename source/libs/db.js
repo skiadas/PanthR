@@ -190,7 +190,7 @@ module.exports = {
    addFriend: addFriend
 };
 //module.exports.init();
-module.exports.init(function(err, result) {
+/*module.exports.init(function(err, result) {
    module.exports.findUser('a@a.com', {
       email: 1,
       nick: 1,
@@ -208,4 +208,4 @@ module.exports.init(function(err, result) {
          })
       });
    });
-});
+});*/

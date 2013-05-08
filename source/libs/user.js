@@ -75,10 +75,10 @@ var a = new User({
    password: 'pass'
 });
 
-setTimeout(function(){
+/*setTimeout(function(){
     a.encriptPassword().save();
     console.log("Created dummy user");
-}, 2000);
+}, 2000);*/
 
 
 module.exports = User;
