@@ -2,7 +2,6 @@ var mongodb = require('mongodb');
 var server = new mongodb.Server('localhost', 27017, {
    auto_reconnect: true
 });
-
 // intitalize function
 // input: takes a database object
 // if known contects database object (ex. testing)
@@ -10,9 +9,9 @@ var server = new mongodb.Server('localhost', 27017, {
 
 function init(callback) {
    if (this.db) {
-       if (callback) {
-           callback(null, this.db);
-       }
+      if (callback) {
+         callback(null, this.db);
+      }
    } else {
       this.db = 'opening';
       var newdb = new mongodb.Db('panthrdb', server);
@@ -28,10 +27,10 @@ function init(callback) {
          }
          var requests = this.requests;
          if (requests) {
-             while (requests.length != 0) {
-                var now = requests.shift()
-                doRequest.apply(this, now);
-             }
+            while (requests.length != 0) {
+               var now = requests.shift()
+               doRequest.apply(this, now);
+            }
          }
          return;
       })
@@ -145,8 +144,11 @@ function deleteUser(email, callback) {
 
 function doRequest(collectionName, methodName, args, callback) {
    if (!this.db) {
+      console.log(this.requests, '---------');
       this.requests.push([collectionName, methodName, args, callback]);
    } else {
+      //console.log(callback);
+      //console.log(args);
       args.push(callback);
       this.db.collection(collectionName, function(err, collection) {
          collection[methodName].apply(collection, args);
@@ -154,6 +156,29 @@ function doRequest(collectionName, methodName, args, callback) {
    }
 }
 
+function addFriend(user, friend, circlesArray, callback) {
+   var friendStr = 'friends.' + friend._id.toHexString();
+   var queryObj = {
+      '$set': {}
+   };
+   queryObj.$set[friendStr] = {
+      nick: friend.nick,
+      email: friend.email,
+      circles: circlesArray
+   };
+   circlesArray.forEach(function(el) {
+      queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
+         nick: friend.nick,
+         email: friend.email
+      };
+   });
+   var findStr = {
+      _id: user._id
+   };
+   findStr[friendStr] = null;
+   //console.log('query', queryObj);
+   this.doRequest('users', 'update', [findStr, queryObj], callback)
+}
 module.exports = {
    db: null,
    requests: [],
@@ -161,15 +186,26 @@ module.exports = {
    doRequest: doRequest,
    createUser: createUser,
    findUser: findUser,
-   updateUser: updateUser
+   updateUser: updateUser,
+   addFriend: addFriend
 };
-
-
 //module.exports.init();
 module.exports.init(function(err, result) {
-   module.exports.doRequest('users', 'findOne', [{
-      email: 'a@a.com'
-   }], function(err, user) {
-      console.log(user);
-   })
+   module.exports.findUser('a@a.com', {
+      email: 1,
+      nick: 1,
+      _id: 1
+   }, function(err, result) {
+      var me = result;
+      module.exports.findUser('b@b.com', {
+         email: 1,
+         nick: 1,
+         _id: 1
+      }, function(err, result) {
+         var them = result;
+         module.exports.addFriend(me, me, ['ds'], function(err, friend) {
+            //console.log(friend);
+         })
+      });
+   });
 });
