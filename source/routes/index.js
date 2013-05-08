@@ -2,6 +2,7 @@
  * GET home page.
  */
 User = require('../libs/user');
+db = require('../libs/db');
 
 exports.index = function(req, res) {
     res.render('index', {
@@ -57,10 +58,21 @@ exports.authenticate = function(req, res) {
     }
 };
 
-exports.check_available = function(req, res) {
-    // TODO: Actually check if this email and username are valid.
-    res.send({
-        email: true,
-        nick: true
+exports.checkAvailable = function(req, res) {
+    // We need to construct the query ourselves instead of simply accepting the request's query,
+    // for security (to avoid someone making $where requests for instance)
+    var check;
+    var query = {}; 
+    if (req.query.email) {
+        check = 'email';
+    } else if (req.query.nick) {
+        check = 'nick';
+    } else {
+        res.send(404);
+        return;
+    }
+    query[check] = req.query[check];
+    db.doRequest('users', 'findOne', [query], function(err, user) {
+        res.json({avail: !user});
     });
 }

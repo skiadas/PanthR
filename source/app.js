@@ -75,7 +75,7 @@ passport.ensureAuthenticated = function(req, res, next) {
 // ROUTES
 //
 app.get('/', routes.index);
-app.get('/checkAvailable', routes.check_available);
+app.get('/check', routes.checkAvailable);
 app.get('/register', routes.register);
 app.post('/register', routes.createUser);
 app.get('/forgotPwd', routes.forgotPwd);

@@ -2,18 +2,45 @@
 function focusHandler(ev, el) {
     // console.log("Focus:", ev, this);
 }
+function checkSubmit() {
+    var email = $('#email')
+    ,   nick = $('#nick')
+    ,   password = $('#password')
+    ,   submit = $('#submit')
+    ,   ok = email.val() && 
+             nick.val() &&
+             email.next().hasClass('avail') &&
+             nick.next().hasClass('avail') &&
+             password.val().length > 4;
+    // console.log(email.val(), nick.val(), email.next(), nick.next(), password.val());
+    if (ok) {
+        submit.removeAttr('disabled');
+    } else {
+        submit.attr('disabled', 'disabled');
+    }
+}
 function verifyHandler(ev, el) {
-    console.log("Verify:", ev, this);
-    console.log($(this).next())
-    $(this).next().html("Checking availability ...");
+    var el = $(this);
+    if (!el.val()) {
+        // Empty string, nothing to search for
+        el.next().html("").removeClass('avail notavail');
+        checkSubmit();
+        return;
+    }
+    el.next().html("Checking availability ...");
+    var field = el.attr('name');
+    var data = {};
+    data[field] = el.val();
     $.ajax({
-        url: "checkAvailable",
-        data: {
-            email: $('#email').val(),
-            nick: $('#nick').val()
-        }
+        url: "check",
+        data: data
     }).done(function(data, status, xhr) {
-        console.log(data, status, xhr)
+        if (data.avail) {
+            el.next().html("Available!").addClass('avail').removeClass('notavail');
+        } else {
+            el.next().html("Not Available!").addClass('notavail').removeClass('avail');
+        }
+        checkSubmit();
     });
 }
 
@@ -47,11 +74,12 @@ function passwordHandler(ev) {
     // We have to wait for the keypress to complete
     setTimeout(function() {
         el.next().html(checkPassword(el.val()));
+        checkSubmit();
     }, 10);
 }
 
 $(function() {
     $('#submit').attr('disabled', 'disabled');
-    $('#nick, #email').focus(focusHandler).change(verifyHandler);
+    $('#nick, #email').focus(focusHandler).change(verifyHandler).change();
     $('#password').focus(focusHandler).keypress(passwordHandler);
 });
