@@ -1,6 +1,5 @@
 var db = require('./db');
 var crypto = require('crypto');
-
 var User = function(obj) {
       for (i in obj) {
          if (obj.hasOwnProperty(i)) {
@@ -8,8 +7,6 @@ var User = function(obj) {
          }
       }
     }
-    
-    
     
 User.find = function(email, callback) {
    return db.findUser(email, function(err, user) {
@@ -22,11 +19,9 @@ User.find = function(email, callback) {
       return this;
    });
 };
-
 User.delete = function(email, callback) {
    return db.deleteUser(email, callback);
 }
-
 User.checkExisting = function(user, callback) {
    return db.findUser(user.email, {
       nick: 1,
@@ -34,7 +29,6 @@ User.checkExisting = function(user, callback) {
       password: 1
    }, callback);
 }
-
 User.prototype = {
    print: function() {
       return this.fname + ' ' + this.lname
@@ -56,9 +50,23 @@ User.prototype = {
          hash: hashpassword
       };
       return this;
-   } //,
-   //friends: function (, callback) {
-   //
+   },
+   addFriend: function(friend, circleArray, callback) {
+      db.addFriend(User, friend, circleArray, callback);
+      return this;
+   },
+   tagFriend: function(friend, circleArray, callback) {
+      db.tagFriend(User, friend, circleArray, callback);
+      return this;
+   },
+   unTagFriend: function(friend, circleArray, callback) {
+      db.unTagFriend(User, friend, circleArray, callback);
+      return this;
+   },
+   removeFriend: function(friend, circleArray, callback) {
+      db.removeFriend(User, friend, circleArray, callback);
+      return this;
+   }
    //},
    //accessWorkspaces: function (, callback) {
    //
@@ -66,19 +74,14 @@ User.prototype = {
    //defaultWorkspace: function (, callback) {
    //
    //},
-
 };
-
 var a = new User({
    email: 'a@a.com',
    nick: 'john',
    password: 'pass'
 });
-
 /*setTimeout(function(){
     a.encriptPassword().save();
     console.log("Created dummy user");
 }, 2000);*/
-
-
 module.exports = User;
