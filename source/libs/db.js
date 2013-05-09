@@ -183,9 +183,27 @@ function addFriend(user, friend, circlesArray, callback) {
 ///circles could have been added 
 //need a way to tell it any circles
 
-//function removeFriend(user, friend, circleArray, callback) {
-//   var friendStr = 'friends.' + friend._id.toHexString();
-//}
+function removeFriend(user, friend, circleArray, callback) {
+   var friendStr = 'friends.' + friend._id.toHexString();
+   var queryObj = {
+      '$unset': {}
+   };
+   queryObj.$unset[friendStr] = '';
+   circleArray.forEach(function(el) {
+      queryObj.$unset['circles.' + el + '.' + friend._id.toHexString()] = {
+         nick: friend.nick,
+         email: friend.email
+      };
+   });
+   var findStr = {
+      _id: user._id
+   };
+   findStr[friendStr] = {
+      $ne: null
+   };
+   console.log('query', queryObj);
+   this.doRequest('users', 'update', [findStr, queryObj], callback);
+}
 
 //tagFriend into a list of circls
 
@@ -216,14 +234,13 @@ function tagFriend(user, friend, circleArray, callback) {
 
 //remove friend  from circle
 function unTagFriend(user, friend, circleArray, callback) {
-   var friendStr = 'friends.' + friend._id.toHexString() ;
+   var friendStr = 'friends.'+ friend._id.toHexString() +'.circles';
    var queryObj = {
-      '$pull': {},
+      '$pullAll': {},
       '$unset': {}
    };
-   queryObj.$pull[friendStr] = {
-      'circles': circleArray
-   };
+   queryObj.$pullAll[friendStr] = circleArray;
+   
    circleArray.forEach(function(el) {
       queryObj.$unset['circles.' + el + '.' + friend._id.toHexString()] = {
          nick: friend.nick,
@@ -239,6 +256,7 @@ function unTagFriend(user, friend, circleArray, callback) {
    console.log('query', queryObj);
    this.doRequest('users', 'update', [findStr, queryObj], callback);
 }
+
 module.exports = {
    db: null,
    requests: [],
@@ -249,9 +267,11 @@ module.exports = {
    updateUser: updateUser,
    addFriend: addFriend,
    tagFriend: tagFriend,
+   unTagFriend: unTagFriend,
    deleteUser: deleteUser,
-   unTagFriend: unTagFriend
+   removeFriend: removeFriend
 };
+
 //module.exports.init();
 /*module.exports.init(function(err, result) {
    module.exports.findUser('a@a.com', {
@@ -267,7 +287,7 @@ module.exports = {
       }, function(err, result) {
          var them = result;
          //module.exports.addFriend(me, them, ['ds', 'hanover' , 'stats'], function(err, friend) {
-         module.exports.unTagFriend(me, them, ['ds'], function(err, friend) {
+         module.exports.removeFriend(me, them, ['ds', 'hanover' , 'stats'], function(err, friend) {
             //console.log(friend);
          })
       });
