@@ -9,8 +9,8 @@ function checkSubmit() {
     ,   submit = $('#submit')
     ,   ok = email.val() && 
              nick.val() &&
-             email.next().hasClass('avail') &&
-             nick.next().hasClass('avail') &&
+             email.hasClass('avail') &&
+             nick.hasClass('avail') &&
              password.val().length > 4;
     // console.log(email.val(), nick.val(), email.next(), nick.next(), password.val());
     if (ok) {
@@ -46,7 +46,7 @@ function verifyHandler(ev, el) {
 
 function checkPassword(password)
 {
-    var strength = [ "", "vweak", "weak", "medium", "strong", "vstrong" ]
+    var strength = [ "", "vweak", "weak", "medium", "strong", "vstrong", "vstrong" ]
     ,   score = 1;
 
     if (password.length < 1)
