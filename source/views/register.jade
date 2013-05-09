@@ -22,27 +22,31 @@ html
           label(for="email") Email  
           input(type="text", 
             name="email", 
-            id="email") 
+            id="email",
+            title="We don't share your email with others, but it is used to distinguish users. It will be used for verification, so please use a valid email account.") 
           span
         //- br
         div
           label(for="nick") Nickname  
           input(type="text", 
             name="nick", 
-            id="nick") 
+            id="nick",
+            title="Nicknames are what is shown when you chat or link files to others. It is all the information others will see of you unless you choose to show your full name.") 
           span
         //- br 
         div
           label(for="password") Password  
           input(type="password", 
             name="password", 
-            id="password")
+            id="password",
+            title="For a secure password, try using different types of characters (lowercase/uppercase/numbers/symbols).")
           span
         //- br 
         input(type="submit", 
           name="submit", 
           value="Register!", 
-          id="submit")
+          id="submit",
+          title="Click to register for a free PanthR account! An email will be sent for verification.")
   include footer
   script(src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"
     type="text/javascript")

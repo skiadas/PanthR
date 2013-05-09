@@ -27,7 +27,9 @@ function verifyHandler(ev, el) {
         checkSubmit();
         return;
     }
-    el.addClass('checking').removeClass('avail notavail');
+    el.addClass('checking').removeClass('avail notavail')
+      .next().attr('title', 'Checking availability ...');
+    
     var field = el.attr('name');
     var data = {};
     data[field] = el.val();
@@ -36,9 +38,12 @@ function verifyHandler(ev, el) {
         data: data
     }).done(function(data, status, xhr) {
         if (data.avail) {
-            el.addClass('avail').removeClass('notavail checking');
+            el.addClass('avail').removeClass('notavail checking')
+            .next().attr('title', 'Available!');
+            ;
         } else {
-            el.addClass('notavail').removeClass('avail checking');
+            el.addClass('notavail').removeClass('avail checking')
+              .next().attr('title', 'Taken!');
         }
         checkSubmit();
     });
@@ -70,15 +75,40 @@ function checkPassword(password)
 }
 
 function passwordHandler(ev) {
-    var el = $(this);
+    var el = $(this)
+    ,   tips = {
+        "": ""
+        , "vweak": "This password is extremely weak and will be broken easily. Try a longer password with more diverse types of characters (e.g. numbers/symbols)."
+        , "weak": "This password is fairly weak and will be vulnerable to standard dictionary attacks. Try including more diverse types of characters (e.g. at least one of lowercase/uppercase/numbers/symbols)"
+        , "medium": "This password has average security. It is up to you, but we recommend using more types of characters  (e.g. at least one of lowercase/uppercase/numbers/symbols)"
+        , "strong": "This password is fairly strong. You could use it, or try for something even more secure by using all 4 character types (lowercase/uppercase/numbers/symbols)"
+        , "vstrong": "This is an extremely strong password."
+    };
     // We have to wait for the keypress to complete
     setTimeout(function() {
-        el.removeClass("vweak weak medium strong vstrong").addClass(checkPassword(el.val()));
+        var strength = checkPassword(el.val())
+        el.removeClass("vweak weak medium strong vstrong").addClass(strength)
+          .next().attr('title', tips[strength]);
         checkSubmit();
     }, 10);
 }
 
 $(function() {
+    $( document ).tooltip({
+        position: {
+            my: "center bottom-20",
+            at: "center top",
+            using: function( position, feedback ) {
+                console.log(position, feedback)
+                $( this ).css( position );
+                $( "<div>" )
+                .addClass( "arrow" )
+                .addClass( feedback.vertical )
+                .addClass( feedback.horizontal )
+                .appendTo( this );
+            }
+        }
+    });
     $('#submit').attr('disabled', 'disabled');
     $('#nick, #email').focus(focusHandler).change(verifyHandler).change();
     $('#password').focus(focusHandler).keypress(passwordHandler);
