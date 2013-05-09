@@ -78,7 +78,23 @@ $sideWidth: 20%;
         color: red;
     }
     #submit {
+        float: right;
+        font-weight: bold;
+        width: 30%;
         clear: both;
+        margin-right: 12%;
+        background-color: $color_opposite_light;
+        color: $color_opposite_bold;
+        border-color: $color_bold;
+        &:disabled {
+            border-width: 1px;
+            background-color: $color_opposite_very_light;
+            color: lighten(gray, 30);
+            border-color: lighten(gray, 30);
+        }
+        &:hover {
+            background-color: $color_opposite_medium;
+        };
     }
     #password.vweak + span:after {
         @include icon-blocked(red);
