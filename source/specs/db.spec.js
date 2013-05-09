@@ -267,14 +267,14 @@ describe("A database connection", function () {
         expect(getCallBack.callback).toHaveBeenCalled();
    });
     
-    /*it("should have a deleteUser() and get called", function() {        
+    it("should have a deleteUser() and get called", function() {        
         var email = 'phamd13'; 
         var err = null;       
         var removed = null;//'phamd13';//null;
         var getCallBack = {
             callback: function(arg1, arg2){
                 expect(arg1).toEqual(null);
-                expect(arg2).toEqual(result);
+                expect(arg2).toEqual(removed);
             }
         };
         var collectionMock = {
@@ -294,6 +294,18 @@ describe("A database connection", function () {
             }
         };
         
+        // create mock database 
+        var mongodbmock = {
+            Server: function (host, port, optional) {
+                return server;
+            },
+            Db: function(databaseName, config){
+                return db;
+            }
+        };
+        mockery.registerMock('mongodb', mongodbmock);
+        var dbmod = require('../libs/db.js');
+        
         dbmod.db = collectionMockForDB;        
         // expect dbmod has a defined property named 'deleteUser' 
         expect(dbmod.deleteUser).toBeDefined();
@@ -310,5 +322,6 @@ describe("A database connection", function () {
         expect(dbmod.db.collection).toHaveBeenCalled();               
         expect(collectionMock.remove).toHaveBeenCalled();        
         expect(getCallBack.callback).toHaveBeenCalled();
-   });  */
+        mockery.deregisterMock('mongodb');
+   });  
 });
