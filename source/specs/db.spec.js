@@ -5,36 +5,17 @@ describe("A database connection", function () {
     
     // inquiring mongodb module 
     // load up db module that RJ made
-    // create a test db 
-    //var mongodb = require('mongodb');
-    var server = 'I am a server'; 
-    /*new mongodb.Server('localhost', 27017, {
-        auto_reconnect: true
-    });*/
-
+    // create a fake server (empty object) 
+    var server = {};
     // create my own testing database
     var db = {
-        open:function(arg1, arg2){   
-            //expect(arg1).toEqual(null);
-            //expect(testCallBack.callback).toHaveBeenCalled();         
+        open:function(arg){            
+            arg(null, db);   
         }
     };
     
-    // making a spy on the callback function for init()
-    var testCallBack = null;
-    // load module to test
-    var dbmod = require('../libs/db.js');
-    console.log('dbmod IS: ' + dbmod);
     beforeEach(function () {       
-        // specify  
-        testCallBack = {
-            callback: function(arg1, arg2) {
-                expect(arg1).toEqual(null);
-                expect(arg2).toEqual(db);                
-            }
-        };
-        spyOn(testCallBack, 'callback');
-        mockery.registerAllowable('../libs/db.js', true);
+        mockery.registerAllowable('../libs/db.js', true);        
     });
 
     afterEach(function () {
@@ -42,45 +23,60 @@ describe("A database connection", function () {
     });
 
     // create my own mock 
-    it("Create mock database!", function (done) {
+    it("Create mock database for init()", function (done) {
         var mongodbmock = {
             Server: function (host, port, optional) {
                 expect(host).toEqual('localhost');
                 expect(port).toEqual(27017);
                 expect(optional).toEqual({
                     auto_reconnect: true
-                });
+                });                
                 return server;
             },
             Db: function(databaseName, config){
                 expect(databaseName).toEqual('panthrdb');
-                expect(config).toEqual(server);                
+                expect(config).toEqual(server);      
                 return db;
             }
         };
-
+        
         mockery.registerMock('mongodb', mongodbmock);
-        console.log('dbmod IS: ' + dbmod);
-        console.log('dbmod.init IS: ' + dbmod.init);        
+        var dbmod = require('../libs/db.js');
         // expect dbmod has a defined property named 'init' 
         expect(dbmod.init).toBeDefined();
         // expect dbmod has a function called 'init'
         expect(dbmod.init).toEqual(jasmine.any(Function));
-        //dbmod.init(testCallBack.callback);
-        //expect(dbmod.init).toNotEqual(jasmine.any(Function));
+        dbmod.init(function(){
+            done();
+        });
         mockery.deregisterMock('mongodb');
     });
     
     // set up a spy function -> check if the function gets called and what arguments have been passed
     
-    /*it("Tracks that the spy of the callback function was called", function() {
-        // create my own function
-        
-        // turn it into a spy function
-        
-        // asynchronous test, wait until the callback function get called
-        
+    it("Test if the callback function was called with proper arguments", function() {
+        // create my own function        
+        // turn it into a spy function        
+        // asynchronous test, wait until the callback function get called        
         // ask if it has been called and what arguments it passes
+        
+        var mongodbmock = {
+            Server: function (host, port, optional) {
+                return server;
+            },
+            Db: function(databaseName, config){
+                return db;
+            }
+        };
+        
+        mockery.registerMock('mongodb', mongodbmock);
+        var dbmod = require('../libs/db.js');
+         
+        var testCallBack = {
+            callback: function(arg1, arg2) {                                                
+            }
+        };
+        spyOn(testCallBack, 'callback');
              
         runs(function() {
             flag = false;
@@ -89,20 +85,22 @@ describe("A database connection", function () {
             }, 100);
         });
     
-        waitsFor(function() {
-            var dbmod = require('../libs/db.js');
+        waitsFor(function() {            
             dbmod.init(testCallBack.callback);
             return flag;
         }, "The callback should be called", 150);
     
         runs(function() {
-            expect(testCallBack.callback).toHaveBeenCalled();            
+            expect(testCallBack.callback).toHaveBeenCalled();
+            expect(testCallBack.callback.mostRecentCall.args[0]).toEqual(null);            
+            expect(testCallBack.callback.mostRecentCall.args[1]).toEqual(db);
         });
-    });*/        
+        mockery.deregisterMock('mongodb');
+    });        
     
     
  // check whether the createUser() function exists and gets called
-    /*it("should have a createUser() function", function() {        
+    it("should have a createUser() function", function() {        
         var user = {email: 'phamd13'};        
         
         // findOne finds an existing user, ignores insert
@@ -147,6 +145,19 @@ describe("A database connection", function () {
             }
         };        
         
+        // create mock database 
+        var mongodbmock = {
+            Server: function (host, port, optional) {
+                return server;
+            },
+            Db: function(databaseName, config){
+                return db;
+            }
+        };
+        
+        mockery.registerMock('mongodb', mongodbmock);
+        var dbmod = require('../libs/db.js');
+        
         dbmod.db = collectionMockForDBPos;        
         // expect dbmod has a defined property named 'createUser' 
         expect(dbmod.createUser).toBeDefined();
@@ -169,7 +180,7 @@ describe("A database connection", function () {
         spyOn(collectionMockNeg, 'insert').andCallThrough();
         dbmod.createUser(user);                        
         expect(collectionMockNeg.insert).toHaveBeenCalled();
-                
+        mockery.deregisterMock('mongodb');
     });
 
 
@@ -201,6 +212,19 @@ describe("A database connection", function () {
                 arg2(null, collectionMockPos);                                
             }
         };
+        
+        // create mock database 
+        var mongodbmock = {
+            Server: function (host, port, optional) {
+                return server;
+            },
+            Db: function(databaseName, config){
+                return db;
+            }
+        };
+        
+        mockery.registerMock('mongodb', mongodbmock);
+        var dbmod = require('../libs/db.js');
                 
         dbmod.db = collectionMockForDBPos;        
         // expect dbmod has a defined property named 'updateUser' 
@@ -218,7 +242,8 @@ describe("A database connection", function () {
         // some tests to check whether functions have been called
         expect(dbmod.db.collection).toHaveBeenCalled();               
         expect(collectionMockPos.findOne).toHaveBeenCalled();        
-        expect(collectionMockPos.update).toHaveBeenCalled();                               
+        expect(collectionMockPos.update).toHaveBeenCalled();
+        mockery.deregisterMock('mongodb');                               
     });
    
    it("should have a findUser() and get called", function(){        
@@ -249,6 +274,19 @@ describe("A database connection", function () {
             }
         };
         
+        // create mock database 
+        var mongodbmock = {
+            Server: function (host, port, optional) {
+                return server;
+            },
+            Db: function(databaseName, config){
+                return db;
+            }
+        };
+        
+        mockery.registerMock('mongodb', mongodbmock);
+        var dbmod = require('../libs/db.js');
+        
         dbmod.db = collectionMockForDB;        
         // expect dbmod has a defined property named 'updateUser' 
         expect(dbmod.findUser).toBeDefined();
@@ -265,6 +303,7 @@ describe("A database connection", function () {
         expect(dbmod.db.collection).toHaveBeenCalled();               
         expect(collectionMock.findOne).toHaveBeenCalled();        
         expect(getCallBack.callback).toHaveBeenCalled();
+        mockery.deregisterMock('mongodb');
    });
     
     /*it("should have a deleteUser() and get called", function() {        
