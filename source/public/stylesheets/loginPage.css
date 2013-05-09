@@ -118,7 +118,6 @@ body {
   float: right;
   font-weight: bold;
   width: 30%;
-  clear: both;
   margin-right: 12%;
   background-color: #f0b375;
   color: #8a4d0f;
@@ -140,6 +139,28 @@ body {
   background-color: #fae6d1;
 }
 /* line 102, ../sass/loginPage.scss */
+#registerForm a {
+  float: left;
+  clear: left;
+  display: block;
+  padding: 0.3em;
+  font-size: 70%;
+  width: 40%;
+  text-align: left;
+  margin-top: 0.2em;
+  text-decoration: none;
+  color: #0f4c8a;
+}
+/* line 113, ../sass/loginPage.scss */
+#registerForm a:visited {
+  color: #197fe6;
+}
+/* line 116, ../sass/loginPage.scss */
+#registerForm a:hover {
+  color: #0f4c8a;
+  font-weight: bold;
+}
+/* line 121, ../sass/loginPage.scss */
 #registerForm #password.vweak + span:after {
   speak: none;
   font-family: 'Icons';
@@ -152,7 +173,7 @@ body {
   content: "\e020";
   color: red;
 }
-/* line 105, ../sass/loginPage.scss */
+/* line 122, ../sass/loginPage.scss */
 #registerForm #password.weak + span:after {
   speak: none;
   font-family: 'Icons';
@@ -165,7 +186,7 @@ body {
   content: "\e020";
   color: #ffaa00;
 }
-/* line 108, ../sass/loginPage.scss */
+/* line 123, ../sass/loginPage.scss */
 #registerForm #password.medium + span:after {
   speak: none;
   font-family: 'Icons';
@@ -178,7 +199,7 @@ body {
   content: "\e020";
   color: #50c800;
 }
-/* line 111, ../sass/loginPage.scss */
+/* line 124, ../sass/loginPage.scss */
 #registerForm #password.strong + span:after {
   speak: none;
   font-family: 'Icons';
@@ -191,7 +212,7 @@ body {
   content: "\e002";
   color: #4dff4d;
 }
-/* line 114, ../sass/loginPage.scss */
+/* line 125, ../sass/loginPage.scss */
 #registerForm #password.vstrong + span:after {
   speak: none;
   font-family: 'Icons';
@@ -205,7 +226,7 @@ body {
   color: green;
 }
 
-/* line 119, ../sass/loginPage.scss */
+/* line 127, ../sass/loginPage.scss */
 .ui-tooltip {
   width: 500px;
   background-color: white;
