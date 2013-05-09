@@ -6,21 +6,31 @@ describe("A database connection", function () {
     // inquiring mongodb module 
     // load up db module that RJ made
     // create a test db 
-    var mongodb = require('mongodb');
-    var server = new mongodb.Server('localhost', 27017, {
+    //var mongodb = require('mongodb');
+    var server = 'I am a server'; 
+    /*new mongodb.Server('localhost', 27017, {
         auto_reconnect: true
-    });
+    });*/
 
     // create my own testing database
-    var db = new mongodb.Db('testingdb', server);
+    var db = {
+        open:function(arg1, arg2){   
+            //expect(arg1).toEqual(null);
+            //expect(testCallBack.callback).toHaveBeenCalled();         
+        }
+    };
     
-    // making a spy on the callback function
+    // making a spy on the callback function for init()
     var testCallBack = null;
-        
+    // load module to test
+    var dbmod = require('../libs/db.js');
+    console.log('dbmod IS: ' + dbmod);
     beforeEach(function () {       
         // specify  
         testCallBack = {
-            callback: function(arg1, arg2) {                
+            callback: function(arg1, arg2) {
+                expect(arg1).toEqual(null);
+                expect(arg2).toEqual(db);                
             }
         };
         spyOn(testCallBack, 'callback');
@@ -50,22 +60,20 @@ describe("A database connection", function () {
         };
 
         mockery.registerMock('mongodb', mongodbmock);
-        // load module to test
-        var dbmod = require('../libs/db.js');
+        console.log('dbmod IS: ' + dbmod);
+        console.log('dbmod.init IS: ' + dbmod.init);        
         // expect dbmod has a defined property named 'init' 
         expect(dbmod.init).toBeDefined();
         // expect dbmod has a function called 'init'
         expect(dbmod.init).toEqual(jasmine.any(Function));
-        dbmod.init(function(){
-            done();            
-        });
+        //dbmod.init(testCallBack.callback);
         //expect(dbmod.init).toNotEqual(jasmine.any(Function));
         mockery.deregisterMock('mongodb');
     });
     
-    // set up a spy funct   ion -> check if the function gets called and what arguments have been passed
+    // set up a spy function -> check if the function gets called and what arguments have been passed
     
-    it("Tracks that the spy of the callback function was called", function() {
+    /*it("Tracks that the spy of the callback function was called", function() {
         // create my own function
         
         // turn it into a spy function
@@ -90,12 +98,11 @@ describe("A database connection", function () {
         runs(function() {
             expect(testCallBack.callback).toHaveBeenCalled();            
         });
-    });        
+    });*/        
     
     
  // check whether the createUser() function exists and gets called
-    it("should have a createUser() function", function() {
-        var dbmod = require('../libs/db.js');
+    /*it("should have a createUser() function", function() {        
         var user = {email: 'phamd13'};        
         
         // findOne finds an existing user, ignores insert
@@ -167,8 +174,7 @@ describe("A database connection", function () {
 
 
     // check whether the updateUser() exists and gets called
-    it("should have a updateUser() function", function() {
-        var dbmod = require('../libs/db.js');
+    it("should have a updateUser() function", function() {        
         var user = {email: 'phamd13'}; 
         var changes = 'changes';       
         
@@ -214,5 +220,95 @@ describe("A database connection", function () {
         expect(collectionMockPos.findOne).toHaveBeenCalled();        
         expect(collectionMockPos.update).toHaveBeenCalled();                               
     });
+   
+   it("should have a findUser() and get called", function(){        
+        var email = 'phamd13';
+        var fields = {};
+        var result = null;//'phamd13';//null;
+        var getCallBack = {
+            callback: function(arg1, arg2){
+                expect(arg1).toEqual(null);
+                expect(arg2).toEqual(result);
+            }
+        };
+        var collectionMock = {
+            findOne: function (arg1, arg2, arg3) {
+                expect(arg1).toEqual({email:email});
+                expect(arg2).toEqual({}); 
+                expect(arg3).toEqual(jasmine.any(Function));
+                arg3(null, result);                                       
+            }          
+        };
+        
+        // create db properties for dbmod in POS case
+        var collectionMockForDB = {
+            collection: function(arg1, arg2) {
+                expect(arg1).toEqual('users');
+                expect(arg2).toEqual(jasmine.any(Function));
+                arg2(null, collectionMock);                                
+            }
+        };
+        
+        dbmod.db = collectionMockForDB;        
+        // expect dbmod has a defined property named 'updateUser' 
+        expect(dbmod.findUser).toBeDefined();
+        // expect dbmod has a function called 'updateUser'
+        expect(dbmod.findUser).toEqual(jasmine.any(Function));                         
+        // spy on the collection method
+        spyOn(dbmod.db, 'collection').andCallThrough();
+        spyOn(getCallBack, 'callback').andCallThrough();
+        // spyon the findOne()
+        spyOn(collectionMock, 'findOne').andCallThrough();
+        // make a call to the findUser()
+        dbmod.findUser(email, fields, getCallBack.callback);
+        // some tests to check whether functions have been called
+        expect(dbmod.db.collection).toHaveBeenCalled();               
+        expect(collectionMock.findOne).toHaveBeenCalled();        
+        expect(getCallBack.callback).toHaveBeenCalled();
+   });
     
+    /*it("should have a deleteUser() and get called", function() {        
+        var email = 'phamd13'; 
+        var err = null;       
+        var removed = null;//'phamd13';//null;
+        var getCallBack = {
+            callback: function(arg1, arg2){
+                expect(arg1).toEqual(null);
+                expect(arg2).toEqual(result);
+            }
+        };
+        var collectionMock = {
+            remove: function (arg1, arg2) {
+                expect(arg1).toEqual({email:email});                
+                expect(arg2).toEqual(jasmine.any(Function));
+                arg2(err, removed);                                       
+            }          
+        };
+        
+        // create db properties for dbmod in POS case
+        var collectionMockForDB = {
+            collection: function(arg1, arg2) {
+                expect(arg1).toEqual('users');
+                expect(arg2).toEqual(jasmine.any(Function));
+                arg2(null, collectionMock);                                
+            }
+        };
+        
+        dbmod.db = collectionMockForDB;        
+        // expect dbmod has a defined property named 'deleteUser' 
+        expect(dbmod.deleteUser).toBeDefined();
+        // expect dbmod has a function called 'deleteUser'
+        expect(dbmod.deleteUser).toEqual(jasmine.any(Function));                         
+        // spy on the collection method
+        spyOn(dbmod.db, 'collection').andCallThrough();
+        spyOn(getCallBack, 'callback').andCallThrough();
+        // spyon the findOne()
+        spyOn(collectionMock, 'remove').andCallThrough();
+        // make a call to the findUser()
+        dbmod.deleteUser(email, getCallBack.callback);
+        // some tests to check whether functions have been called
+        expect(dbmod.db.collection).toHaveBeenCalled();               
+        expect(collectionMock.remove).toHaveBeenCalled();        
+        expect(getCallBack.callback).toHaveBeenCalled();
+   });  */
 });
