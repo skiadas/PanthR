@@ -76,3 +76,17 @@ exports.checkAvailable = function(req, res) {
         res.json({avail: !user});
     });
 }
+
+exports.requestReset = function(req, res) {
+    // Called when user enters his email to have his password reset
+}
+
+exports.reset = function(req, res) {
+    // If called as '/reset', serves the reset page
+    
+    // If called as '/reset/longRequestHash, verifies request and serves a new password form
+}
+
+exports.performReset = function(req, res) {
+    // Called when user enters the new password
+}
