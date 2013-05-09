@@ -144,7 +144,6 @@ function deleteUser(email, callback) {
 
 function doRequest(collectionName, methodName, args, callback) {
    if (!this.db) {
-      console.log(this.requests, '---------');
       this.requests.push([collectionName, methodName, args, callback]);
    } else {
       //console.log(callback);
@@ -204,7 +203,6 @@ function removeFriend(user, friend, circleArray, callback) {
    console.log('query', queryObj);
    this.doRequest('users', 'update', [findStr, queryObj], callback);
 }
-
 //tagFriend into a list of circls
 
 function tagFriend(user, friend, circleArray, callback) {
@@ -231,16 +229,15 @@ function tagFriend(user, friend, circleArray, callback) {
    console.log('query', queryObj);
    this.doRequest('users', 'update', [findStr, queryObj], callback);
 }
-
 //remove friend  from circle
+
 function unTagFriend(user, friend, circleArray, callback) {
-   var friendStr = 'friends.'+ friend._id.toHexString() +'.circles';
+   var friendStr = 'friends.' + friend._id.toHexString() + '.circles';
    var queryObj = {
       '$pullAll': {},
       '$unset': {}
    };
    queryObj.$pullAll[friendStr] = circleArray;
-   
    circleArray.forEach(function(el) {
       queryObj.$unset['circles.' + el + '.' + friend._id.toHexString()] = {
          nick: friend.nick,
@@ -257,6 +254,42 @@ function unTagFriend(user, friend, circleArray, callback) {
    this.doRequest('users', 'update', [findStr, queryObj], callback);
 }
 
+function verifyRequest(requestHash, callback) {
+   var hash = crypto.createHash('sha512').update(requestHash).digest('hex');
+   var findStr = {
+      _id: hash
+   };
+   this.doRequest('resetRequests', 'findOne', [findStr], callback);
+}
+
+function resetRequest(email, callback) {
+   //store it
+   var salt = Math.round((new Date().valueOf() * Math.random())) + '';
+   var requestHash = crypto.createHash('sha512').update(salt).digest('hex');
+   var hash = crypto.createHash('sha512').update(requestHash).digest('hex');
+   this.doRequest('resetRequests', 'insert', [{
+      _id: hash,
+      email: email,
+      date: new Date()
+   }], callback);
+   return requestHash;
+}
+
+function changePassword(email, password, callback) {
+   var salt = Math.round((new Date().valueOf() * Math.random())) + '';
+   var hashpassword = crypto.createHash('sha512').update(salt + this.password).digest('hex');
+   this.password = {
+      salt: salt,
+      hash: hashpassword
+   };
+   this.doRequest('users', 'update', [{
+      email: email
+   }, {
+      $set: {
+         password: this.password
+      }
+   }], callback);
+}
 module.exports = {
    db: null,
    requests: [],
@@ -269,9 +302,10 @@ module.exports = {
    tagFriend: tagFriend,
    unTagFriend: unTagFriend,
    deleteUser: deleteUser,
-   removeFriend: removeFriend
+   removeFriend: removeFriend,
+   resetRequest: resetRequest,
+   verifyRequest: verifyRequest
 };
-
 //module.exports.init();
 /*module.exports.init(function(err, result) {
    module.exports.findUser('a@a.com', {
