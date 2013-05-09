@@ -1,0 +1,98 @@
+//@import "compass/reset";
+@import "compass";
+@import "icons";
+@import "settings";
+
+body {
+    background: none;
+    height: 20em;
+}
+$formWidth: 550px;
+$sideWidth: 20%;
+#registerForm {
+    width: $formWidth;
+    margin: 10% $sideWidth;
+    padding: 1em;
+//    box-shadow: -2px -1px 1px transparentize($sat_bold, 0.25),
+//                 2px 1px 1px transparentize($sat_bold, 0.25);
+    background-color: $color_very_light;
+    border: 2px solid $color_bold;
+    border-radius: 5px;
+    text-align: center;
+    h2 {
+//        @include background(linear-gradient($color_opposite_light,$color_opposite_medium));
+        font: {
+            size: 140%;
+            weight: bold;
+        }
+        color: $color_opposite_bold;
+        border: none;
+        border-bottom: {
+            style: dotted;
+            color: $color_opposite_light;
+            width: 1px;
+//            radius: 6px;
+        };
+        padding: 0;
+        margin-bottom: 1em;
+    }
+    form {
+        overflow: auto;
+        font-size: 120%;
+    }
+    label {
+        display: block;
+        float: left;
+        text-align: right;
+        width: 25%;
+        padding: 0.8em 0.3em;
+    }
+    input {
+        width: 60%;
+        float: left;
+        margin: 0.25em 0.7em;
+        margin-right: 0;
+        padding: 0.15em;
+        font-size: 120%;
+        border: 2px solid $color_bold;
+        border-radius: 5px;
+        &.notavail {
+            background-color: lighten(red, 40);
+        }
+        &:focus {
+            background-color: $color_opposite_very_light;
+        };
+    }
+    span {
+        display: block;
+        width: 5%;
+        float: left;
+        padding: 0.7em 0;
+    }
+    input.avail + span:after {
+        @include icon-checkmark($color_opposite_bold);
+        color: green;
+    }
+    input.notavail + span:after {
+        @include icon-warning($color_opposite_bold);
+        color: red;
+    }
+    #submit {
+        clear: both;
+    }
+    #password.vweak + span:after {
+        @include icon-blocked(red);
+    };
+    #password.weak + span:after {
+        @include icon-blocked(rgb(255,170,0));
+    };
+    #password.medium + span:after {
+        @include icon-blocked(rgb(80,200,0));
+    };
+    #password.strong + span:after {
+        @include icon-checkmark(lighten(green, 40));
+    };
+    #password.vstrong + span:after {
+        @include icon-checkmark(green);
+    };
+}

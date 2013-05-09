@@ -24,3 +24,4 @@ $white_transparent: rgba(255, 255, 255, 0);
 $color_opposite_bold: adjust_hue($color_bold, 180);
 $color_opposite_medium: adjust_hue($color_medium, 180);
 $color_opposite_light: adjust_hue($color_light, 180);
+$color_opposite_very_light: adjust_hue($color_very_light, 180);

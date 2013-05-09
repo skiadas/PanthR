@@ -23,11 +23,11 @@ function verifyHandler(ev, el) {
     var el = $(this);
     if (!el.val()) {
         // Empty string, nothing to search for
-        el.next().html("").removeClass('avail notavail');
+        el.removeClass('avail notavail');
         checkSubmit();
         return;
     }
-    el.next().html("Checking availability ...");
+    el.addClass('checking').removeClass('avail notavail');
     var field = el.attr('name');
     var data = {};
     data[field] = el.val();
@@ -36,9 +36,9 @@ function verifyHandler(ev, el) {
         data: data
     }).done(function(data, status, xhr) {
         if (data.avail) {
-            el.next().html("Available!").addClass('avail').removeClass('notavail');
+            el.addClass('avail').removeClass('notavail checking');
         } else {
-            el.next().html("Not Available!").addClass('notavail').removeClass('avail');
+            el.addClass('notavail').removeClass('avail checking');
         }
         checkSubmit();
     });
@@ -46,7 +46,7 @@ function verifyHandler(ev, el) {
 
 function checkPassword(password)
 {
-    var strength = [ "", "Very Weak", "Weak", "Medium", "Strong", "Very Strong" ]
+    var strength = [ "", "vweak", "weak", "medium", "strong", "vstrong" ]
     ,   score = 1;
 
     if (password.length < 1)
@@ -73,7 +73,7 @@ function passwordHandler(ev) {
     var el = $(this);
     // We have to wait for the keypress to complete
     setTimeout(function() {
-        el.next().html(checkPassword(el.val()));
+        el.removeClass("vweak weak medium strong vstrong").addClass(checkPassword(el.val()));
         checkSubmit();
     }, 10);
 }
