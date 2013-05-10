@@ -80,22 +80,26 @@ exports.checkAvailable = function(req, res) {
 exports.requestReset = function(req, res) {
    // Called when user enters his email to have his password reset
    //create a request
+   console.log('starting post');
    db.resetRequest(req.body.email, function(err, request) {
       if (!request) {
          res.send('No email found');
       } else {
          var newRequestHash = request;
-         emailReset(req.body.email, newRequestHash, function(err, request) {
-            if (request) {
-               res.send('EMail sent');
-            }
-         });
+         //need to create method to actually send an emaill to the user
+         //emailReset(req.body.email, newRequestHash, function(err, request) {
+            //if (request) {
+             //  res.send('EMail sent');
+           // }
+         //});
       }
    });
 }
 exports.reset = function(req, res) {
    // If called as '/reset', serves the reset page
-   if (req.params. / reset) {
+   console.log('params = ', req.path);
+   if (req.path === '/reset') {
+   console.log('found param');
       res.render('reset', {
          title: 'Reset'
       });
@@ -115,5 +119,17 @@ exports.reset = function(req, res) {
 }
 exports.performReset = function(req, res) {
    // Called when user enters the new password
-   db.changePassword() //still needs work
+   db.verifyRequest(requestHash, function(err, request) {
+      if (request.email === email && request.requestHash === requestHash) {
+         db.changePassword(req.body.email, req.body.password, req.params.requestHash, function(err, result) {
+            if (result) {
+               res.render('somepage', {
+                  title: 'reset'
+               });
+            }
+         });
+      } else {
+         res.send('no request found');
+      }
+   });
 }
