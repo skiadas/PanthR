@@ -82,9 +82,9 @@ app.post('/register', routes.createUser);
 // POST /reset   ->  User provided email and wants to reset password
 // GET /reset/:requestHash  -> Link followed from the email user receives
 // POST /performReset -> User provided new password, need to update his entries
-app.get('/reset/:requestHash', routes.reset);
+app.get('/reset', routes.reset);
 app.post('/reset', routes.requestReset);
-app.post('/performReset', routs.performReset);
+app.post('/performReset', routes.performReset);
 app.get('/login', routes.login);
 app.post('/login', 
     passport.authenticate('local', { successRedirect: '/user',
