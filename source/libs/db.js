@@ -290,6 +290,46 @@ function changePassword(email, password, callback) {
       }
    }], callback);
 }
+
+function createStructure(structure, callback) {
+    this.doRequest('structures', 'insert', [structure], callback)
+}
+
+function removeStructure(structure, callback) {
+    /*
+        what if we delete something that is an essential part of a structure
+        e.g. the x-component of a graph
+    */
+    var structureID = structure._id;        
+    // then remove the struture itself, the first one encountered
+    this.doRequest('structures', 'remove', [{_id: structureID, true}], callback)
+}
+
+function updateStructure(structure, changes, callback) {
+    // get the string id of the structure
+    var structureIDStr = structure._id.toHexString();
+    // set up the update object and the query object
+    var updateObj = {
+        '$set':{}
+    };
+    updateObj.$set(structureIDStr) = {
+        type : changes.type,
+        owner_id : changes.owner_id,
+        parent: changes.parent,
+        links: changes.links  
+    };
+    
+    var queryObj = {
+        _id : structure._id
+    };
+    queryObj[structureIDStr] = {
+        $ne : null 
+    };
+    this.doRequest('structures', 'update', [queryObj, updateObj], callback);
+}
+
+function
+
 module.exports = {
    db: null,
    requests: [],
