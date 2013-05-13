@@ -6,9 +6,9 @@ describe("The PubSub module", function () {
     ,   foo = { handler: function(obj) {} }
     ,   data = [{}];
     beforeEach(function() {
-        topic = Math.round(10000*Math.random()).toString(16)
-        aKey =  Math.round(10000*Math.random()).toString(16)
-        aValue = Math.round(10000*Math.random())
+        topic = Math.round(10000*Math.random()).toString(16);
+        aKey =  Math.round(10000*Math.random()).toString(16);
+        aValue = Math.round(10000*Math.random());
         data[0][aKey] = aValue;
         spyOn(foo, 'handler');
     });
@@ -22,7 +22,7 @@ describe("The PubSub module", function () {
         expect(PubSub.publish).toEqual(jasmine.any(Function));
     });
     it("allows publishers to publish a topic even if noone is listening", function() {
-       expect(PubSub.publish.bind(PubSub, [topic, data])).not.toThrow();
+       expect(PubSub.publish.bind(PubSub, topic, data)).not.toThrow();
     });
     it("allows subscribers to listen to events with the same 'topic'", function() {
         PubSub.subscribe(topic, foo.handler);
@@ -57,5 +57,17 @@ describe("The PubSub module", function () {
         PubSub.subscribe(topic, foo.handler);
         PubSub.publish(topic, data, scope);
         expect(that).toEqual(scope);
+    });
+    it("allows subscribers to subscribe to part of a topic", function() {
+        var bigTopic = [topic, Math.round(10000*Math.random()).toString(16)].join("/");
+        PubSub.subscribe(topic, foo.handler);
+        PubSub.publish(bigTopic, data);
+        expect(foo.handler).toHaveBeenCalledWith(data[0]);
+    });
+    it("even allows allows subscribing to an empty topic to listen to all topics", function() {
+        var bigTopic = [topic, Math.round(10000*Math.random()).toString(16)].join("/");
+        PubSub.subscribe("", foo.handler);
+        PubSub.publish(bigTopic, data);
+        expect(foo.handler).toHaveBeenCalledWith(data[0]);
     });
 });

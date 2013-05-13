@@ -1,7 +1,7 @@
 /**
 * Events. Pub/Sub system for Loosely Coupled logic.
 * Based on Peter Higgins' port from Dojo to jQuery
-* https://github.com/phiggins42/bloody-jquery-plugins/blob/master/pubsub.js
+* Original code from: https://github.com/phiggins42/bloody-jquery-plugins/blob/master/pubsub.js
 *
 * Re-adapted to vanilla Javascript
 *
@@ -11,7 +11,8 @@
 //
 // Adjusted by skiadas@hanover.edu to be loaded as a node package
 //
-//
+// Further adjusted to allow "namespacing" of the form "db/subject/verb" etc
+// 
 
 var Events = (function (){
     var cache = {},
@@ -26,14 +27,24 @@ var Events = (function (){
     * @param scope {Object} Optional
     */
     publish = function (topic, args, scope) {
-        if (cache[topic]) {
-            var thisTopic = cache[topic],
-            i = thisTopic.length - 1;
+        scope = scope || this;
+        args = args || [];
+        lastPass = false;
+        // Goes through each subtopic in order, including the empty subtopic;
+        do {
+            if (topic == "") {
+                lastPass = true;
+            };
+            if (cache[topic]) {
+                var thisTopic = cache[topic],
+                i = thisTopic.length - 1;
 
-            for (i; i >= 0; i -= 1) {
-                thisTopic[i].apply( scope || this, args || []);
+                for (i; i >= 0; i -= 1) {
+                    thisTopic[i].apply( scope, args);
+                }
             }
-        }
+            topic = topic.substring(0, topic.lastIndexOf("/"));
+        } while ((topic != "") || (!lastPass));
     },
     /**
     * Events.subscribe
