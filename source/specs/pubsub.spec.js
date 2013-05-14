@@ -4,7 +4,7 @@ describe("The PubSub module", function () {
     ,   aKey
     ,   aValue
     ,   foo = { handler: function(obj) {} }
-    ,   data = [{}];
+    ,   data = [{a: 5}];
     beforeEach(function() {
         topic = Math.round(10000*Math.random()).toString(16);
         aKey =  Math.round(10000*Math.random()).toString(16);
