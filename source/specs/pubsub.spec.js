@@ -1,4 +1,4 @@
-PubSub = require('../libs/pubsub.js');
+PubSub = require('../libs/pubsub.js').sync();
 describe("The PubSub module", function () {
     var topic
     ,   aKey
@@ -69,5 +69,36 @@ describe("The PubSub module", function () {
         PubSub.subscribe("", foo.handler);
         PubSub.publish(bigTopic, data);
         expect(foo.handler).toHaveBeenCalledWith(data[0]);
+    });
+    it("can go into asynchronous mode", function(done) {
+        var that = {};
+        PubSub.async();
+        foo.handler = function(obj) { 
+            expect(this === that).toBe(true);
+            expect(obj).toEqual(data);
+            done(); 
+        };
+        spyOn(foo, 'handler').andCallThrough();
+        PubSub.subscribe(topic, foo.handler);
+        PubSub.publish(topic, data, that);
+        expect(foo.handler).not.toHaveBeenCalled();
+    });
+    it("can be specified the synchronicity mode on the publish event", function(done) {
+        PubSub.sync();
+        foo.handler = function(obj) { done(); }
+        spyOn(foo, 'handler').andCallThrough();
+        PubSub.subscribe(topic, foo.handler);
+        PubSub.publish(topic, data, true);
+        expect(foo.handler).not.toHaveBeenCalled();
+        PubSub.publish(topic, data, {}, true);
+        expect(foo.handler).not.toHaveBeenCalled();
+    });
+    it("and vice versa, it can make an synchronous publish while in async mode", function() {
+        PubSub.async();
+        PubSub.subscribe(topic, foo.handler);
+        PubSub.publish(topic, data, false);
+        expect(foo.handler).toHaveBeenCalled();
+        PubSub.publish(topic, data, {}, false);
+        expect(foo.handler.calls.length).toEqual(2);
     });
 });

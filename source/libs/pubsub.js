@@ -15,7 +15,10 @@
 // 
 
 var Events = (function (){
-    var cache = {},
+    var cache = {}
+    ,   doAsync = true;  // Default to asynchronous messaging
+    async = function() { doAsync = true; return this; };
+    sync = function() { doAsync = false; return this; };
     /**
     * Events.publish
     * e.g.: Events.publish("/Article/added", [article], this);
@@ -26,8 +29,16 @@ var Events = (function (){
     * @param args {Array}
     * @param scope {Object} Optional
     */
-    publish = function (topic, args, scope) {
+    publish = function (topic, args, scope, async) {
+        if ((scope === true) || (scope === false)) {
+            // No scope was provided but then third argument will be the async setting
+            async = scope;
+            scope = this;
+        }
         scope = scope || this;
+        if ((async) !== false) {
+            async = async || doAsync;
+        }
         args = args || [];
         lastPass = false;
         // Goes through each subtopic in order, including the empty subtopic;
@@ -39,8 +50,14 @@ var Events = (function (){
                 var thisTopic = cache[topic],
                 i = thisTopic.length - 1;
 
-                for (i; i >= 0; i -= 1) {
-                    thisTopic[i].apply( scope, args);
+                if (async) {
+                    for (i; i >= 0; i -= 1) {
+                        process.nextTick(thisTopic[i].bind(scope, args));
+                    }
+                } else {
+                    for (i; i >= 0; i -= 1) {
+                        thisTopic[i].apply( scope, args);
+                    }
                 }
             }
             topic = topic.substring(0, topic.lastIndexOf("/"));
@@ -91,7 +108,9 @@ var Events = (function (){
     return {
         publish: publish,
         subscribe: subscribe,
-        unsubscribe: unsubscribe
+        unsubscribe: unsubscribe,
+        sync: sync,
+        async: async
     };
 }());
 
