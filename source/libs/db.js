@@ -1,4 +1,6 @@
 var util = require('util');
+var PubSub = require('./pubsub.js');
+
 Db = function() {
     var mongodb = require('mongodb');
     var crypto = require('crypto');
@@ -9,6 +11,12 @@ Db = function() {
     // input: takes a database object
     // if known contects database object (ex. testing)
     // if it doesnt find calls function to initialize standard
+
+    // PubSub for init() method
+    PubSub.subscribe('db/init', function {
+        // publish if init() gets called
+        PubSub.publish('db/initialized', {});
+    });
 
     this.init = function(callback) {
        if (this.db) {
@@ -55,6 +63,12 @@ Db = function() {
        }
     }
 
+    // PubSub for updateUser() method
+    PubSub.subscribe('db/updateUser', function {
+        // publish if updateUser() gets called
+        PubSub.publish('db/userUpdated', {});
+    });
+
     this.updateUser = function(user, changes, callback) {
        if (this.db) {
           this.db.collection('users', function(err, collection) {
@@ -76,6 +90,12 @@ Db = function() {
        return this;
     }
 
+    // PubSub for createUser() method
+    PubSub.subscribe('db/createUser', function {
+        // publish if createUser() gets called
+        PubSub.publish('db/userCreated', {});
+    });
+
     this.createUser = function(user, callback) {
        if (this.db) {
           this.db.collection('users', function(err, collection) {
@@ -94,6 +114,12 @@ Db = function() {
        }
        return this;
     }
+
+    // PubSub for findUser() method
+    PubSub.subscribe('db/findUser', function {
+        // publish if findUser() gets called
+        PubSub.publish('db/userFound', {});
+    });
 
     this.findUser = function(email, fields, callback) {
        if (fields instanceof Function) {
@@ -121,6 +147,12 @@ Db = function() {
           })
        })
     }
+
+    // PubSub for deleteUser() method
+    PubSub.subscribe('db/deleteUser', function {
+        // publish if deleteUser() gets called
+        PubSub.publish('db/userDeleted', {});
+    });
 
     this.deleteUser = function(email, callback) {
        this.db.collection('users', function(err, collection) {
@@ -156,6 +188,12 @@ Db = function() {
        }
     }
 
+    // PubSub for addFriend() method
+    PubSub.subscribe('db/addFriend', function {
+        // publish if addFriend() gets called
+        PubSub.publish('db/friendAdded', {});
+    });
+
     this.addFriend = function(user, friend, circlesArray, callback) {
        var friendStr = 'friends.' + friend._id.toHexString();
        var queryObj = {
@@ -182,6 +220,12 @@ Db = function() {
     ///circles could have been added 
     //need a way to tell it any circles
 
+    // PubSub for removeFriend() method
+    PubSub.subscribe('db/removeFriend', function {
+        // publish if removeFriend() gets called
+        PubSub.publish('db/friendRemoved', {});
+    });
+
     this.removeFriend = function(user, friend, circleArray, callback) {
        var friendStr = 'friends.' + friend._id.toHexString();
        var queryObj = {
@@ -202,7 +246,13 @@ Db = function() {
        };
        this.doRequest('users', 'update', [findStr, queryObj], callback);
     }
+    
     //tagFriend into a list of circls
+    // PubSub for tagFriend() method
+    PubSub.subscribe('db/tagFriend', function {
+        // publish if tagFriend() gets called
+        PubSub.publish('db/friendTagged', {});
+    });
 
     this.tagFriend = function(user, friend, circleArray, callback) {
        var friendStr = 'friends.' + friend._id.toHexString() + '.circles';
@@ -227,7 +277,14 @@ Db = function() {
        };
        this.doRequest('users', 'update', [findStr, queryObj], callback);
     }
+    
     //remove friend  from circle
+
+    // PubSub for unTagFriend() method
+    PubSub.subscribe('db/unTagFriend', function {
+        // publish if unTagFriend() gets called
+        PubSub.publish('db/friendUnTagged', {});
+    });
 
     this.unTagFriend = function(user, friend, circleArray, callback) {
        var friendStr = 'friends.' + friend._id.toHexString() + '.circles';
@@ -289,9 +346,21 @@ Db = function() {
        }], callback);
     }
 
+    // PubSub for createStructure() method
+    PubSub.subscribe('db/createStructure', function {
+        // publish if createStructure() gets called
+        PubSub.publish('db/structureCreated', {});
+    });
+
     this.createStructure = function(structure, callback) {
         this.doRequest('structures', 'insert', [structure], callback)
     }
+
+    // PubSub for removeStructure() method
+    PubSub.subscribe('db/removeStructure', function {
+        // publish if removeStructure() gets called
+        PubSub.publish('db/structureRemoved', {});
+    });
 
     this.removeStructure = function(structure, callback) {
         /*
@@ -303,9 +372,15 @@ Db = function() {
         this.doRequest('structures', 'remove', [{_id: structureID}], callback)
     }
 
+    // PubSub for updateStructure() method
+    PubSub.subscribe('db/updateStructure', function {
+        // publish if createStructure() gets called
+        PubSub.publish('db/structureUpdated', {});
+    });
+
     this.updateStructure = function(structure, changes, callback) {
         // get the string id of the structure
-        var structureIDStr = structure._id.toHexString();
+        var structureIDStr = structure._id;//.toHexString();
         // set up the update object and the query object
         var updateObj = {
             '$set':{}
@@ -320,10 +395,30 @@ Db = function() {
         var queryObj = {
             _id : structure._id
         };
-        queryObj[structureIDStr] = {
+        /*queryObj[structureIDStr] = {
             $ne : null 
-        };
+        };*/
         this.doRequest('structures', 'update', [queryObj, updateObj], callback);
+    }
+    
+    // PubSub for findStructure() method
+    PubSub.subscribe('db/findStructure', function {
+        // publish if findStructure() gets called
+        PubSub.publish('db/structureFound', {});
+    });
+
+    // for now, findStructure acts like findOne
+    this.findStructure = function(structure, callback) {
+        // get the string id of the structure
+        var structureIDStr = structure._id;        
+        var queryObj = {
+            _id : structure._id
+        };
+        /*queryObj[structureIDStr] = {
+            $ne : null 
+        };*/
+        // expect to receive the 1st match in return
+        return this.doRequest('structures', 'findOne', [queryObj], callback);
     }
     this.db = null;
     this.requests = [];
