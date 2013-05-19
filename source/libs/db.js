@@ -1,5 +1,6 @@
 var util = require('util');
 var PubSub = require('./pubsub.js');
+var _ = require('underscore');
 
 Db = function() {
     var mongodb = require('mongodb');
@@ -16,13 +17,18 @@ Db = function() {
         return new Db();
     };
 
+    function init(server){
+         server = server || {};
+        _.defaults(server, {host:"localhost", port:"27017", dbname:"panthrdb"});        
+    };
+
     this.init = function() {        
         this.emit('initializing');       
         return this;
     }
 
     this.on('initializing', function() {
-        PubSub.publish('initializing',[], this);
+        PubSub.publish('db/initializing',[], this);
         server = new mongodb.Server('localhost', 27017, {auto_reconnect: true});
         db = new mongodb.Db('panthrdb', server);
         var that = this;
@@ -447,9 +453,10 @@ Db = function() {
     }
     this.db = null;
     this.requests = [];
+    init();
 };
 util.inherits(Db, require('events').EventEmitter);
-module.exports = new Db();
+module.exports = Db();
 //module.exports.init();
 /*module.exports.init(function(err, result) {
    module.exports.findUser('a@a.com', {
