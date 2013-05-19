@@ -1,6 +1,14 @@
+var PubSub = require('../libs/pubsub.js');
 var mockery = require('mockery');
 // mockery.enable();
 
+describe("The db module", function() {
+   it("should subscribe to PubSub notifications", function() {
+       spyOn(PubSub, 'subscribe');
+       db = require('../libs/db.js');
+       expect(PubSub.subscribe).toHaveBeenCalled();
+   }); 
+});
 return;
 describe("A database connection", function () {
     
