@@ -1,13 +1,38 @@
 var PubSub = require('../libs/pubsub.js');
+var _ = require('underscore');
 var mockery = require('mockery');
+var realMongo = require('mongodb');
+var mongoMock = jasmine.createSpyObj('mongodb',
+    ['Server', 'Db', 'open', 'collection', 'findOne', 'update', 'remove']
+);
+var Db = require('../libs/db.js');
+var server = {host: 'localhost', port: 27017, dbname: 'testingdb'};
+
 // mockery.enable();
 
 describe("The db module", function() {
-   it("should subscribe to PubSub notifications", function() {
-       spyOn(PubSub, 'subscribe');
-       db = require('../libs/db.js');
-       expect(PubSub.subscribe).toHaveBeenCalled();
+    it("exposes a constructor", function() {
+        expect(Db).toEqual(jasmine.any(Function));
+    });
+    it("should subscribe to PubSub notifications", function() {
+        spyOn(PubSub, 'subscribe').andCallThrough();
+        new Db(server);
+        expect(PubSub.subscribe).toHaveBeenCalled();
+        var subscribed = _(PubSub.subscribe.calls).map(function(x) {return x.args[0]});
+        var expected = [ 
+            'db/update/user', 'db/create/user', 'db/find/user', 'db/delete/user',
+            'db/add/friend', 'db/remove/friend', 'db/tag/friend', 'db/unTag/friend',
+            'db/create/structure', 'db/remove/structure', 'db/update/structure', 'db/find/structure'
+        ]
+        _.each(expected, function(x) {return expect(subscribed).toContain(x)});
    }); 
+   it("should eventually publish 'db/initialized' when it is set up", function(done) {
+       spyOn(PubSub, 'publish').andCallThrough();
+       PubSub.subscribe('db/initialized', function() {
+           done();
+       })
+       new Db(server);
+   });
 });
 return;
 describe("A database connection", function () {
