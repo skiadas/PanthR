@@ -1,6 +1,8 @@
 var mockery = require('mockery');
 mockery.enable();
 
+
+return;
 describe("A database connection", function () {
     
     // inquiring mongodb module 
