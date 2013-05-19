@@ -4,50 +4,70 @@ var PubSub = require('./pubsub.js');
 Db = function() {
     var mongodb = require('mongodb');
     var crypto = require('crypto');
-    var server = new mongodb.Server('localhost', 27017, {
-       auto_reconnect: true
-    });
-    // intitalize function
-    // input: takes a database object
+    var server;
+    var db;
+    var failedRequests; // store all requests that haven't been processed
+    
+    // intitalize function    
     // if known contects database object (ex. testing)
     // if it doesnt find calls function to initialize standard
 
-    // PubSub for init() method
-    PubSub.subscribe('db/init', function {
-        // publish if init() gets called
-        PubSub.publish('db/initialized', {});
+    if (!(this instanceof Db)){
+        return new Db();
+    };
+
+    this.init = function() {        
+        this.emit('initializing');       
+        return this;
+    }
+
+    this.on('initializing', function() {
+        PubSub.publish('initializing',[], this);
+        server = new mongodb.Server('localhost', 27017, {auto_reconnect: true});
+        db = new mongodb.Db('panthrdb', server);
+        var that = this;
+        db.on('close', function(){
+            that.emit('disconnected');
+        });
+        this.emit('initialized');
     });
 
-    this.init = function(callback) {
-       if (this.db) {
-          if (callback) {
-             callback(null, this.db);
+    // a new instance of mongodb is initialized
+    this.on('initialized', function() {
+        PubSub.publish('initialized', [], this);
+        this.emit('connect');
+    });
+
+    // connect to the database, call open()
+    this.on('connect', function(){
+        PubSub.publish('db/connect', [], this);
+        db.open(function(err, db){
+          if (err) {
+            PubSub.publish('db/connect/error', [], this);
+          } else {
+            this.emit('connected');
           }
-       } else {
-          this.db = 'opening';
-          var newdb = new mongodb.Db('panthrdb', server);
-          var that = this;
-          newdb.open(function(err, db) {
-             if (err) {
-                console.log(err);
-             } else {
-                that.db = db
-             }
-             if (callback) {
-                callback(err, db);
-             }
-             var requests = this.requests;
-             if (requests) {
-                while (requests.length != 0) {
-                   var now = requests.shift()
+        });
+    });
+
+    // connection is set up
+    this.on('connected', function(){
+        // send all failed requests to doRequest
+        if (failedRequests) {
+                while (failedRequests.length != 0) {
+                   var now = requests.shift();
                    doRequest.apply(this, now);
                 }
              }
-             return;
-          })
-       }
-       return this;
-    }
+        PubSub.publish('db/connected', [], this);
+    });
+
+    // connection is not yet up
+    this.on('disconnected', function(){
+        PubSub.publish('db/disconnected', [], this);
+        this.emit('connect');
+    });    
+
     // Local helper function
     var myCb = function(message, user, callback) {
        return function(err, result) {
@@ -68,6 +88,11 @@ Db = function() {
         // publish if updateUser() gets called
         PubSub.publish('db/userUpdated', {});
     });
+
+    // perform only update(), not findOne() anymore
+    // reduce from 2 calls to 1 call in the database
+    // need to listen to the callback from update() 
+    // to determine if the update() succeeds or not
 
     this.updateUser = function(user, changes, callback) {
        if (this.db) {
