@@ -1,6 +1,5 @@
 var mockery = require('mockery');
-mockery.enable();
-
+// mockery.enable();
 
 return;
 describe("A database connection", function () {
