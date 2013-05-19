@@ -1,13 +1,53 @@
 {
-  "name": "application-name",
+  "name": "panthr",
   "version": "0.0.1",
+  "author": "PanthR Development Team <panthrteam@hanover.edu",
+  "description": "A Web-based Statistics Suite using R backend",
+  "contributors" : [
+    {
+        "name": "Haris Skiadas",
+        "email": "skiadas@hanover.edu"
+    },
+    {
+        "name": "Barb Wahl"
+    },
+    {
+        "name": "Bill Altermatt"
+    },
+    {
+        "name": "John Krantz"
+    }
+  ],
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "jasmine-node specs/",
+    "predeploy": "echo This will be run before deploying the app",
+    "postdeploy": "echo This will be run after deploying the app"
   },
+  "repository": {
+     "type": "git",
+     "url": "https://github.com/skiadas/PanthR.git"
+   },
+   "keywords": [
+       "statistics", "R", "webapp", "interactive"
+   ],
+  "main": { "./app.js" },
   "dependencies": {
     "express": "3.2.1",
     "jade": "*",
-    "sass": "*"
-  }
+    "sass": "*",
+    "underscore": "*",
+    "mongodb-native": "*",
+    "passport": "*",
+    "passport-local": "*",
+    "node-rserve": "https://github.com/skiadas/node-rserve.git"
+  },
+  "devDependencies": {
+      "jasmine-node": "*"
+  },
+  "license": "MIT",
+   "engines": {
+     "node": ">=0.10"
+   }
 }
