@@ -1,12 +1,21 @@
 var PubSub = require('../libs/pubsub.js');
+var _ = require('underscore');
 var mockery = require('mockery');
 // mockery.enable();
 
 describe("The db module", function() {
-   it("should subscribe to PubSub notifications", function() {
-       spyOn(PubSub, 'subscribe');
-       db = require('../libs/db.js');
-       expect(PubSub.subscribe).toHaveBeenCalled();
+    it("should subscribe to PubSub notifications", function() {
+        spyOn(PubSub, 'subscribe');
+        var db = require('../libs/db.js');
+        expect(PubSub.subscribe).toHaveBeenCalled();
+        var subscribed = _(PubSub.subscribe.calls).map(function(x) {return x.args[0]});
+        var expected = [ 
+            'db/init', 
+            'db/update/user', 'db/create/user', 'db/find/user', 'db/delete/user',
+            'db/add/friend', 'db/remove/friend', 'db/tag/friend', 'db/unTag/friend',
+            'db/create/structure', 'db/remove/structure', 'db/update/structure', 'db/find/structure'
+        ]
+        _.each(expected, function(x) {return expect(subscribed).toContain(x)});
    }); 
 });
 return;
