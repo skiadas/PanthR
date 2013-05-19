@@ -13,7 +13,7 @@ Db = function() {
     // if it doesnt find calls function to initialize standard
 
     // PubSub for init() method
-    PubSub.subscribe('db/init', function {
+    PubSub.subscribe('db/init', function(data) {
         // publish if init() gets called
         PubSub.publish('db/initialized', {});
     });
@@ -64,7 +64,7 @@ Db = function() {
     }
 
     // PubSub for updateUser() method
-    PubSub.subscribe('db/updateUser', function {
+    PubSub.subscribe('db/updateUser', function(data) {
         // publish if updateUser() gets called
         PubSub.publish('db/userUpdated', {});
     });
@@ -91,7 +91,7 @@ Db = function() {
     }
 
     // PubSub for createUser() method
-    PubSub.subscribe('db/createUser', function {
+    PubSub.subscribe('db/createUser', function(data) {
         // publish if createUser() gets called
         PubSub.publish('db/userCreated', {});
     });
@@ -116,7 +116,7 @@ Db = function() {
     }
 
     // PubSub for findUser() method
-    PubSub.subscribe('db/findUser', function {
+    PubSub.subscribe('db/findUser', function(data) {
         // publish if findUser() gets called
         PubSub.publish('db/userFound', {});
     });
@@ -149,7 +149,7 @@ Db = function() {
     }
 
     // PubSub for deleteUser() method
-    PubSub.subscribe('db/deleteUser', function {
+    PubSub.subscribe('db/deleteUser', function(data) {
         // publish if deleteUser() gets called
         PubSub.publish('db/userDeleted', {});
     });
@@ -189,7 +189,7 @@ Db = function() {
     }
 
     // PubSub for addFriend() method
-    PubSub.subscribe('db/addFriend', function {
+    PubSub.subscribe('db/addFriend', function(data) {
         // publish if addFriend() gets called
         PubSub.publish('db/friendAdded', {});
     });
@@ -221,7 +221,7 @@ Db = function() {
     //need a way to tell it any circles
 
     // PubSub for removeFriend() method
-    PubSub.subscribe('db/removeFriend', function {
+    PubSub.subscribe('db/removeFriend', function(data) {
         // publish if removeFriend() gets called
         PubSub.publish('db/friendRemoved', {});
     });
@@ -249,7 +249,7 @@ Db = function() {
     
     //tagFriend into a list of circls
     // PubSub for tagFriend() method
-    PubSub.subscribe('db/tagFriend', function {
+    PubSub.subscribe('db/tagFriend', function(data) {
         // publish if tagFriend() gets called
         PubSub.publish('db/friendTagged', {});
     });
@@ -281,7 +281,7 @@ Db = function() {
     //remove friend  from circle
 
     // PubSub for unTagFriend() method
-    PubSub.subscribe('db/unTagFriend', function {
+    PubSub.subscribe('db/unTagFriend', function(data) {
         // publish if unTagFriend() gets called
         PubSub.publish('db/friendUnTagged', {});
     });
@@ -347,7 +347,7 @@ Db = function() {
     }
 
     // PubSub for createStructure() method
-    PubSub.subscribe('db/createStructure', function {
+    PubSub.subscribe('db/createStructure', function(data) {
         // publish if createStructure() gets called
         PubSub.publish('db/structureCreated', {});
     });
@@ -357,7 +357,7 @@ Db = function() {
     }
 
     // PubSub for removeStructure() method
-    PubSub.subscribe('db/removeStructure', function {
+    PubSub.subscribe('db/removeStructure', function(data) {
         // publish if removeStructure() gets called
         PubSub.publish('db/structureRemoved', {});
     });
@@ -373,7 +373,7 @@ Db = function() {
     }
 
     // PubSub for updateStructure() method
-    PubSub.subscribe('db/updateStructure', function {
+    PubSub.subscribe('db/updateStructure', function(data) {
         // publish if createStructure() gets called
         PubSub.publish('db/structureUpdated', {});
     });
@@ -402,7 +402,7 @@ Db = function() {
     }
     
     // PubSub for findStructure() method
-    PubSub.subscribe('db/findStructure', function {
+    PubSub.subscribe('db/findStructure', function(data) {
         // publish if findStructure() gets called
         PubSub.publish('db/structureFound', {});
     });
