@@ -120,62 +120,13 @@ function Db(customServer) {
 
     
     
-    this.createUser = function(user){
-        this.emit('creatingUser', user);
-        return this;
-    };
-
-    this.on('creatingUser', function(){
-        PubSub.publish('db/creating/user', [], this);
-        this.doRequest('users', 'insert', [{email : user.email}, {safe:true}], function(error, records){
-            if (error){
-                PubSub.publish('error/db/connection/undefined', [], this);
-            }
-            else if (!records[0]){// no item is inserted to the record array
-                PubSub.publish('error/db/user/notCreated', [], this);
-            }
-            else{
-                this.emit('userCreated');                
-            }
-        });
-    });
-
-    this.on('userCreated', function(){
-        PubSub.publish('db/user/created');
-    });
+    
     
     // PubSub for findUser() method
     PubSub.subscribe('db/find/user', function(data) {
         // publish if findUser() gets called
         PubSub.publish('db/user/found', {});
-    });
-
-    this.findUser = function(email, fields, callback) {
-       if (fields instanceof Function) {
-          callback = fields;
-          fields = {};
-       }
-       this.db.collection('users', function(err, collection) {
-          collection.findOne({
-             email: email
-          }, fields, function(err, result) {
-             if (result === null) {
-                console.log("Did not find user!", email);
-                if (callback) {
-                   callback(err, result);
-                   return;
-                } else {
-                   throw err;
-                }
-             }
-             if (callback) {
-                callback(err, result);
-             }
-             console.log('Found User!', result);
-             return result;
-          })
-       })
-    }
+    });    
 
     // PubSub for deleteUser() method
     PubSub.subscribe('db/delete/user', function(data) {
@@ -481,9 +432,82 @@ _.extend(Db.prototype, {
     return this;
   },
   createUser : function(user){
-    this.emit('creatingUser', user);
+    this.createUser = function(user){
+        this.emit('creatingUser', user);
+        return this;
+    };
+
+    this.on('creatingUser', function(){
+        PubSub.publish('db/creating/user', [], this);
+        this.doRequest('users', 'insert', [{email : user.email}, {safe:true}], function(error, records){
+            if (error){
+                PubSub.publish('error/db/connection/undefined', [], this);
+            }
+            else if (!records[0]){// no item is inserted to the record array
+                PubSub.publish('error/db/user/notCreated', [], this);
+            }
+            else{
+                this.emit('userCreated');                
+            }
+        });
+    });
+
+    this.on('userCreated', function(){
+        PubSub.publish('db/user/created');
+    });
     return this;
-  }
+  },
+  
+  findUser : function(email, fields){    
+       if (fields instanceof Function) {
+          callback = fields;
+          fields = {};
+       }
+       this.db.collection('users', function(err, collection) {
+          collection.findOne({
+             email: email
+          }, fields, function(err, result) {
+             if (result === null) {
+                console.log("Did not find user!", email);
+                if (callback) {
+                   callback(err, result);
+                   return;
+                } else {
+                   throw err;
+                }
+             }
+             if (callback) {
+                callback(err, result);
+             }
+             console.log('Found User!', result);
+             return result;
+          })
+       })    
+  },
+
+  deleteUser : function(email) {
+       this.db.collection('users', function(err, collection) {
+          collection.remove({
+             email: email
+          }, function(err, removed) {
+             if (err) {
+                console.log('user not deleted!', err);
+                if (callback) {
+                   callback(err, removed);
+                   return;
+                } else {
+                   throw err;
+                }
+             }
+             if (callback) {
+                callback(err, removed);
+             }
+             console.log('user deleted');
+             return removed;
+          })
+       })
+    }
+
 });
 
 //module.exports.init();
