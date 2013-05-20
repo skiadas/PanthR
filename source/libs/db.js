@@ -4,7 +4,7 @@ var _ = require('underscore');
 var mongodb = require('mongodb');
 var crypto = require('crypto');
 
-function Db() {    
+function Db(customServer) {    
     var server;
     var db;
     var failedRequests; // store all requests that haven't been processed
@@ -18,14 +18,14 @@ function Db() {
         return new Db();
     };
 
-    function init(Server){
-        Server = Server || {};
-        _.defaults(Server, {host:"localhost", port:"27017", dbname:"panthrdb"});        
-        self.emit('initializing', Server);
+    function init(customServer){
+        customServer = customServer || {};
+        _.defaults(customServer, {host:"localhost", port:"27017", dbname:"panthrdb"});        
+        self.emit('initializing', customServer);
         return self;
     };
     
-    this.on('initializing', function() {
+    this.on('initializing', function(Server) {
         PubSub.publish('db/initializing',[], this);
         server = new mongodb.Server(Server.host, Server.port, {auto_reconnect: true});
         db = new mongodb.Db(Server.dbname, server);
@@ -91,30 +91,34 @@ function Db() {
     // reduce from 2 calls to 1 call in the database
     // need to listen to the callback from update() 
     // to determine if the update() succeeds or not
+    
+    PubSub.subscribe('db/update/user', _.bind(this.updateUser, this));                
+    PubSub.subscribe('db/create/user', _.bind(this.createUser, this));                
+    PubSub.subscribe('db/find/user', _.bind(this.findUser, this));               
+    PubSub.subscribe('db/delete/user', _.bind(this.deleteUser, this));                
 
-    this.updateUser = function(user, changes) {
-        this.emit('updatingUser', user, changes);
-        return this;
-    };
 
-    this.on('updatingUser', function(){
-        PubSub.publish('db/updating/user',[], this);
-        this.doRequest('users', 'update', [{email : user.email}, {$set:changes}, {safe:true}], function(error, countOfRecords){
-            if (error){
-                PubSub.publish('error/db/connection/undefined', [], this);
-            }
-            else if (countOfRecords == 0){
-                PubSub.publish('error/db/user/notFound', [], this);
-            }
-            else{
-                this.emit('userUpdated');                
-            }
-        });
+    this.on('dbConnectionError', function(user){
+        PubSub.publish('error/db/connection/undefined', [user], this);
+    });
+    this.on('dbUserNotFoundError', function(user){
+        PubSub.publish('error/db/user/notFound', [user], this);
     });
 
-    this.on('userUpdated', function(){
-        PubSub.publish('db/user/updated');
+    this.on('userUpdated', function(user){
+        PubSub.publish('db/user/updated', [user], this);
     });
+    this.on('userCreated', function(user){
+        PubSub.publish('db/user/created', [user], this);
+    });
+    this.on('userFound', function(user){
+        PubSub.publish('db/user/found', [user], this);
+    });
+    this.on('userDeleted', function(user){
+        PubSub.publish('db/user/deleted', [user], this);
+    });
+
+    
     
     this.createUser = function(user){
         this.emit('creatingUser', user);
@@ -201,18 +205,21 @@ function Db() {
           })
        })
     }
-
-    this.doRequest = function(collectionName, methodName, args, callback) {
+    
+    this.doRequest = function(req, callback) {
        if (!this.db) {
-          this.requests.push([collectionName, methodName, args, callback]);
+          this.requests.push([req, callback]);
        } else {
-          args.push(callback);
-          this.db.collection(collectionName, function(err, collection) {
-             collection[methodName].apply(collection, args);
+          var that = this;
+          var ourCallBack = function(err, result) {
+              callback.call(that, err, req, result);
+          };
+          req.args.push(ourCallBack); // push our callback, instead of the original callback
+          this.db.collection(req.collectionName, function(err, collection) {
+             collection[req.methodName].apply(collection, req.args);
           });
        }
     }
-
     // PubSub for addFriend() method
     PubSub.subscribe('db/add/friend', function(data) {
         // publish if addFriend() gets called
@@ -451,6 +458,34 @@ function Db() {
 };
 util.inherits(Db, require('events').EventEmitter);
 module.exports = Db;
+
+// creating prototype properties for Db
+_.extend(Db.prototype, {
+  updateUser : function(user, changes){
+    var request = {
+      collectionName:'users',
+      methodName:'update',
+      args:[{email : user.email}, {$set:changes}, {safe:true}]
+    }
+    this.doRequest(request, function(error, countOfRecords){
+        if (error){
+            this.emit('dbConnectionError', error, request);            
+        }
+        else if (countOfRecords == 0){
+            this.emit('dbUserNotFoundError', user);            
+        }
+        else{
+            this.emit('userUpdated', user);    
+        }   
+    });
+    return this;
+  },
+  createUser : function(user){
+    this.emit('creatingUser', user);
+    return this;
+  }
+});
+
 //module.exports.init();
 /*module.exports.init(function(err, result) {
    module.exports.findUser('a@a.com', {
