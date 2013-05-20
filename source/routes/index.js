@@ -133,3 +133,8 @@ exports.performReset = function(req, res) {
       }
    });
 }
+
+// Temporary route to show typing commands in textboxes and having R evaluating them
+exports.console = function(req, res) {
+    res.render('console', {});
+}
