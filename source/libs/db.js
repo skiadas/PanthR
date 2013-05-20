@@ -1,14 +1,15 @@
 var util = require('util');
 var PubSub = require('./pubsub.js');
 var _ = require('underscore');
+var mongodb = require('mongodb');
+var crypto = require('crypto');
 
-Db = function() {
-    var mongodb = require('mongodb');
-    var crypto = require('crypto');
+Db = function() {    
     var server;
     var db;
     var failedRequests; // store all requests that haven't been processed
-    
+    var sefl = this;
+
     // intitalize function    
     // if known contects database object (ex. testing)
     // if it doesnt find calls function to initialize standard
@@ -17,20 +18,17 @@ Db = function() {
         return new Db();
     };
 
-    function init(server){
-         server = server || {};
-        _.defaults(server, {host:"localhost", port:"27017", dbname:"panthrdb"});        
+    function init(Server){
+        Server = Server || {};
+        _.defaults(Server, {host:"localhost", port:"27017", dbname:"panthrdb"});        
+        self.emit('initializing', Server);
+        return self;
     };
-
-    this.init = function() {        
-        this.emit('initializing');       
-        return this;
-    }
-
+    
     this.on('initializing', function() {
         PubSub.publish('db/initializing',[], this);
-        server = new mongodb.Server('localhost', 27017, {auto_reconnect: true});
-        db = new mongodb.Db('panthrdb', server);
+        server = new mongodb.Server(Server.host, Server.port, {auto_reconnect: true});
+        db = new mongodb.Db(Server.dbname, server);
         var that = this;
         db.on('close', function(){
             that.emit('disconnected');
@@ -40,7 +38,7 @@ Db = function() {
 
     // a new instance of mongodb is initialized
     this.on('initialized', function() {
-        PubSub.publish('initialized', [], this);
+        PubSub.publish('db/initialized', [], this);
         this.emit('connect');
     });
 
@@ -49,7 +47,7 @@ Db = function() {
         PubSub.publish('db/connect', [], this);
         db.open(function(err, db){
           if (err) {
-            PubSub.publish('db/connect/error', [], this);
+            PubSub.publish('error/db/connection/undefined', [], this);
           } else {
             this.emit('connected');
           }
@@ -88,68 +86,64 @@ Db = function() {
           return;
        }
     }
-
-    // PubSub for updateUser() method
-    PubSub.subscribe('db/updateUser', function(data) {
-        // publish if updateUser() gets called
-        PubSub.publish('db/userUpdated', {});
-    });
-
+    
     // perform only update(), not findOne() anymore
     // reduce from 2 calls to 1 call in the database
     // need to listen to the callback from update() 
     // to determine if the update() succeeds or not
 
-    this.updateUser = function(user, changes, callback) {
-       if (this.db) {
-          this.db.collection('users', function(err, collection) {
-             collection.findOne({
-                email: user.email
-             }, function(err, dbUser) {
-                if (dbUser) {
-                   collection.update(dbUser, {
-                      $set: changes
-                   }, myCb('Updated user!', user, callback));
-                } else {
-                   myCb('Cannot find email address', user, callback)();
-                }
-             })
-          })
-       } else {
-          console.log('db not open');
-       }
-       return this;
-    }
+    this.updateUser = function(user, changes) {
+        this.emit('updatingUser', user, changes);
+        return this;
+    };
 
-    // PubSub for createUser() method
-    PubSub.subscribe('db/createUser', function(data) {
-        // publish if createUser() gets called
-        PubSub.publish('db/userCreated', {});
+    this.on('updatingUser', function(){
+        PubSub.publish('db/updating/user',[], this);
+        this.doRequest('users', 'update', [{email : user.email}, {$set:changes}, {safe:true}], function(error, countOfRecords){
+            if (error){
+                PubSub.publish('error/db/connection/undefined', [], this);
+            }
+            else if (countOfRecords == 0){
+                PubSub.publish('error/db/user/notFound', [], this);
+            }
+            else{
+                this.emit('userUpdated');                
+            }
+        });
     });
 
-    this.createUser = function(user, callback) {
-       if (this.db) {
-          this.db.collection('users', function(err, collection) {
-             collection.findOne({
-                email: user.email
-             }, function(err, dbUser) {
-                if (!dbUser) {
-                   collection.insert(user, myCb('Added User!', user, callback))
-                } else {
-                   myCb('Failed user already existed', user, callback)();
-                }
-             })
-          });
-       } else {
-          console.log('db not open');
-       }
-       return this;
-    }
+    this.on('userUpdated', function(){
+        PubSub.publish('db/user/updated');
+    });
+    
+    this.createUser = function(user){
+        this.emit('creatingUser', user);
+        return this;
+    };
 
+    this.on('creatingUser', function(){
+        PubSub.publish('db/creating/user', [], this);
+        this.doRequest('users', 'insert', [{email : user.email}, {safe:true}], function(error, records){
+            if (error){
+                PubSub.publish('error/db/connection/undefined', [], this);
+            }
+            else if (!records[0]){// no item is inserted to the record array
+                PubSub.publish('error/db/user/notCreated', [], this);
+            }
+            else{
+                this.emit('userCreated');                
+            }
+        });
+    });
+
+    this.on('userCreated', function(){
+        PubSub.publish('db/user/created');
+    });
+    
     // PubSub for findUser() method
-    PubSub.subscribe('db/findUser', function(data) {
+    PubSub.subscribe('db/find/user', function(data) {
         // publish if findUser() gets called
-        PubSub.publish('db/userFound', {});
+        PubSub.publish('db/user/found', {});
     });
 
     this.findUser = function(email, fields, callback) {
@@ -180,9 +174,9 @@ Db = function() {
     }
 
     // PubSub for deleteUser() method
-    PubSub.subscribe('db/deleteUser', function(data) {
+    PubSub.subscribe('db/delete/user', function(data) {
         // publish if deleteUser() gets called
-        PubSub.publish('db/userDeleted', {});
+        PubSub.publish('db/user/deleted', {});
     });
 
     this.deleteUser = function(email, callback) {
@@ -220,9 +214,9 @@ Db = function() {
     }
 
     // PubSub for addFriend() method
-    PubSub.subscribe('db/addFriend', function(data) {
+    PubSub.subscribe('db/add/friend', function(data) {
         // publish if addFriend() gets called
-        PubSub.publish('db/friendAdded', {});
+        PubSub.publish('db/friend/added', {});
     });
 
     this.addFriend = function(user, friend, circlesArray, callback) {
@@ -252,9 +246,9 @@ Db = function() {
     //need a way to tell it any circles
 
     // PubSub for removeFriend() method
-    PubSub.subscribe('db/removeFriend', function(data) {
+    PubSub.subscribe('db/remove/friend', function(data) {
         // publish if removeFriend() gets called
-        PubSub.publish('db/friendRemoved', {});
+        PubSub.publish('db/friend/removed', {});
     });
 
     this.removeFriend = function(user, friend, circleArray, callback) {
@@ -280,9 +274,9 @@ Db = function() {
     
     //tagFriend into a list of circls
     // PubSub for tagFriend() method
-    PubSub.subscribe('db/tagFriend', function(data) {
+    PubSub.subscribe('db/tag/friend', function(data) {
         // publish if tagFriend() gets called
-        PubSub.publish('db/friendTagged', {});
+        PubSub.publish('db/friend/tagged', {});
     });
 
     this.tagFriend = function(user, friend, circleArray, callback) {
@@ -312,9 +306,9 @@ Db = function() {
     //remove friend  from circle
 
     // PubSub for unTagFriend() method
-    PubSub.subscribe('db/unTagFriend', function(data) {
+    PubSub.subscribe('db/unTag/friend', function(data) {
         // publish if unTagFriend() gets called
-        PubSub.publish('db/friendUnTagged', {});
+        PubSub.publish('db/friend/unTagged', {});
     });
 
     this.unTagFriend = function(user, friend, circleArray, callback) {
@@ -378,9 +372,9 @@ Db = function() {
     }
 
     // PubSub for createStructure() method
-    PubSub.subscribe('db/createStructure', function(data) {
+    PubSub.subscribe('db/create/structure', function(data) {
         // publish if createStructure() gets called
-        PubSub.publish('db/structureCreated', {});
+        PubSub.publish('db/structure/created', {});
     });
 
     this.createStructure = function(structure, callback) {
@@ -388,9 +382,9 @@ Db = function() {
     }
 
     // PubSub for removeStructure() method
-    PubSub.subscribe('db/removeStructure', function(data) {
+    PubSub.subscribe('db/remove/structure', function(data) {
         // publish if removeStructure() gets called
-        PubSub.publish('db/structureRemoved', {});
+        PubSub.publish('db/structure/removed', {});
     });
 
     this.removeStructure = function(structure, callback) {
@@ -404,9 +398,9 @@ Db = function() {
     }
 
     // PubSub for updateStructure() method
-    PubSub.subscribe('db/updateStructure', function(data) {
+    PubSub.subscribe('db/update/structure', function(data) {
         // publish if createStructure() gets called
-        PubSub.publish('db/structureUpdated', {});
+        PubSub.publish('db/structure/updated', {});
     });
 
     this.updateStructure = function(structure, changes, callback) {
@@ -433,9 +427,9 @@ Db = function() {
     }
     
     // PubSub for findStructure() method
-    PubSub.subscribe('db/findStructure', function(data) {
+    PubSub.subscribe('db/find/structure', function(data) {
         // publish if findStructure() gets called
-        PubSub.publish('db/structureFound', {});
+        PubSub.publish('db/structure/found', {});
     });
 
     // for now, findStructure acts like findOne
