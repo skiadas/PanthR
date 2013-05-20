@@ -104,7 +104,7 @@ io.sockets.on('connection', function (socket) {
     // TODO change this code
   socket.rclient = new RClient();
   socket.rclient.on('data', function(data) {
-      socket.emit('reply', data.toString());
+      socket.emit('reply', (data || '').toString());
   });
   socket.on('command', function (data) {
       console.log('Received command for:', data)
