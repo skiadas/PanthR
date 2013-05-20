@@ -4,11 +4,11 @@ var _ = require('underscore');
 var mongodb = require('mongodb');
 var crypto = require('crypto');
 
-Db = function() {    
+function Db() {    
     var server;
     var db;
     var failedRequests; // store all requests that haven't been processed
-    var sefl = this;
+    var self = this;
 
     // intitalize function    
     // if known contects database object (ex. testing)
@@ -450,7 +450,7 @@ Db = function() {
     init();
 };
 util.inherits(Db, require('events').EventEmitter);
-module.exports = Db();
+module.exports = Db;
 //module.exports.init();
 /*module.exports.init(function(err, result) {
    module.exports.findUser('a@a.com', {
