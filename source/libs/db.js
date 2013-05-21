@@ -50,7 +50,7 @@ function Db(customServer) {
             PubSub.publish('error/db/connection/undefined', [], self);
           } else {
             PubSub.publish('db/initialized', [], self);
-            this.emit('connected');
+            self.emit('connected');
           }
         });
     });
