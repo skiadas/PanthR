@@ -38,7 +38,7 @@ function Db(customServer) {
 
     // a new instance of mongodb is initialized
     this.on('initialized', function() {
-        PubSub.publish('db/initialized', [], this);
+        //PubSub.publish('db/initialized', [], this);
         this.emit('connect');
     });
 
@@ -49,6 +49,7 @@ function Db(customServer) {
           if (err) {
             PubSub.publish('error/db/connection/undefined', [], self);
           } else {
+            PubSub.publish('db/initialized', [], self);
             this.emit('connected');
           }
         });
