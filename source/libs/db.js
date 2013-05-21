@@ -47,7 +47,7 @@ function Db(customServer) {
         PubSub.publish('db/connect', [], this);
         db.open(function(err, db){
           if (err) {
-            PubSub.publish('error/db/connection/undefined', [], this);
+            PubSub.publish('error/db/connection/undefined', [], self);
           } else {
             this.emit('connected');
           }
@@ -103,6 +103,9 @@ function Db(customServer) {
     });
     this.on('dbUserNotFoundError', function(user){
         PubSub.publish('error/db/user/notFound', [user], this);
+    });
+    this.on('dbUserNotCreatedError', function(user){        
+        PubSub.publish('error/db/user/notCreated', [user], this);
     });
 
     this.on('userUpdated', function(user){
@@ -412,12 +415,13 @@ module.exports = Db;
 
 // creating prototype properties for Db
 _.extend(Db.prototype, {
+  
   updateUser : function(user, changes){
     var request = {
       collectionName:'users',
       methodName:'update',
       args:[{email : user.email}, {$set:changes}, {safe:true}]
-    }
+    };
     this.doRequest(request, function(error, countOfRecords){
         if (error){
             this.emit('dbConnectionError', error, request);            
@@ -431,30 +435,26 @@ _.extend(Db.prototype, {
     });
     return this;
   },
+  
   createUser : function(user){
-    this.createUser = function(user){
-        this.emit('creatingUser', user);
-        return this;
+    var req = {
+      collectionName:'users',
+      methodName:'update',
+      args:[{email : user.email}, {safe:true}]
     };
 
-    this.on('creatingUser', function(){
-        PubSub.publish('db/creating/user', [], this);
-        this.doRequest('users', 'insert', [{email : user.email}, {safe:true}], function(error, records){
-            if (error){
-                PubSub.publish('error/db/connection/undefined', [], this);
-            }
-            else if (!records[0]){// no item is inserted to the record array
-                PubSub.publish('error/db/user/notCreated', [], this);
-            }
-            else{
-                this.emit('userCreated');                
-            }
-        });
-    });
-
-    this.on('userCreated', function(){
-        PubSub.publish('db/user/created');
-    });
+    this.doRequest(req, function(error, records){
+        if (error){
+            this.emit('dbConnectionError', error, req);
+            //PubSub.publish('error/db/connection/undefined', [], this);
+        }
+        else if (!records[0]){// no item is inserted to the record array
+            this.emit('dbUserNotCreatedError', user);            
+        }
+        else{
+            this.emit('userCreated', user);                
+        }
+    });        
     return this;
   },
   
