@@ -438,16 +438,14 @@ _.extend(Db.prototype, {
   },
   
   createUser : function(user){
-    var req = {
+    var request = {
       collectionName:'users',
       methodName:'update',
       args:[{email : user.email}, {safe:true}]
     };
-
-    this.doRequest(req, function(error, records){
+    this.doRequest(request, function(error, records){
         if (error){
-            this.emit('dbConnectionError', error, req);
-            //PubSub.publish('error/db/connection/undefined', [], this);
+            this.emit('dbConnectionError', error, request);
         }
         else if (!records[0]){// no item is inserted to the record array
             this.emit('dbUserNotCreatedError', user);            
