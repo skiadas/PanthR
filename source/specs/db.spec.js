@@ -1,12 +1,29 @@
+// Run with 
+// jasmine-node specs/db.spec.js --captureExceptions
+//
 var PubSub = require('../libs/pubsub.js');
 var _ = require('underscore');
 var mockery = require('mockery');
 var realMongo = require('mongodb');
-var mongoMock = jasmine.createSpyObj('mongodb',
-    ['Server', 'Db', 'open', 'collection', 'findOne', 'update', 'remove']
-);
+
+// var mongoMock = jasmine.createSpyObj('mongodb',
+//     ['Server', 'Db', 'open', 'collection', 'findOne', 'update', 'remove']
+// );
 var Db = require('../libs/db.js');
-var server = {host: 'localhost', port: 27017, dbname: 'testingdb'};
+var server = {host: 'localhost', port: 27017, dbName: 'testingdb'};
+
+var mongoserver = new realMongo.Server(server.host, server.port);
+var db_connector = new realMongo.Db(server.dbName, mongoserver, {safe: false});
+var client
+db_connector.open(function(err, db) {
+    client = db;
+});
+
+new realMongo.MongoClient(new realMongo.Server(server.host, server.port)).open(function(err, cl) { if (err) {
+    console.log("Failed to connect to Server");
+} else {
+    console.log("Database connection established"); client = cl;} 
+} );
 
 // mockery.enable();
 
@@ -35,8 +52,50 @@ describe("The db module", function() {
    });
    it("uses a doRequest method to talk to the database", function(done) {
        // Need to add checks here that doRequest can perform operations on the testing database
-       done()
+       var user = {email: "a@a.com", name: "John Doe"}  // Work in randomized names and emails
+       var requests = [
+           { collectionName: 'users', methodName: 'insert', args: [user]},
+           { collectionName: 'users', methodName: 'findOne', args: [_(user).pick('email')]},
+           { collectionName: 'users', methodName: 'remove', args: [_(user).pick('email')]},
+       ];
+       var flag
+       console.log("Database opened");
+       runs(function() {
+           flag = false;
+           setTimeout(function() {
+                   flag = true;
+            }, 3000);
+       });
+       waitsFor(function() {
+            console.log("Checking waits");
+            console.log(client, flag)
+            return flag;
+       }, "MongoDb client failed to connect", 5000);
+       console.log("After waits")
+       runs(function() {
+           console.log("Inside runs")
+           done();
+       client.dropCollection('users', _droppedCollection);
+       function _droppedCollection(err, collection) {
+           console.log("In _droppedCollection");
+           client.createCollection('users', _createdCollection);
+       };
+       function _createdCollection(err, collection) {
+           console.log("In _createdCollection");
+           Db.doRequest(requests[1], function(err, req, res) {
+               expect(req).toEqual(requests[1]);
+               expect(_(res).pick('email', 'name').isEqual(user)).toBeTruthy();
+               expect(res._id).toBeDefined();
+               _addedUser();
+           });
+       };
+       function _addedUser() {
+           console.log("In _addedUser");
+       }
+       });
+       console.log("After runs")
    });
+   return
    it("would request to create a user when db/create/user message is sent", function(done) {
        PubSub.subscribe('db/user/created', function() {
            expect(db.doRequest).toHaveBeenCalled();
