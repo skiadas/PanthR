@@ -122,19 +122,9 @@ function Db(customServer) {
         PubSub.publish('db/user/deleted', [user], this);
     });
 
-    
-    
-    
-    
-    // PubSub for findUser() method
-    PubSub.subscribe('db/find/user', function(data) {
-        // publish if findUser() gets called
-        PubSub.publish('db/user/found', {});
-    });    
-
+        
     // PubSub for deleteUser() method
-    PubSub.subscribe('db/delete/user', function(data) {
-        // publish if deleteUser() gets called
+    PubSub.subscribe('db/delete/user', function(data) {        
         PubSub.publish('db/user/deleted', {});
     });
 
@@ -457,31 +447,25 @@ _.extend(Db.prototype, {
     return this;
   },
   
-  findUser : function(email, fields){    
-       if (fields instanceof Function) {
-          callback = fields;
-          fields = {};
-       }
-       this.db.collection('users', function(err, collection) {
-          collection.findOne({
-             email: email
-          }, fields, function(err, result) {
-             if (result === null) {
-                console.log("Did not find user!", email);
-                if (callback) {
-                   callback(err, result);
-                   return;
-                } else {
-                   throw err;
-                }
-             }
-             if (callback) {
-                callback(err, result);
-             }
-             console.log('Found User!', result);
-             return result;
-          })
-       })    
+  findUser : function(email){    
+
+    var request = {
+      collectionName:'users',
+      methodName:'findOne',
+      args:[{email : user.email}]
+    };  
+    this.doRequest(request, function(error, docObject){
+        if (error){
+            this.emit('dbConnectionError', error, request);
+        }
+        else if (!docObject){// docObject is not defined
+            this.emit('dbUserNotFoundError', user);            
+        }
+        else{
+            this.emit('userFound', user);                
+        }
+    });
+    return this;    
   },
 
   deleteUser : function(email) {
