@@ -115,8 +115,8 @@ function Db(customServer) {
     this.on('userCreated', function(user){
         PubSub.publish('db/user/created', [user], this);
     });
-    this.on('userFound', function(user){
-        PubSub.publish('db/user/found', [user], this);
+    this.on('userFound', function(email){
+        PubSub.publish('db/user/found', [email], this);
     });
     this.on('userDeleted', function(user){
         PubSub.publish('db/user/deleted', [user], this);
@@ -452,44 +452,41 @@ _.extend(Db.prototype, {
     var request = {
       collectionName:'users',
       methodName:'findOne',
-      args:[{email : user.email}]
+      args:[{email : email}, {safe:true}]
     };  
     this.doRequest(request, function(error, docObject){
         if (error){
             this.emit('dbConnectionError', error, request);
         }
         else if (!docObject){// docObject is not defined
-            this.emit('dbUserNotFoundError', user);            
+            this.emit('dbUserNotFoundError', email);            
         }
         else{
-            this.emit('userFound', user);                
+            this.emit('userFound', email);                
         }
     });
     return this;    
   },
 
   deleteUser : function(email) {
-       this.db.collection('users', function(err, collection) {
-          collection.remove({
-             email: email
-          }, function(err, removed) {
-             if (err) {
-                console.log('user not deleted!', err);
-                if (callback) {
-                   callback(err, removed);
-                   return;
-                } else {
-                   throw err;
-                }
-             }
-             if (callback) {
-                callback(err, removed);
-             }
-             console.log('user deleted');
-             return removed;
-          })
-       })
-    }
+    var request = {
+      collectionName:'users',
+      methodName:'remove',
+      args:[{email : user.email}, {safe:true}]
+    };
+    this.doRequest(request, function(error, countOfRemovedRecords){
+        if (error){
+            this.emit('dbConnectionError', error, request);
+        }
+        else if (countOfRemovedRecords == 0){// no object is removed
+            this.emit('dbUserNotDeletedError', user);            
+        }
+        else{
+            this.emit('userDeleted', user);                
+        }
+    });
+    return this;    
+  }
 
 });
 
