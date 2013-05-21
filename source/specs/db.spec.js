@@ -33,7 +33,62 @@ describe("The db module", function() {
        })
        new Db(server);
    });
+   it("uses a doRequest method to talk to the database", function(done) {
+       // Need to add checks here that doRequest can perform operations on the testing database
+       done()
+   });
+   it("would request to create a user when db/create/user message is sent", function(done) {
+       PubSub.subscribe('db/user/created', function() {
+           
+           expect(db.doRequest).toHaveBeenCalled();
+           console.log(db.doRequest.calls);
+           done()
+       });
+       db = new Db(server);
+       var req = {
+           methodName: 'create',
+           collectionName: 'users',
+           args: [{email: 'a@a.com'}]
+       };
+       spyOn(db, 'doRequest');
+       PubSub.publish('db/create/user', req.args[0]);
+   });
+   it("would request to update a user when db/create/user message is sent", function(done) {
+       PubSub.subscribe('db/user/updated', function() {
+
+          expect(db.doRequest).toHaveBeenCalled();
+          console.log(db.doRequest.calls);
+          done()
+       });
+       db = new Db(server);
+       var req = {
+           methodName: 'update',
+           collectionName: 'users',
+           args: [{email: 'a@a.com'}, {$set: {name: 'John'}}]
+       };
+       spyOn(db, 'doRequest');
+       PubSub.publish('db/update/user', req.args[0]);
+   });
+   it("would request to delete a user when db/delete/user message is sent", function(done) {
+       PubSub.subscribe('db/user/deleted', function() {
+
+          expect(db.doRequest).toHaveBeenCalled();
+          console.log(db.doRequest.calls);
+          done()
+       });
+       db = new Db(server);
+       var req = {
+           methodName: 'remove',
+           collectionName: 'users',
+           args: [{email: 'a@a.com'}]
+       };
+       spyOn(db, 'doRequest');
+       PubSub.publish('db/delete/user', req.args[0]);
+   });
+   
 });
+
+
 return;
 describe("A database connection", function () {
     
