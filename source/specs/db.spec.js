@@ -12,12 +12,12 @@ var realMongo = require('mongodb');
 var Db = require('../libs/db.js');
 var server = {host: 'localhost', port: 27017, dbName: 'testingdb'};
 
-var mongoserver = new realMongo.Server(server.host, server.port);
-var db_connector = new realMongo.Db(server.dbName, mongoserver, {safe: false});
+// var mongoserver = new realMongo.Server(server.host, server.port);
+// var db_connector = new realMongo.Db(server.dbName, mongoserver, {safe: false});
 var client
-db_connector.open(function(err, db) {
-    client = db;
-});
+// db_connector.open(function(err, db) {
+//     client = db;
+// });
 
 new realMongo.MongoClient(new realMongo.Server(server.host, server.port)).open(function(err, cl) { if (err) {
     console.log("Failed to connect to Server");
@@ -45,10 +45,12 @@ describe("The db module", function() {
    }); 
    it("should eventually publish 'db/initialized' when it is set up", function(done) {
        spyOn(PubSub, 'publish').andCallThrough();
+       var theDb;
        PubSub.subscribe('db/initialized', function() {
+           expect(theDb && theDb.db).toBeTruthy();
            done();
        })
-       new Db(server);
+       theDb = new Db(server);
    });
    it("uses a doRequest method to talk to the database", function(done) {
        // Need to add checks here that doRequest can perform operations on the testing database
@@ -58,42 +60,35 @@ describe("The db module", function() {
            { collectionName: 'users', methodName: 'findOne', args: [_(user).pick('email')]},
            { collectionName: 'users', methodName: 'remove', args: [_(user).pick('email')]},
        ];
-       var flag
-       console.log("Database opened");
-       runs(function() {
-           flag = false;
-           setTimeout(function() {
-                   flag = true;
-            }, 3000);
-       });
+       var testDb = new Db(server);
        waitsFor(function() {
-            console.log("Checking waits");
-            console.log(client, flag)
-            return flag;
+            return client && testDb;
        }, "MongoDb client failed to connect", 5000);
-       console.log("After waits")
        runs(function() {
-           console.log("Inside runs")
-           done();
-       client.dropCollection('users', _droppedCollection);
-       function _droppedCollection(err, collection) {
-           console.log("In _droppedCollection");
-           client.createCollection('users', _createdCollection);
-       };
-       function _createdCollection(err, collection) {
-           console.log("In _createdCollection");
-           Db.doRequest(requests[1], function(err, req, res) {
-               expect(req).toEqual(requests[1]);
-               expect(_(res).pick('email', 'name').isEqual(user)).toBeTruthy();
-               expect(res._id).toBeDefined();
-               _addedUser();
-           });
-       };
-       function _addedUser() {
-           console.log("In _addedUser");
-       }
+           var db = client.db(server.dbName);
+           // console.log(_(db).functions())
+           db.dropCollection('users', _droppedCollection);
+           function _droppedCollection(err, collection) {
+               console.log("In _droppedCollection");
+               db.createCollection('users', _createdCollection);
+           };
+           function _createdCollection(err, collection) {
+               console.log("In _createdCollection.");
+               console.log("We should be hearing from doRequest's callback.");
+               console.log("We sent it: ", requests[0]);
+               testDb.doRequest(requests[0], function(err, req, res) {
+                   console.log("In doRequest's callback. We should reach here.")
+                   expect(req).toEqual(requests[0]);
+                   expect(_(res).pick('email', 'name').isEqual(user)).toBeTruthy();
+                   expect(res._id).toBeDefined();
+                   _addedUser();
+               });
+           };
+           function _addedUser() {
+               console.log("In _addedUser");
+               done();
+           }
        });
-       console.log("After runs")
    });
    return
    it("would request to create a user when db/create/user message is sent", function(done) {
