@@ -62,7 +62,6 @@ describe("The db module", function() {
        theDb = new Db(server);
    });
    it("uses a doRequest method to talk to the database", function(done) {
-       // Need to add checks here that doRequest can perform operations on the testing database
        var user = {email: "a@a.com", name: "John Doe"}  // Work in randomized names and emails
        var requests = [
            { collectionName: 'users', methodName: 'insert', args: [user]},
@@ -79,75 +78,65 @@ describe("The db module", function() {
            var db = client.db(server.dbName);
            db.dropCollection('users', _droppedCollection);
            function _droppedCollection(err, collection) {
-               console.log("In _droppedCollection");
                db.createCollection('users', _createdCollection);
            };
            function _createdCollection(err, collection) {
-               console.log("In _createdCollection.");
-               console.log("We should be hearing from doRequest's callback.");
-               console.log("We sent it: ", requests[0]);
                testDb.doRequest(requests[0], function(err, req, res) {
-                   console.log("In doRequest's callback. We should reach here.")
                    expect(req).toEqual(requests[0]);
-                   expect(_(res).pick('email', 'name').isEqual(user)).toBeTruthy();
-                   expect(res._id).toBeDefined();
+                   expect(_.chain(res).pick('email', 'name').isEqual(user)).toBeTruthy();
+                   expect(res[0]._id).toBeDefined();
+                   // done();
                    _addedUser();
                });
            };
            function _addedUser() {
-               console.log("In _addedUser. Verifying ...");
-               db.findOne(_(req.args).pick('email'), function(err, doc) {
-                   expect(err).toEqual(null);
-                   expect(_(doc).pick('email', 'name').isEqual(user)).toBeTruthy();
-                   _foundTheUser();
+               db.collection('users', function(err, coll) {
+                  coll.findOne(_(requests[0].args[0]).pick('email'), function(err, doc) {
+                     expect(err).toEqual(null);
+                     expect(doc).not.toBe(null);
+                     expect(_.chain(doc).pick('email', 'name').isEqual(user)).toBeTruthy();
+                     _foundTheUser();
+                  });
                });
            };
            function _foundTheUser() {
-               console.log("Found the added user.");
-               console.log("Asking doRequest to find the user.")
                testDb.doRequest(requests[1], function(err, req, res) {
-                   console.log("In doRequest's callback. We should reach here.")
                    expect(req).toEqual(requests[1]);
-                   expect(_(res).pick('email', 'name').isEqual(user)).toBeTruthy();
+                   expect(_.chain(res).pick('email', 'name').isEqual(user)).toBeTruthy();
                    expect(res._id).toBeDefined();
                    _updateTheUser();
                });
            };
            function _updateTheUser() {
-               console.log("Asking doRequest to update the user.");
                testDb.doRequest(requests[2], function(err, req, res) {
-                   console.log("In doRequest's callback. We should reach here.")
                    expect(req).toEqual(requests[2]);
-                   expect(res.email).toEqual(user.email);
-                   expect(res.name).toEqual(requests[2].args[1].$set.name);
-                   expect(res.nick).toEqual(requests[2].args[1].$set.nick);
-                   expect(res._id).toBeDefined();
                    _verifyUpdate();
                });
            };
            function _verifyUpdate() {
-               db.findOne(_(req.args).pick('email'), function(err, doc) {
-                   expect(err).toEqual(null);
-                   expect(doc.email).toEqual(user.email);
-                   expect(doc.name).toEqual(requests[2].args[1].$set.name);
-                   expect(doc.nick).toEqual(requests[2].args[1].$set.nick);
-                   _deleteTheUser();
+               db.collection('users', function(err, coll) {
+                  coll.findOne(_(requests[2].args).pick('email'), function(err, doc) {
+                     expect(err).toEqual(null);
+                     expect(doc.email).toEqual(user.email);
+                     expect(doc.name).toEqual(requests[2].args[1].$set.name);
+                     expect(doc.nick).toEqual(requests[2].args[1].$set.nick);
+                     _deleteTheUser();
+                  });
                });
            };
            function _deleteTheUser() {
-               console.log("Asking doRequest to delete the user");
                testDb.doRequest(requests[3], function(err, req, res) {
-                   console.log("In doRequest's callback. We should reach here.")
                    expect(req).toEqual(requests[3]);
                    _verifyDeletion();
                });
            };
            function _verifyDeletion() {
-               console.log("Verifying deletion");
-               db.findOne(_(req.args).pick('email'), function(err, doc) {
-                   expect(err).toEqual(null);
-                   expect(doc).toEqual(null);
-                   done();
+               db.collection('users', function(err, coll) {
+                  coll.findOne(_(requests[3].args).pick('email'), function(err, doc) {
+                     expect(err).toEqual(null);
+                     expect(doc).toEqual(null);
+                     done();
+                  });
                });
            }
        });
