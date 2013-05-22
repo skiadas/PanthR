@@ -115,7 +115,7 @@ function Db(customServer) {
        if (!this.db) {
           console.log("Db not found. queueing task for later");
           PubSub.publish('warning/db/requestQueueForLater');
-          this.requests.push([req, callback]);
+          this.failedRequests.push([req, callback]);
        } else {
            console.log("Asked to perform: ", req);
           var that = this;
@@ -452,7 +452,35 @@ _.extend(Db.prototype, {
     return this;    
   },
 
+  this.addFriend = function(user, friend, circlesArray) {
 
+    var request = {
+      collectionName:'users',
+      methodName:'remove',
+      args:[{email : email}, {safe:true}]
+    };  
+
+       var friendStr = 'friends.' + friend._id.toHexString();
+       var queryObj = {
+          '$set': {}
+       };
+       queryObj.$set[friendStr] = {
+          nick: friend.nick,
+          email: friend.email,
+          circles: circlesArray
+       };
+       circlesArray.forEach(function(el) {
+          queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
+             nick: friend.nick,
+             email: friend.email
+          };
+       });
+       var findStr = {
+          _id: user._id
+       };
+       findStr[friendStr] = null
+       this.doRequest('users', 'update', [findStr, queryObj], callback)
+    }
 
 });
 
