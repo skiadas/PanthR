@@ -153,11 +153,11 @@ describe("The db module", function() {
            collectionName: 'users',
            args: [{email: 'a@a.com'}]
        };
-       spyOn(db, 'doRequest').andCallFake(function(req,callback) {
-           callback.call(db, null, req.args[0]);
+       spyOn(db, 'doRequest').andCallFake(function(req, callback) {
+           callback.call(db, null, [req.args[0]]);
            return;
        });
-       PubSub.publish('db/create/user', req.args[0]);
+       PubSub.publish('db/create/user', [req.args[0]]);
    });
    it("would request to update a user when db/update/user message is sent", function(done) {
        console.log('testing update')
@@ -176,14 +176,13 @@ describe("The db module", function() {
           expect(request.methodName).toEqual(req.methodName);
           expect(request.collectionName).toEqual(req.collectionName);
           _(req.args).each(function(item) { expect(request.args).toContain(item)});
-          callback.call(db, null, 1);
+          callback.call(db, null, [1]);
        });
        PubSub.publish('db/update/user', req.args);
    });
    it("would request to delete a user when db/delete/user message is sent", function(done) {
        console.log('testing delete')
        PubSub.subscribe('db/user/deleted', function() {
-   
           expect(db.doRequest).toHaveBeenCalled();
           console.log(db.doRequest.calls);
           done()
@@ -196,13 +195,14 @@ describe("The db module", function() {
        };
        spyOn(db, 'doRequest').andCallFake(function(request, callback) {
             console.log('in dorequest')
-          expect(request).toEqual(req);
-          callback.call(db, null, 1);
+          expect(request.methodName).toEqual(req.methodName);
+          expect(request.collectionName).toEqual(req.collectionName);
+          _(req.args).each(function(item) { expect(request.args).toContain(item)});
+          callback.call(db, null, [1]);
        });
        console.log('publishing delete')
-       PubSub.publish('db/delete/user', req.args[0]);
+       PubSub.publish('db/delete/user', [req.args[0].email]);
    });
-   
 });
 
 
