@@ -20,7 +20,7 @@ function Db(customServer) {
 
     function init(customServer){
         customServer = customServer || {};
-        _.defaults(customServer, {host:"localhost", port:"27017", dbname:"panthrdb"});        
+        _.defaults(customServer, {host:"localhost", port:"27017", dbName:"panthrdb"});        
         self.emit('initializing', customServer);
         return self;
     };
@@ -28,7 +28,7 @@ function Db(customServer) {
     this.on('initializing', function(Server) {
         PubSub.publish('db/initializing',[], this);
         server = new mongodb.Server(Server.host, Server.port, {auto_reconnect: true});
-        db = new mongodb.Db(Server.dbname, server);
+        db = new mongodb.Db(Server.dbName, server, {safe:false});
         var that = this;
         db.on('close', function(){
             that.emit('disconnected');
@@ -374,7 +374,7 @@ function Db(customServer) {
     }
     this.db = null;
     this.requests = [];
-    init();
+    init(customServer);
 };
 util.inherits(Db, require('events').EventEmitter);
 module.exports = Db;
