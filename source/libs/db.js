@@ -28,7 +28,7 @@ function Db(customServer) {
     this.on('initializing', function(Server) {
         PubSub.publish('db/initializing',[], this);
         server = new mongodb.Server(Server.host, Server.port, {auto_reconnect: true});
-        db = new mongodb.Db(Server.dbname, server);
+        db = new mongodb.Db(Server.dbname, server, {safe:false});
         var that = this;
         db.on('close', function(){
             that.emit('disconnected');
@@ -38,7 +38,6 @@ function Db(customServer) {
 
     // a new instance of mongodb is initialized
     this.on('initialized', function() {
-        //PubSub.publish('db/initialized', [], this);
         this.emit('connect');
     });
 
@@ -49,14 +48,15 @@ function Db(customServer) {
           if (err) {
             PubSub.publish('error/db/connection/undefined', [], self);
           } else {
-            PubSub.publish('db/initialized', [], self);
-            self.emit('connected');
+            self.db = db;
+            PubSub.publish('db/initialized', [db], self);
+            self.emit('connected', db);
           }
         });
     });
 
     // connection is set up
-    this.on('connected', function(){
+    this.on('connected', function(db){
         // send all failed requests to doRequest
         if (failedRequests) {
                 while (failedRequests.length != 0) {
@@ -64,12 +64,12 @@ function Db(customServer) {
                    doRequest.apply(this, now);
                 }
              }
-        PubSub.publish('db/connected', [], this);
+        PubSub.publish('db/connected', [db], this);
     });
 
     // connection is not yet up
     this.on('disconnected', function(){
-        PubSub.publish('db/disconnected', [], this);
+        PubSub.publish('db/disconnected', [db], this);
         this.emit('connect');
     });    
 
@@ -373,7 +373,7 @@ function Db(customServer) {
         return this.doRequest('structures', 'findOne', [queryObj], callback);
     }
     this.db = null;
-    this.requests = [];
+    this.failedRequests = [];
     init();
 };
 util.inherits(Db, require('events').EventEmitter);
