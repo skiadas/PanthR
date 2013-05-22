@@ -64,7 +64,7 @@ describe("The db module", function() {
        ];
        var testDb = new Db(server);
        waitsFor(function() {
-            return client && testDb;
+            return client && testDb.db;
        }, "MongoDb client failed to connect", 5000);
        runs(function() {
            var db = client.db(server.dbName);
