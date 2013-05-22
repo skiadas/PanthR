@@ -143,7 +143,6 @@ describe("The db module", function() {
            }
        });
    });
-   return
    it("would request to create a user when db/create/user message is sent", function(done) {
        PubSub.subscribe('db/user/created', function() {
            expect(db.doRequest).toHaveBeenCalled();
@@ -183,28 +182,28 @@ describe("The db module", function() {
        });
        PubSub.publish('db/update/user', req.args);
    });
-   // it("would request to delete a user when db/delete/user message is sent", function(done) {
-   //     console.log('testing delete')
-   //     PubSub.subscribe('db/user/deleted', function() {
-   // 
-   //        expect(db.doRequest).toHaveBeenCalled();
-   //        console.log(db.doRequest.calls);
-   //        done()
-   //     });
-   //     db = new Db(server);
-   //     var req = {
-   //         methodName: 'remove',
-   //         collectionName: 'users',
-   //         args: [{email: 'a@a.com'}]
-   //     };
-   //     spyOn(db, 'doRequest').andCallFake(function(request, callback) {
-   //          console.log('in dorequest')
-   //        expect(request).toEqual(req);
-   //        callback.call(db, null, 1);
-   //     });
-   //     console.log('publishing delete')
-   //     PubSub.publish('db/delete/user', req.args[0]);
-   // });
+   it("would request to delete a user when db/delete/user message is sent", function(done) {
+       console.log('testing delete')
+       PubSub.subscribe('db/user/deleted', function() {
+   
+          expect(db.doRequest).toHaveBeenCalled();
+          console.log(db.doRequest.calls);
+          done()
+       });
+       db = new Db(server);
+       var req = {
+           methodName: 'remove',
+           collectionName: 'users',
+           args: [{email: 'a@a.com'}]
+       };
+       spyOn(db, 'doRequest').andCallFake(function(request, callback) {
+            console.log('in dorequest')
+          expect(request).toEqual(req);
+          callback.call(db, null, 1);
+       });
+       console.log('publishing delete')
+       PubSub.publish('db/delete/user', req.args[0]);
+   });
    
 });
 
