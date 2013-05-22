@@ -1,7 +1,7 @@
 // Run with 
 // jasmine-node specs/db.spec.js --captureExceptions
 //
-var PubSub = require('../libs/pubsub.js');
+var PubSub = require('../libs/pubsub.js').sync();
 var _ = require('underscore');
 var mockery = require('mockery');
 var realMongo = require('mongodb');
@@ -33,7 +33,7 @@ describe("The db module", function() {
     });
     it("should subscribe to PubSub notifications", function() {
         spyOn(PubSub, 'subscribe').andCallThrough();
-        new Db(server);
+        var db = new Db(server);
         expect(PubSub.subscribe).toHaveBeenCalled();
         var subscribed = _(PubSub.subscribe.calls).map(function(x) {return x.args[0]});
         var expected = [ 
@@ -42,13 +42,22 @@ describe("The db module", function() {
             'db/create/structure', 'db/remove/structure', 'db/update/structure', 'db/find/structure'
         ]
         _.each(expected, function(x) {return expect(subscribed).toContain(x)});
+        db = null;
+        PubSub.reset();
    }); 
    it("should eventually publish 'db/initialized' when it is set up", function(done) {
        spyOn(PubSub, 'publish').andCallThrough();
        var theDb;
-       PubSub.subscribe('db/initialized', function() {
-           expect(theDb && theDb.db).toBeTruthy();
-           done();
+       PubSub.subscribe('db/initialized', function(db) {
+           if (theDb.db) {
+               expect(theDb && theDb.db).toBeTruthy();
+               expect(theDb.db.databaseName).toBe(server.dbName);
+               theDb = null;
+               PubSub.reset();
+               done();
+           } else {
+               console.log("Null db case")
+           }
        })
        theDb = new Db(server);
    });
