@@ -26,7 +26,7 @@ function Db(customServer) {
     };
     
     this.on('initializing', function(Server) {
-        PubSub.publish('db/initializing',[], this);
+        PubSub.publish('db/initializing',[Server], this);
         server = new mongodb.Server(Server.host, Server.port, {auto_reconnect: true});
         db = new mongodb.Db(Server.dbName, server, {safe:false});
         var that = this;
@@ -46,7 +46,7 @@ function Db(customServer) {
         PubSub.publish('db/connect', [], this);
         db.open(function(err, db){
           if (err) {
-            PubSub.publish('error/db/connection/undefined', [], self);
+            PubSub.publish('error/db/connection/undefined', [err], self);
           } else {
             self.db = db;
             PubSub.publish('db/initialized', [db], self);
@@ -73,21 +73,6 @@ function Db(customServer) {
         this.emit('connect');
     });    
 
-    // Local helper function
-    var myCb = function(message, user, callback) {
-       return function(err, result) {
-          if (err) {
-             console.log(err);
-          } else {
-             console.log(message, user.email);
-          }
-          if (callback) {
-             callback(err, result);
-          }
-          return;
-       }
-    }
-    
     // perform only update(), not findOne() anymore
     // reduce from 2 calls to 1 call in the database
     // need to listen to the callback from update() 
@@ -128,7 +113,8 @@ function Db(customServer) {
                 
     this.doRequest = function(req, callback) {
        if (!this.db) {
-           console.log("Db not found. queueing task for later")
+          console.log("Db not found. queueing task for later");
+          PubSub.publish('warning/db/requestQueueForLater');
           this.requests.push([req, callback]);
        } else {
            console.log("Asked to perform: ", req);
