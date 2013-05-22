@@ -12,13 +12,22 @@
 // Adjusted by skiadas@hanover.edu to be loaded as a node package
 //
 // Further adjusted to allow "namespacing" of the form "db/subject/verb" etc
-// 
+// Added synchronous/asynchronous option
+// Added a "reset" option
 
 var Events = (function (){
     var cache = {}
     ,   doAsync = true;  // Default to asynchronous messaging
     async = function() { doAsync = true; return this; };
     sync = function() { doAsync = false; return this; };
+    reset = function(topic) {
+        // Removes all handlers for a specific topic. If topic is undefined, removes all handlers
+        if (topic == undefined) {
+            cache = {};
+        } else if (cache[topic]) {
+            delete cache[topic];
+        }
+    };
     /**
     * Events.publish
     * e.g.: Events.publish("/Article/added", [article], this);
@@ -110,7 +119,8 @@ var Events = (function (){
         subscribe: subscribe,
         unsubscribe: unsubscribe,
         sync: sync,
-        async: async
+        async: async,
+        reset: reset
     };
 }());
 
