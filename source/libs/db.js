@@ -376,7 +376,7 @@ _.extend(Db.prototype, {
     var request = {
       collectionName:'users',
       methodName:'update',
-      args:[{email : user.email}, {changes}, {safe:true}]
+      args:[{email : user.email}, changes, {safe:true}]
     };
     this.doRequest(request, function(error, countOfRecords){
         if (error){
@@ -452,7 +452,7 @@ _.extend(Db.prototype, {
     return this;    
   },
 
-  this.addFriend = function(user, friend, circlesArray) {
+  addFriend : function(user, friend, circlesArray) {
 
     var request = {
       collectionName:'users',
