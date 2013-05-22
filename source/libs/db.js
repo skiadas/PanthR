@@ -38,7 +38,6 @@ function Db(customServer) {
 
     // a new instance of mongodb is initialized
     this.on('initialized', function() {
-        //PubSub.publish('db/initialized', [], this);
         this.emit('connect');
     });
 
@@ -49,14 +48,15 @@ function Db(customServer) {
           if (err) {
             PubSub.publish('error/db/connection/undefined', [], self);
           } else {
-            PubSub.publish('db/initialized', [], self);
-            self.emit('connected');
+            self.db = db;
+            PubSub.publish('db/initialized', [db], self);
+            self.emit('connected', db);
           }
         });
     });
 
     // connection is set up
-    this.on('connected', function(){
+    this.on('connected', function(db){
         // send all failed requests to doRequest
         if (failedRequests) {
                 while (failedRequests.length != 0) {
@@ -64,12 +64,12 @@ function Db(customServer) {
                    doRequest.apply(this, now);
                 }
              }
-        PubSub.publish('db/connected', [], this);
+        PubSub.publish('db/connected', [db], this);
     });
 
     // connection is not yet up
     this.on('disconnected', function(){
-        PubSub.publish('db/disconnected', [], this);
+        PubSub.publish('db/disconnected', [db], this);
         this.emit('connect');
     });    
 
@@ -128,8 +128,10 @@ function Db(customServer) {
                 
     this.doRequest = function(req, callback) {
        if (!this.db) {
+           console.log("Db not found. queueing task for later")
           this.requests.push([req, callback]);
        } else {
+           console.log("Asked to perform: ", req);
           var that = this;
           var ourCallBack = function(err, result) {
               callback.call(that, err, req, result);
@@ -373,7 +375,7 @@ function Db(customServer) {
         return this.doRequest('structures', 'findOne', [queryObj], callback);
     }
     this.db = null;
-    this.requests = [];
+    this.failedRequests = [];
     init(customServer);
 };
 util.inherits(Db, require('events').EventEmitter);
