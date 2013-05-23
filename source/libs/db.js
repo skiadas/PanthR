@@ -19,7 +19,6 @@ function Db(customServer) {
     };
 
     function init(customServer){
-        console.log(customServer);
         customServer = customServer || {};
         _.defaults(customServer, {host:"localhost", port:"27017", dbName:"panthrdb"});        
         self.emit('initializing', customServer);
@@ -393,25 +392,51 @@ _.extend(Db.prototype, {
     return this;
   },
   
-  createUser : function(user){
-    console.log('GOING IN createUser');
-    var request = {
+  createUser : function(user){    
+    var request1 = {
+      collectionName:'users',
+      methodName:'findOne',
+      args:[{email : user.email}, {safe:true}]
+    };
+    var request2 = {
       collectionName:'users',
       methodName:'insert',
       args:[user, {safe:true}]
     };
     var self = this;
-    this.doRequest(request, function(error, request, records){                        
-        if (error){            
+    this.doRequest(request1, function(error, request, docObject){
+        if (error){
             self.emit('dbConnectionError', error, request);
         }
-        else if (!records[0]){// no item is inserted to the record array
-            self.emit('dbUserNotCreatedError', user);            
+        else if (!docObject){// docObject is not defined
+            self.emit('userNotExisted', user);            
         }
         else{
-            self.emit('userCreated', user);                
+            self.emit('userExisted', user);                
         }
-    });      
+    });
+    
+    var _createUser = function(user){
+        this.doRequest(request2, function(error, request, records){                        
+            if (error){            
+                self.emit('dbConnectionError', error, request);
+            }            
+            else if (!records[0]){// no item is inserted to the record array
+                self.emit('dbUserNotCreatedError', user);            
+            }
+            else{
+                self.emit('userCreated', user);                
+            }
+        });          
+    };
+
+    var _ignoreUser = function(user){
+        console.log(user, ' already exists!');
+        process.exit(0);
+    };
+
+    this.on('userNotExisted', _createUser);
+    this.on('userExisted', _ignoreUser);
     return this;
   },
   
@@ -512,11 +537,10 @@ _.extend(Db.prototype, {
 /*run mongodb: sudo mongod --config /etc/mongodb.conf --nojournal*/
   
 if (require.main === module) {
-  var user = {email: "hi@hi.com", name: "John Doer"};
+  var user = {email: "h5@hu.com", name: "John Doer"};
 
   PubSub.subscribe('db/connected', function(){      
-      newDB.createUser(user);      
-      //process.exit(0);
+      newDB.createUser(user);           
   });
 
   var myServer = {host:"localhost", port:"27017", dbName:"foodb"};
@@ -524,8 +548,7 @@ if (require.main === module) {
 
   PubSub.subscribe('db/user/created', function(user){
      var collection = newDB.db.collection('users');
-     collection.findOne({email: user.email}, function(err, doc){
-        console.log('doc: ', doc);
+     collection.findOne({email: user[0].email}, function(err, doc){
         process.exit(0);
      });     
      
