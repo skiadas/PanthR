@@ -60,8 +60,10 @@ var Events = (function (){
                 i = thisTopic.length - 1;
 
                 if (async) {
+                    var theArgs = args;
                     for (i; i >= 0; i -= 1) {
-                        process.nextTick(thisTopic[i].bind(scope, args));
+                        var handler = thisTopic[i];
+                        process.nextTick(function() {handler.apply(scope, theArgs)});
                     }
                 } else {
                     for (i; i >= 0; i -= 1) {
