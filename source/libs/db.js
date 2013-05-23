@@ -3,6 +3,7 @@ var PubSub = require('./pubsub.js');
 var _ = require('underscore');
 var mongodb = require('mongodb');
 var crypto = require('crypto');
+var assert = require('assert');
 
 function Db(customServer) {    
     var server;
@@ -408,34 +409,24 @@ _.extend(Db.prototype, {
         if (error){
             self.emit('dbConnectionError', error, request);
         }
-        else if (!docObject){// docObject is not defined
-            self.emit('userNotExisted', user);            
+        else if (!docObject){// user is not existed
+            this.doRequest(request2, function(error, request, records){                        
+                        if (error){            
+                            self.emit('dbConnectionError', error, request);
+                        }            
+                        else if (!records[0]){// no item is inserted to the record array
+                            self.emit('dbUserNotCreatedError', user);            
+                        }
+                        else{
+                            self.emit('userCreated', user);                
+                        }
+                    });          
         }
-        else{
-            self.emit('userExisted', user);                
+        else{ // user exists
+            console.log(user, ' already exists!');        
         }
     });
     
-    var _createUser = function(user){
-        this.doRequest(request2, function(error, request, records){                        
-            if (error){            
-                self.emit('dbConnectionError', error, request);
-            }            
-            else if (!records[0]){// no item is inserted to the record array
-                self.emit('dbUserNotCreatedError', user);            
-            }
-            else{
-                self.emit('userCreated', user);                
-            }
-        });          
-    };
-
-    var _ignoreUser = function(user){
-        console.log(user, ' already exists!');        
-    };
-
-    this.on('userNotExisted', _createUser);
-    this.on('userExisted', _ignoreUser);
     return this;
   },
   
@@ -537,6 +528,8 @@ _.extend(Db.prototype, {
   
 if (require.main === module) {
   var user = {email: "h5@hu.com", name: "John Doer"};
+  var user1 = {email: "h4@hu.com", name: "hi"};
+  var changes = {email: "h5@hu.com", name: "hello"};
 
   PubSub.subscribe('db/connected', function(){      
       newDB.createUser(user);           
@@ -548,12 +541,35 @@ if (require.main === module) {
   PubSub.subscribe('db/user/created', function(user){
      var collection = newDB.db.collection('users');
      collection.findOne({email: user.email}, function(err, doc){
-        console.log(doc);
-        process.exit(0);
-     });     
-     
+        assert.equal(user.email, doc.email);
+        assert.equal(user.name, doc.name);
+        newDB.updateUser(user1, changes);      
+        newDB.findUser({email:user.email});
+        newDB.deleteUser({email:user.email});
+     });          
   });  
+
+  PubSub.subscribe('db/user/updated', function(user){
+     var collection = newDB.db.collection('users');
+     collection.findOne({email: user.email}, function(err, doc){
+        assert.equal(user.email, doc.email);        
+     });          
+  });  
+
+  PubSub.subscribe('db/user/found', function(email){
+      // email is an object
+     assert.equal(user.email, email.email);        
+  });  
+
+  PubSub.subscribe('db/user/deleted', function(email){
+     var collection = newDB.db.collection('users'); 
+     collection.findOne(email, function(err, doc){
+        assert.equal(null, doc);
+        process.exit(0);
+     });               
+  });
+
+  PubSub.subscribe('error/db/user/notFound', function(user){
+      console.log(user, ' does not exist');    
+  });
 };
-
-
-
