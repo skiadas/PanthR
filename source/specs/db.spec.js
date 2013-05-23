@@ -152,6 +152,11 @@ describe("The user part of the database", function() {
            PubSub.unsubscribe(h);
            done()
        });
+       var h2 = PubSub.subscribe('error/db', function() {
+           console.log("Received an error from the database. This should not have happened.");
+           PubSub.unsubscribe(h2);
+           done();
+       });
        db = new Db(server);
        var req = {
            methodName: 'insert',
@@ -174,6 +179,11 @@ describe("The user part of the database", function() {
           PubSub.unsubscribe(h);
           done()
        });
+       var h2 = PubSub.subscribe('error/db', function() {
+           console.log("Received an error from the database. This should not have happened.");
+           PubSub.unsubscribe(h2);
+           done();
+       });
        db = new Db(server);
        var req = {
            methodName: 'update',
@@ -193,6 +203,11 @@ describe("The user part of the database", function() {
           expect(db.doRequest).toHaveBeenCalled();
           PubSub.unsubscribe(h);
           done()
+       });
+       var h2 = PubSub.subscribe('error/db', function() {
+           console.log("Received an error from the database. This should not have happened.");
+           PubSub.unsubscribe(h2);
+           done();
        });
        db = new Db(server);
        var req = {
