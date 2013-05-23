@@ -13,6 +13,7 @@ var express = require('express')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server)
   , PubSub = require('./libs/pubsub')
+  , rserve = require('node-rserve')
   , User = require('./libs/user')
   , db = require('./libs/db');
 
