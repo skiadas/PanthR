@@ -154,7 +154,7 @@ describe("The user part of the database", function() {
        });
        db = new Db(server);
        var req = {
-           methodName: 'create',
+           methodName: 'insert',
            collectionName: 'users',
            args: [{email: 'a@a.com', name: 'Johnny', job: 'student'}]
        };
