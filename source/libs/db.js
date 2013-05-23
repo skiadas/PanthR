@@ -395,7 +395,7 @@ _.extend(Db.prototype, {
   createUser : function(user){
     var request = {
       collectionName:'users',
-      methodName:'update',
+      methodName:'insert',
       args:[{email : user.email}, {safe:true}]
     };
     this.doRequest(request, function(error, records){
@@ -505,3 +505,20 @@ _.extend(Db.prototype, {
       });
    });
 });*/
+
+if (require.main === module) {
+  var customServer = {host:"host", port:"27072", dbName:"testdb"};
+  var newDB = Db(customServer);  
+  PubSub.subscribe('db/connected', function(newDB){
+      var user = {email: "a@a.com", name: "John Doe"};
+      var request = {
+        collectionName:'users',
+        methodName:'update',
+        args:[{email : user.email}, changes, {safe:true}]
+      };
+      newDB.doRequest(request, function(error, countOfRecords){
+
+      }
+      //newDB.doRequest()
+  })  
+}
