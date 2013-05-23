@@ -118,7 +118,7 @@ function Db(customServer) {
           PubSub.publish('warning/db/requestQueueForLater');
           this.failedRequests.push([req, callback]);
        } else {
-           console.log("Asked to perform: ", req);
+           //console.log("Asked to perform: ", req);
           var that = this;
           var ourCallBack = function(err, result) {
               callback.call(that, err, req, result);
@@ -394,22 +394,24 @@ _.extend(Db.prototype, {
   },
   
   createUser : function(user){
+    console.log('GOING IN createUser');
     var request = {
       collectionName:'users',
       methodName:'insert',
-      args:[{email : user.email}, {safe:true}]
+      args:[user, {safe:true}]
     };
-    this.doRequest(request, function(error, records){
-        if (error){
-            this.emit('dbConnectionError', error, request);
+    var self = this;
+    this.doRequest(request, function(error, request, records){                        
+        if (error){            
+            self.emit('dbConnectionError', error, request);
         }
         else if (!records[0]){// no item is inserted to the record array
-            this.emit('dbUserNotCreatedError', user);            
+            self.emit('dbUserNotCreatedError', user);            
         }
         else{
-            this.emit('userCreated', user);                
+            self.emit('userCreated', user);                
         }
-    });        
+    });      
     return this;
   },
   
@@ -507,19 +509,28 @@ _.extend(Db.prototype, {
    });
 });*/
 
+/*run mongodb: sudo mongod --config /etc/mongodb.conf --nojournal*/
+  
 if (require.main === module) {
-  var customServer = {host:"host", port:"27072", dbName:"testdb"};
-  var newDB = Db(customServer);  
-  PubSub.subscribe('db/connected', function(newDB){
-      var user = {email: "a@a.com", name: "John Doe"};
-      var request = {
-        collectionName:'users',
-        methodName:'update',
-        args:[{email : user.email}, changes, {safe:true}]
-      };
-      newDB.doRequest(request, function(error, countOfRecords){
+  var user = {email: "hi@hi.com", name: "John Doer"};
 
-      }
-      //newDB.doRequest()
-  })  
-}
+  PubSub.subscribe('db/connected', function(){      
+      newDB.createUser(user);      
+      //process.exit(0);
+  });
+
+  var myServer = {host:"localhost", port:"27017", dbName:"foodb"};
+  var newDB = Db(myServer);  
+
+  PubSub.subscribe('db/user/created', function(user){
+     var collection = newDB.db.collection('users');
+     collection.findOne({email: user.email}, function(err, doc){
+        console.log('doc: ', doc);
+        process.exit(0);
+     });     
+     
+  });  
+};
+
+
+
