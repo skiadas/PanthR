@@ -1,5 +1,5 @@
 // Run with 
-// jasmine-node specs/db.spec.js --captureExceptions
+// jasmine-node specs/db.spec.js --captureExceptions --forceexit
 //
 var PubSub = require('../libs/pubsub.js').sync();
 var _ = require('underscore');
@@ -141,10 +141,12 @@ describe("The db module", function() {
            }
        });
    });
+});
+describe("The user part of the database", function() {
    it("would request to create a user when db/create/user message is sent", function(done) {
-       PubSub.subscribe('db/user/created', function() {
+       var h = PubSub.subscribe('db/user/created', function() {
            expect(db.doRequest).toHaveBeenCalled();
-           console.log("We should make it here!", db.doRequest.calls);
+           PubSub.unsubscribe(h);
            done()
        });
        db = new Db(server);
@@ -160,10 +162,10 @@ describe("The db module", function() {
        PubSub.publish('db/create/user', [req.args[0]]);
    });
    it("would request to update a user when db/update/user message is sent", function(done) {
-       console.log('testing update')
-       PubSub.subscribe('db/user/updated', function(user) {
+       var h = PubSub.subscribe('db/user/updated', function(user) {
           expect(db.doRequest).toHaveBeenCalled();
           expect(user).toEqual(req.args[0]);
+          PubSub.unsubscribe(h);
           done()
        });
        db = new Db(server);
@@ -181,10 +183,9 @@ describe("The db module", function() {
        PubSub.publish('db/update/user', req.args);
    });
    it("would request to delete a user when db/delete/user message is sent", function(done) {
-       console.log('testing delete')
-       PubSub.subscribe('db/user/deleted', function() {
+       var h = PubSub.subscribe('db/user/deleted', function() {
           expect(db.doRequest).toHaveBeenCalled();
-          console.log(db.doRequest.calls);
+          PubSub.unsubscribe(h);
           done()
        });
        db = new Db(server);
@@ -194,13 +195,11 @@ describe("The db module", function() {
            args: [{email: 'a@a.com'}]
        };
        spyOn(db, 'doRequest').andCallFake(function(request, callback) {
-            console.log('in dorequest')
           expect(request.methodName).toEqual(req.methodName);
           expect(request.collectionName).toEqual(req.collectionName);
           _(req.args).each(function(item) { expect(request.args).toContain(item)});
           callback.call(db, null, [1]);
        });
-       console.log('publishing delete')
        PubSub.publish('db/delete/user', [req.args[0].email]);
    });
 });
