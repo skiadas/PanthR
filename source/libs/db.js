@@ -15,10 +15,11 @@ function Db(customServer) {
     // if it doesnt find calls function to initialize standard
 
     if (!(this instanceof Db)){
-        return new Db();
+        return new Db(customServer);
     };
 
     function init(customServer){
+        console.log(customServer);
         customServer = customServer || {};
         _.defaults(customServer, {host:"localhost", port:"27017", dbName:"panthrdb"});        
         self.emit('initializing', customServer);
