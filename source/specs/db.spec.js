@@ -142,6 +142,9 @@ describe("The db module", function() {
        });
    });
 });
+
+
+
 describe("The user part of the database", function() {
    it("would request to create a user when db/create/user message is sent", function(done) {
        var h = PubSub.subscribe('db/user/created', function() {
@@ -201,6 +204,41 @@ describe("The user part of the database", function() {
           callback.call(db, null, [1]);
        });
        PubSub.publish('db/delete/user', [req.args[0].email]);
+   });
+   describe("has tools for dealing with friends:", function() {
+       function IdMock(id) { this.toHexString = function() {return _id;}; };
+       var user = { email: "a@a.com", name: "John Doe", _id: new IdMock("a3ae") };
+       var friend = { email: 'mark@a.com', name: 'Mark the mark', _id: new IdMock("efef") };
+       var circles = ['hanover', 'student', 'statistics'];
+       it("would attempt to add a friend when db/add/friend is sent", function(done) {
+          var h = PubSub.subscribe('db/friend/added', function() {
+             expect(db.doRequest).toHaveBeenCalled();
+             PubSub.unsubscribe(h);
+             done();
+          });
+          db = new Db(server);
+          var req = {
+              methodName: 'update',
+              collectionName: 'users',
+          };
+          spyOn(db, 'doRequest').andCallFake(function(request, callback) {
+             expect(request.methodName).toEqual(req.methodName);
+             expect(request.collectionName).toEqual(req.collectionName);
+             var set = request.args[1].$set;
+             expect(set.friends).toBeDefined();
+             expect(set.circles).toBeDefined();
+             expect(set.friends.efef).toBeDefined();
+             expect(
+                 _(set.friends.efef).isEqual(
+                     _(friend).extend({circles: circles}))
+             ).toBeTruthy();
+             _(circles).each(function(circle) {
+                expect(set.circles[circle]).toBeDefined();
+             });
+             callback.call(db, null, [1]);
+          });
+          PubSub.publish('db/add/friend', [user, friend, circles]);
+       });
    });
 });
 
