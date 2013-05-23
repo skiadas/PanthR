@@ -1,5 +1,5 @@
 // Db module performance test
-var PubSub = require('../libs/pubsub.js').sync()
+var PubSub = require('../libs/pubsub.js').async()
 ,   _ = require('underscore')
 ,   realMongo = require('mongodb')
 ,   Db = require('../libs/db.js')
@@ -9,13 +9,17 @@ PubSub.subscribe('db/initialized', _performTests);
 PubSub.subscribe('db/user/created', _recordCreated);
 PubSub.subscribe('db/user/updated', _recordUpdated);
 PubSub.subscribe('db/user/deleted', _recordDeleted);
+PubSub.subscribe('error/db', _errorFound);
 
 
-nobjects = 5;
+nobjects = 50;
+nbatches = 100;
+ntotal = nbatches * nobjects;
 objects = Array(nobjects);
 results = {};
-for (i=nobjects;i--;) objects[i] = { email: _randomString(50), name: i };
-for (i=nobjects;i--;) results[objects[i].email] = [];
+var i;
+for (i=ntotal;i--;) objects[i] = { email: _randomString(50), name: i };
+for (i=ntotal;i--;) results[objects[i].email] = [];
 new Db(server);
 
 function _randomString(length) {
@@ -28,8 +32,15 @@ function _randomString(length) {
 
 function _performTests() {
     console.log("Db initialized")
-    for (i=nobjects; i--;) {
-        process.nextTick(function() { _addEntry(); });
+    for (i=nbatches; i--;) {
+        // _addEntry();
+        // process.nextTick(
+        setTimeout(
+            function() { 
+            for (var j=nobjects;j--;) {
+                _addEntry(); 
+            }
+        }, 400);
     }
 }
 index = 0;
@@ -39,7 +50,7 @@ function _addEntry() {
     PubSub.publish('db/create/user', [entry]);
 }
 function _recordCreated(user) {
-    console.log("Getting here!")
+    // console.log("Getting here!")
     results[user.email][1] = new Date();
     PubSub.publish('db/update/user', [{email: user.email}, {$set: {foo: 'bar'}}]);
 }
@@ -51,7 +62,31 @@ function _recordDeleted(email) {
     results[email][3] = new Date();
     _done();
 }
-_done = _.after(nobjects, function() {
-    console.log("Done!");
-    console.log(results);
+function _errorFound(err) {
+    console.log("We're in trouble now!", err);
+}
+_done = _.after(ntotal, function() {
+    console.log("Done! Processing");
+    _processResults();
 });
+
+
+function _getStats(vec) {
+    var n = vec.length
+    ,   sum = _(vec).reduce(function(memo, x) {return memo + x}, 0)
+    ,   sumSq = _(vec).reduce(function(memo, x) {return memo + x*x}, 0)
+    ,   mean = sum / n
+    ,   sd = Math.sqrt(sumSq / n - mean * mean);
+    return { mean: mean, sd: sd };
+}
+
+function _processResults() {
+    var differences = _.chain(results).values().map(function(x) {return [x[1]-x[0], x[2]-x[1], x[3]-x[1]]}).value();
+    var createTimes = _(differences).map(function(x) {return x[0]});
+    var updateTimes = _(differences).map(function(x) {return x[1]});
+    var deleteTimes = _(differences).map(function(x) {return x[2]});
+    console.log("Create Times:", _getStats(createTimes));
+    console.log("Update Times:", _getStats(updateTimes));
+    console.log("Delete Times:", _getStats(deleteTimes));
+    process.exit(0);
+}
