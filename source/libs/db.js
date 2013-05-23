@@ -378,7 +378,7 @@ _.extend(Db.prototype, {
       methodName:'update',
       args:[{email : user.email}, changes, {safe:true}]
     };
-    this.doRequest(request, function(error, countOfRecords){
+    this.doRequest(request, function(error, request, countOfRecords){
         if (error){
             this.emit('dbConnectionError', error, request);            
         }
@@ -431,8 +431,7 @@ _.extend(Db.prototype, {
     };
 
     var _ignoreUser = function(user){
-        console.log(user, ' already exists!');
-        process.exit(0);
+        console.log(user, ' already exists!');        
     };
 
     this.on('userNotExisted', _createUser);
@@ -444,14 +443,14 @@ _.extend(Db.prototype, {
     var request = {
       collectionName:'users',
       methodName:'findOne',
-      args:[{email : email}, {safe:true}]
+      args:[email, {safe:true}]
     };  
-    this.doRequest(request, function(error, docObject){
+    this.doRequest(request, function(error, request, docObject){
         if (error){
             this.emit('dbConnectionError', error, request);
         }
         else if (!docObject){// docObject is not defined
-            this.emit('dbUserNotFoundError', email);            
+            this.emit('dbUserNotFoundError', request);            
         }
         else{
             this.emit('userFound', email);                
@@ -464,14 +463,14 @@ _.extend(Db.prototype, {
     var request = {
       collectionName:'users',
       methodName:'remove',
-      args:[{email : email}, {safe:true}]
+      args:[email, {safe:true}]
     };
-    this.doRequest(request, function(error, countOfRemovedRecords){
+    this.doRequest(request, function(error, request, countOfRemovedRecords){
         if (error){
             this.emit('dbConnectionError', error, request);
         }
         else if (countOfRemovedRecords == 0){// no object is removed
-            this.emit('dbUserNotDeletedError', email);            
+            this.emit('dbUserNotDeletedError', request);            
         }
         else{
             this.emit('userDeleted', email);                
@@ -548,7 +547,8 @@ if (require.main === module) {
 
   PubSub.subscribe('db/user/created', function(user){
      var collection = newDB.db.collection('users');
-     collection.findOne({email: user[0].email}, function(err, doc){
+     collection.findOne({email: user.email}, function(err, doc){
+        console.log(doc);
         process.exit(0);
      });     
      
