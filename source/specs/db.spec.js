@@ -156,9 +156,12 @@ describe("The user part of the database", function() {
        var req = {
            methodName: 'create',
            collectionName: 'users',
-           args: [{email: 'a@a.com'}]
+           args: [{email: 'a@a.com', name: 'Johnny', job: 'student'}]
        };
-       spyOn(db, 'doRequest').andCallFake(function(req, callback) {
+       spyOn(db, 'doRequest').andCallFake(function(request, callback) {
+           expect(request.methodName).toEqual(req.methodName);
+           expect(request.collectionName).toEqual(req.collectionName);
+           expect(request.args[0]).toEqual(req.args[0]);
            callback.call(db, null, [req.args[0]]);
            return;
        });
