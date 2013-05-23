@@ -25,11 +25,11 @@ var Helper = function() {
          return this;
       });*/
       // PubSub for find()
-      PubSub.subscribe("user/find", function{
+      PubSub.subscribe("user/find", function(data) {
          //it should publish if db.findUser() gets called
          PubSub.publish('db/find/user', [email], this);
       });
-      PubSub.subscribe("db/user/found", function{
+      PubSub.subscribe("db/user/found", function(data) {
       //it should publish if a new structure is created
          PubSub.publish('user/found', [], this);
       });
@@ -41,11 +41,11 @@ var Helper = function() {
    User.delete = function(email, callback) {
       //return db.deleteUser(email, callback);
       // PubSub for delete()
-      PubSub.subscribe("user/delete", function{
+      PubSub.subscribe("user/delete", function(data) {
          //it should publish if db.createStructure() gets called
          PubSub.publish('db/delete/user', [email], this);
       });
-      PubSub.subscribe("db/user/deleted", function{
+      PubSub.subscribe("db/user/deleted", function(data) {
       //it should publish if a new structure is created
          PubSub.publish('user/deleted', [], this);
       });
@@ -62,11 +62,11 @@ var Helper = function() {
       }, callback);*/
 
       // PubSub for checkExisting()
-      PubSub.subscribe("user/checkExisting", function{
+      PubSub.subscribe("user/checkExisting", function(data) {
          //it should publish if db.createStructure() gets called
          PubSub.publish('db/find/user', [user.email, {nick: 1,email: 1,password: 1}], this);
       });
-      PubSub.subscribe("db/user/found", function{
+      PubSub.subscribe("db/user/found", function(data) {
       //it should publish if a new structure is created
          PubSub.publish('user/checkedExistence', [], this);
       });
