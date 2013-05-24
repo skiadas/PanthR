@@ -57,8 +57,8 @@ function _recordUpdated(user) {
     results[user.email][2] = new Date();
     PubSub.publish('db/delete/user',[user]);
 }
-function _recordDeleted(email) {
-    results[email][3] = new Date();
+function _recordDeleted(user) {
+    results[user.email][3] = new Date();
     _done();
 }
 function _errorFound(err) {
