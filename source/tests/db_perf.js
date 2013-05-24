@@ -12,15 +12,15 @@ PubSub.subscribe('db/user/deleted', _recordDeleted);
 PubSub.subscribe('error/db', _errorFound);
 
 
-nobjects = 50;
-nbatches = 100;
+nobjects = 5;
+nbatches = 1000;
+ninterval = 40;
 ntotal = nbatches * nobjects;
 objects = Array(nobjects);
 results = {};
 var i;
 for (i=ntotal;i--;) objects[i] = { email: _randomString(50), name: i };
 for (i=ntotal;i--;) results[objects[i].email] = [];
-new Db(server);
 
 function _randomString(length) {
     length = length || Math.round(1000*Math.random());
@@ -40,10 +40,9 @@ function _performTests() {
             for (var j=nobjects;j--;) {
                 _addEntry(); 
             }
-        }, 400);
+        }, ninterval);
     }
 }
-index = 0;
 function _addEntry() {
     var entry = objects[index++];
     results[entry.email][0] = new Date();
@@ -65,11 +64,6 @@ function _recordDeleted(email) {
 function _errorFound(err) {
     console.log("We're in trouble now!", err);
 }
-_done = _.after(ntotal, function() {
-    console.log("Done! Processing");
-    _processResults();
-});
-
 
 function _getStats(vec) {
     var n = vec.length
@@ -88,5 +82,33 @@ function _processResults() {
     console.log("Create Times:", _getStats(createTimes));
     console.log("Update Times:", _getStats(updateTimes));
     console.log("Delete Times:", _getStats(deleteTimes));
-    process.exit(0);
+    if (callback) {
+        callback();
+    }
 }
+
+// First, we measure PubSub timings by faking the db messages
+index = 0;
+handlers = [];
+handlers.push(PubSub.subscribe('db/create/user', function(user) {PubSub.publish('db/user/created', [user])}));
+handlers.push(PubSub.subscribe('db/update/user', function(user) {PubSub.publish('db/user/updated', [user])}));
+handlers.push(PubSub.subscribe('db/delete/user', function(email) {PubSub.publish('db/user/deleted', [email])}));
+
+_done = _.after(ntotal, function() {
+    console.log("Done! Processing");
+    _processResults();
+});
+callback = function() {
+    // This is called after the dry run is completed
+    _done = _.after(ntotal, function() {
+        console.log("Done! Processing");
+        _processResults();
+    });
+    _(handlers).each(function(h) {PubSub.unsubscribe(h)});
+    index = 0;
+    for (i=ntotal;i--;) results[objects[i].email] = [];
+    callback = function() { process.exit(0); };
+    new Db(server);
+}
+PubSub.publish('db/initialized');
+
