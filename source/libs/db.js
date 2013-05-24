@@ -329,36 +329,44 @@ _.extend(Db.prototype, {
     return this;    
   },
 
-  addFriend : function(user, friend, circlesArray) {
-    var request = {
-      collectionName:'users',
-      methodName:'remove',
-      args:[{email : email}, {safe:true}]
-    };  
+  addFriend : function(user, friend, circlesArray) {  
+    var friendStr = 'friends.' + friend._id.toHexString();
+    var queryObj = {'$set': {} };
+     queryObj.$set[friendStr] = {
+        nick: friend.nick,
+        email: friend.email,
+        circles: circlesArray
+     };
+     circlesArray.forEach(function(el) {
+        queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
+           nick: friend.nick,
+           email: friend.email
+        };
+     });
+    var findStr = { _id: user._id };
+     findStr[friendStr] = null;
 
-       var friendStr = 'friends.' + friend._id.toHexString();
-       var queryObj = {
-          '$set': {}
-       };
-       queryObj.$set[friendStr] = {
-          nick: friend.nick,
-          email: friend.email,
-          circles: circlesArray
-       };
-       circlesArray.forEach(function(el) {
-          queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
-             nick: friend.nick,
-             email: friend.email
-          };
-       });
-       var findStr = {
-          _id: user._id
-       };
-       findStr[friendStr] = null
-       this.doRequest('users', 'update', [findStr, queryObj], callback)
+    var request = {
+        collectionName:'users',
+        methodName:'update',
+        args:[findStr, queryObj, {safe:true}]
+     };  
+
+    this.doRequest(request, function(error, request, countOfRecords){
+          if (error){
+              this.emit('dbConnectionError', error, request);            
+          }
+          else if (countOfRecords == 0){
+              this.emit('dbUserNotFoundError', user);            
+          }
+          else{
+              this.emit('friendAdded', user);    
+          }   
+      });
+    return this;
   },
 
-  removeFriend : function(user, friend, circleArray, callback) {
+  removeFriend : function(user, friend, circleArray) {
        var friendStr = 'friends.' + friend._id.toHexString();
        var queryObj = {
           '$unset': {}
@@ -370,40 +378,62 @@ _.extend(Db.prototype, {
              email: friend.email
           };
        });
-       var findStr = {
-          _id: user._id
-       };
-       findStr[friendStr] = {
-          $ne: null
-       };
-       this.doRequest('users', 'update', [findStr, queryObj], callback);
+       var findStr = { _id: user._id };
+       findStr[friendStr] = { $ne: null };       
+       var request = {
+           collectionName:'users',
+           methodName:'update',
+           args:[findStr, queryObj, {safe:true}]
+        };  
+       this.doRequest(request, function(error, request, countOfRecords){
+             if (error){
+                 this.emit('dbConnectionError', error, request);            
+             }
+             else if (countOfRecords == 0){
+                 this.emit('dbUserNotFoundError', user);            
+             }
+             else{
+                 this.emit('friendRemoved', user);    
+             }   
+         });
+       return this;
     },
 
-  tagFriend : function(user, friend, circleArray, callback) {
+  tagFriend : function(user, friend, circleArray) {
        var friendStr = 'friends.' + friend._id.toHexString() + '.circles';
        var queryObj = {
           '$set': {},
           '$addToSet': {}
        };
-       queryObj.$addToSet[friendStr] = {
-          $each: circleArray
-       };
+       queryObj.$addToSet[friendStr] = { $each: circleArray };
        circleArray.forEach(function(el) {
           queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
              nick: friend.nick,
              email: friend.email
           };
        });
-       var findStr = {
-          _id: user._id
-       };
-       findStr['friends.' + friend._id.toHexString()] = {
-          $ne: null
-       };
-       this.doRequest('users', 'update', [findStr, queryObj], callback);
+       var findStr = { _id: user._id };
+       findStr['friends.' + friend._id.toHexString()] = { $ne: null };       
+       var request = {
+           collectionName:'users',
+           methodName:'update',
+           args:[findStr, queryObj, {safe:true}]
+        };  
+       this.doRequest(request, function(error, request, countOfRecords){
+             if (error){
+                 this.emit('dbConnectionError', error, request);            
+             }
+             else if (countOfRecords == 0){
+                 this.emit('dbUserNotFoundError', user);            
+             }
+             else{
+                 this.emit('friendTagged', user);    
+             }   
+         });
+       return this;
     },
 
-  unTagFriend : function(user, friend, circleArray, callback) {
+  unTagFriend : function(user, friend, circleArray) {
        var friendStr = 'friends.' + friend._id.toHexString() + '.circles';
        var queryObj = {
           '$pullAll': {},
@@ -416,13 +446,25 @@ _.extend(Db.prototype, {
              email: friend.email
           };
        });
-       var findStr = {
-          _id: user._id
-       };
-       findStr['friends.' + friend._id.toHexString()] = {
-          $ne: null
-       };
-       this.doRequest('users', 'update', [findStr, queryObj], callback);
+       var findStr = { _id: user._id };
+       findStr['friends.' + friend._id.toHexString()] = { $ne: null };
+       var request = {
+           collectionName:'users',
+           methodName:'update',
+           args:[findStr, queryObj, {safe:true}]
+        };  
+       this.doRequest(request, function(error, request, countOfRecords){
+             if (error){
+                 this.emit('dbConnectionError', error, request);            
+             }
+             else if (countOfRecords == 0){
+                 this.emit('dbUserNotFoundError', user);            
+             }
+             else{
+                 this.emit('friendUnTagged', user);    
+             }   
+         });
+       return this;
   },
 
   createStructure : function(structure, callback) {
