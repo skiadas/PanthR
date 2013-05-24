@@ -137,28 +137,6 @@ function Db(customServer) {
 
     PubSub.subscribe('db/add/friend', _.bind(this.addFriend, this));
 
-    this.addFriend = function(user, friend, circlesArray, callback) {
-       var friendStr = 'friends.' + friend._id.toHexString();
-       var queryObj = {
-          '$set': {}
-       };
-       queryObj.$set[friendStr] = {
-          nick: friend.nick,
-          email: friend.email,
-          circles: circlesArray
-       };
-       circlesArray.forEach(function(el) {
-          queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
-             nick: friend.nick,
-             email: friend.email
-          };
-       });
-       var findStr = {
-          _id: user._id
-       };
-       findStr[friendStr] = null
-       this.doRequest('users', 'update', [findStr, queryObj], callback)
-    }
     //remove friend - remove them every circle
     ///circles could have been added 
     //need a way to tell it any circles
@@ -169,26 +147,7 @@ function Db(customServer) {
         PubSub.publish('db/friend/removed', {});
     });
 
-    this.removeFriend = function(user, friend, circleArray, callback) {
-       var friendStr = 'friends.' + friend._id.toHexString();
-       var queryObj = {
-          '$unset': {}
-       };
-       queryObj.$unset[friendStr] = '';
-       circleArray.forEach(function(el) {
-          queryObj.$unset['circles.' + el + '.' + friend._id.toHexString()] = {
-             nick: friend.nick,
-             email: friend.email
-          };
-       });
-       var findStr = {
-          _id: user._id
-       };
-       findStr[friendStr] = {
-          $ne: null
-       };
-       this.doRequest('users', 'update', [findStr, queryObj], callback);
-    }
+    
     
     //tagFriend into a list of circls
     // PubSub for tagFriend() method
@@ -196,30 +155,6 @@ function Db(customServer) {
         // publish if tagFriend() gets called
         PubSub.publish('db/friend/tagged', {});
     });
-
-    this.tagFriend = function(user, friend, circleArray, callback) {
-       var friendStr = 'friends.' + friend._id.toHexString() + '.circles';
-       var queryObj = {
-          '$set': {},
-          '$addToSet': {}
-       };
-       queryObj.$addToSet[friendStr] = {
-          $each: circleArray
-       };
-       circleArray.forEach(function(el) {
-          queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
-             nick: friend.nick,
-             email: friend.email
-          };
-       });
-       var findStr = {
-          _id: user._id
-       };
-       findStr['friends.' + friend._id.toHexString()] = {
-          $ne: null
-       };
-       this.doRequest('users', 'update', [findStr, queryObj], callback);
-    }
     
     //remove friend  from circle
 
@@ -229,27 +164,7 @@ function Db(customServer) {
         PubSub.publish('db/friend/unTagged', {});
     });
 
-    this.unTagFriend = function(user, friend, circleArray, callback) {
-       var friendStr = 'friends.' + friend._id.toHexString() + '.circles';
-       var queryObj = {
-          '$pullAll': {},
-          '$unset': {}
-       };
-       queryObj.$pullAll[friendStr] = circleArray;
-       circleArray.forEach(function(el) {
-          queryObj.$unset['circles.' + el + '.' + friend._id.toHexString()] = {
-             nick: friend.nick,
-             email: friend.email
-          };
-       });
-       var findStr = {
-          _id: user._id
-       };
-       findStr['friends.' + friend._id.toHexString()] = {
-          $ne: null
-       };
-       this.doRequest('users', 'update', [findStr, queryObj], callback);
-    }
+    
 
     this.verifyRequest = function(requestHash, callback) {
        var hash = crypto.createHash('sha512').update(requestHash).digest('hex');
@@ -295,54 +210,18 @@ function Db(customServer) {
         PubSub.publish('db/structure/created', {});
     });
 
-    this.createStructure = function(structure, callback) {
-        this.doRequest('structures', 'insert', [structure], callback)
-    }
-
+    
     // PubSub for removeStructure() method
     PubSub.subscribe('db/remove/structure', function(data) {
         // publish if removeStructure() gets called
         PubSub.publish('db/structure/removed', {});
-    });
-
-    this.removeStructure = function(structure, callback) {
-        /*
-            what if we delete something that is an essential part of a structure
-            e.g. the x-component of a graph
-        */
-        var structureID = structure._id;        
-        // then remove the struture itself, the first one encountered
-        this.doRequest('structures', 'remove', [{_id: structureID}], callback)
-    }
+    });    
 
     // PubSub for updateStructure() method
     PubSub.subscribe('db/update/structure', function(data) {
         // publish if createStructure() gets called
         PubSub.publish('db/structure/updated', {});
-    });
-
-    this.updateStructure = function(structure, changes, callback) {
-        // get the string id of the structure
-        var structureIDStr = structure._id;//.toHexString();
-        // set up the update object and the query object
-        var updateObj = {
-            '$set':{}
-        };
-        updateObj.$set(structureIDStr) = {
-            type : changes.type,
-            owner_id : changes.owner_id,
-            parent: changes.parent,
-            links: changes.links  
-        };
-    
-        var queryObj = {
-            _id : structure._id
-        };
-        /*queryObj[structureIDStr] = {
-            $ne : null 
-        };*/
-        this.doRequest('structures', 'update', [queryObj, updateObj], callback);
-    }
+    });    
     
     // PubSub for findStructure() method
     PubSub.subscribe('db/find/structure', function(data) {
@@ -350,19 +229,7 @@ function Db(customServer) {
         PubSub.publish('db/structure/found', {});
     });
 
-    // for now, findStructure acts like findOne
-    this.findStructure = function(structure, callback) {
-        // get the string id of the structure
-        var structureIDStr = structure._id;        
-        var queryObj = {
-            _id : structure._id
-        };
-        /*queryObj[structureIDStr] = {
-            $ne : null 
-        };*/
-        // expect to receive the 1st match in return
-        return this.doRequest('structures', 'findOne', [queryObj], callback);
-    }
+    // for now, findStructure acts like findOne    
     this.db = null;
     this.failedRequests = [];
     init(customServer);
@@ -471,7 +338,6 @@ _.extend(Db.prototype, {
   },
 
   addFriend : function(user, friend, circlesArray) {
-
     var request = {
       collectionName:'users',
       methodName:'remove',
@@ -498,8 +364,118 @@ _.extend(Db.prototype, {
        };
        findStr[friendStr] = null
        this.doRequest('users', 'update', [findStr, queryObj], callback)
-    }
+  },
 
+  removeFriend : function(user, friend, circleArray, callback) {
+       var friendStr = 'friends.' + friend._id.toHexString();
+       var queryObj = {
+          '$unset': {}
+       };
+       queryObj.$unset[friendStr] = '';
+       circleArray.forEach(function(el) {
+          queryObj.$unset['circles.' + el + '.' + friend._id.toHexString()] = {
+             nick: friend.nick,
+             email: friend.email
+          };
+       });
+       var findStr = {
+          _id: user._id
+       };
+       findStr[friendStr] = {
+          $ne: null
+       };
+       this.doRequest('users', 'update', [findStr, queryObj], callback);
+    },
+
+  tagFriend : function(user, friend, circleArray, callback) {
+       var friendStr = 'friends.' + friend._id.toHexString() + '.circles';
+       var queryObj = {
+          '$set': {},
+          '$addToSet': {}
+       };
+       queryObj.$addToSet[friendStr] = {
+          $each: circleArray
+       };
+       circleArray.forEach(function(el) {
+          queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
+             nick: friend.nick,
+             email: friend.email
+          };
+       });
+       var findStr = {
+          _id: user._id
+       };
+       findStr['friends.' + friend._id.toHexString()] = {
+          $ne: null
+       };
+       this.doRequest('users', 'update', [findStr, queryObj], callback);
+    },
+
+  unTagFriend : function(user, friend, circleArray, callback) {
+       var friendStr = 'friends.' + friend._id.toHexString() + '.circles';
+       var queryObj = {
+          '$pullAll': {},
+          '$unset': {}
+       };
+       queryObj.$pullAll[friendStr] = circleArray;
+       circleArray.forEach(function(el) {
+          queryObj.$unset['circles.' + el + '.' + friend._id.toHexString()] = {
+             nick: friend.nick,
+             email: friend.email
+          };
+       });
+       var findStr = {
+          _id: user._id
+       };
+       findStr['friends.' + friend._id.toHexString()] = {
+          $ne: null
+       };
+       this.doRequest('users', 'update', [findStr, queryObj], callback);
+  },
+
+  createStructure : function(structure, callback) {
+        this.doRequest('structures', 'insert', [structure], callback)
+  },
+
+  removeStructure : function(structure, callback) {
+        /*
+            what if we delete something that is an essential part of a structure
+            e.g. the x-component of a graph
+        */
+        var structureID = structure._id;        
+        // then remove the struture itself, the first one encountered
+        this.doRequest('structures', 'remove', [{_id: structureID}], callback)
+  },
+
+  updateStructure : function(structure, changes, callback) {
+        // get the string id of the structure
+        var structureIDStr = structure._id;//.toHexString();
+        // set up the update object and the query object
+        var updateObj = {
+            '$set':{}
+        };
+        updateObj.$set(structureIDStr) = {
+            type : changes.type,
+            owner_id : changes.owner_id,
+            parent: changes.parent,
+            links: changes.links  
+        };
+    
+        var queryObj = {
+            _id : structure._id
+        };
+        this.doRequest('structures', 'update', [queryObj, updateObj], callback);
+  },
+
+  findStructure : function(structure, callback) {
+        // get the string id of the structure
+        var structureIDStr = structure._id;        
+        var queryObj = {
+            _id : structure._id
+        };
+        // expect to receive the 1st match in return
+        return this.doRequest('structures', 'findOne', [queryObj], callback);
+  }
 });
 
 //module.exports.init();
