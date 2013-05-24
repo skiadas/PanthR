@@ -79,12 +79,23 @@ function Db(customServer) {
     // need to listen to the callback from update() 
     // to determine if the update() succeeds or not
     
+    // user methods
     PubSub.subscribe('db/update/user', _.bind(this.updateUser, this));                
     PubSub.subscribe('db/create/user', _.bind(this.createUser, this));                
     PubSub.subscribe('db/find/user', _.bind(this.findUser, this));               
-    PubSub.subscribe('db/delete/user', _.bind(this.deleteUser, this));                
+    PubSub.subscribe('db/delete/user', _.bind(this.deleteUser, this));               
+    // friend methods 
+    PubSub.subscribe('db/add/friend', _.bind(this.addFriend, this));
+    PubSub.subscribe('db/remove/friend', _.bind(this.removeFriend, this));
+    PubSub.subscribe('db/tag/friend', _.bind(this.tagFriend, this));
+    PubSub.subscribe('db/unTag/friend', _.bind(this.unTagFriend, this));
+    // structure methods
+    PubSub.subscribe('db/create/structure', _.bind(this.createStructure, this));
+    PubSub.subscribe('db/remove/structure', _.bind(this.removeStructure, this));
+    PubSub.subscribe('db/update/structure', _.bind(this.updateStructure, this));
+    PubSub.subscribe('db/find/structure', _.bind(this.findStructure, this));
 
-
+    // error listeners
     this.on('dbConnectionError', function(user){
         PubSub.publish('error/db/connection/undefined', [user], this);
     });
@@ -98,7 +109,7 @@ function Db(customServer) {
         PubSub.publish('error/db/user/notDeleted', [email], this);
     });
 
-
+    // user methods listeners
     this.on('userUpdated', function(user){
         PubSub.publish('db/user/updated', [user], this);
     });
@@ -110,6 +121,34 @@ function Db(customServer) {
     });
     this.on('userDeleted', function(email){
         PubSub.publish('db/user/deleted', [email], this);
+    });
+
+    // friend methods listeners
+    this.on('friendAdded', function(user){
+        PubSub.publish('db/friend/added', [user], this);
+    });
+    this.on('friendRemoved', function(user){
+        PubSub.publish('db/friend/removed', [user], this);
+    });
+    this.on('friendTagged', function(user){
+        PubSub.publish('db/friend/tagged', [user], this);
+    });
+    this.on('friendUnTagged', function(user){
+        PubSub.publish('db/user/untagged', [user], this);
+    });    
+
+    // structure methods listeners
+    this.on('structureUpdated', function(structure){
+        PubSub.publish('db/structure/updated', [structure], this);
+    });
+    this.on('structureCreated', function(structure){
+        PubSub.publish('db/structure/created', [structure], this);
+    });
+    this.on('structureFound', function(structure){
+        PubSub.publish('db/structure/found', [structure], this);
+    });
+    this.on('structureRemoved', function(structure){
+        PubSub.publish('db/structure/removed', [structure], this);
     });
                 
     this.doRequest = function(req, callback) {
@@ -134,37 +173,16 @@ function Db(customServer) {
         // publish if addFriend() gets called
         PubSub.publish('db/friend/added', {});
     });
-
-    PubSub.subscribe('db/add/friend', _.bind(this.addFriend, this));
-
+    
     //remove friend - remove them every circle
     ///circles could have been added 
     //need a way to tell it any circles
-
-    // PubSub for removeFriend() method
-    PubSub.subscribe('db/remove/friend', function(data) {
-        // publish if removeFriend() gets called
-        PubSub.publish('db/friend/removed', {});
-    });
-
-    
+        
     
     //tagFriend into a list of circls
     // PubSub for tagFriend() method
-    PubSub.subscribe('db/tag/friend', function(data) {
-        // publish if tagFriend() gets called
-        PubSub.publish('db/friend/tagged', {});
-    });
     
-    //remove friend  from circle
-
-    // PubSub for unTagFriend() method
-    PubSub.subscribe('db/unTag/friend', function(data) {
-        // publish if unTagFriend() gets called
-        PubSub.publish('db/friend/unTagged', {});
-    });
-
-    
+    //remove friend  from circle        
 
     this.verifyRequest = function(requestHash, callback) {
        var hash = crypto.createHash('sha512').update(requestHash).digest('hex');
@@ -204,32 +222,6 @@ function Db(customServer) {
        }], callback);
     }
 
-    // PubSub for createStructure() method
-    PubSub.subscribe('db/create/structure', function(data) {
-        // publish if createStructure() gets called
-        PubSub.publish('db/structure/created', {});
-    });
-
-    
-    // PubSub for removeStructure() method
-    PubSub.subscribe('db/remove/structure', function(data) {
-        // publish if removeStructure() gets called
-        PubSub.publish('db/structure/removed', {});
-    });    
-
-    // PubSub for updateStructure() method
-    PubSub.subscribe('db/update/structure', function(data) {
-        // publish if createStructure() gets called
-        PubSub.publish('db/structure/updated', {});
-    });    
-    
-    // PubSub for findStructure() method
-    PubSub.subscribe('db/find/structure', function(data) {
-        // publish if findStructure() gets called
-        PubSub.publish('db/structure/found', {});
-    });
-
-    // for now, findStructure acts like findOne    
     this.db = null;
     this.failedRequests = [];
     init(customServer);
