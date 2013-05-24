@@ -56,7 +56,7 @@ function _recordCreated(user) {
 }
 function _recordUpdated(user) {
     results[user.email][2] = new Date();
-    PubSub.publish('db/delete/user',[user.email]);
+    PubSub.publish('db/delete/user',[user]);
 }
 function _recordDeleted(email) {
     results[email][3] = new Date();

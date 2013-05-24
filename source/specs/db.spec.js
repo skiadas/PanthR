@@ -221,7 +221,7 @@ describe("The user part of the database", function() {
           _(req.args).each(function(item) { expect(request.args).toContain(item)});
           callback.call(db, null, [1]);
        });
-       PubSub.publish('db/delete/user', [req.args[0].email]);
+       PubSub.publish('db/delete/user', [req.args[0]]);
    });
    describe("has tools for dealing with friends:", function() {
        function IdMock(id) { this.toHexString = function() {return _id;}; };
