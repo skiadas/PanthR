@@ -71,11 +71,12 @@ describe("The PubSub module", function () {
         expect(foo.handler).toHaveBeenCalledWith(data[0], bigTopic);
     });
     it("can go into asynchronous mode", function(done) {
+        PubSub.reset();
         var that = {};
         PubSub.async();
         foo.handler = function(obj) { 
             expect(this === that).toBe(true);
-            expect(obj).toEqual(data);
+            expect(obj).toEqual(data[0]);
             done(); 
         };
         spyOn(foo, 'handler').andCallThrough();
