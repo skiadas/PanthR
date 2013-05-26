@@ -513,44 +513,68 @@ _.extend(Db.prototype, {
     return this;          
   },
 
-  removeStructure : function(structure, callback) {
+  removeStructure : function(structure) {
         /*
             what if we delete something that is an essential part of a structure
             e.g. the x-component of a graph
         */
-        var structureID = structure._id;        
-        // then remove the struture itself, the first one encountered
-        this.doRequest('structures', 'remove', [{_id: structureID}], callback)
+        var request = {
+          collectionName:'structures',
+          methodName:'remove',
+          args:[{email : structure.email}, {safe:true}]
+        };
+        this.doRequest(request, function(error, request, countOfRemovedRecords){
+            if (error){
+                this.emit('dbConnectionError', error, request);
+            }
+            else if (countOfRemovedRecords == 0){// no object is removed
+                this.emit('dbStructureNotDeletedError', request);            
+            }
+            else{
+                this.emit('structureDeleted', structure);                
+            }
+        });
+        return this;    
   },
 
-  updateStructure : function(structure, changes, callback) {
-        // get the string id of the structure
-        var structureIDStr = structure._id;//.toHexString();
-        // set up the update object and the query object
-        var updateObj = {
-            '$set':{}
+  updateStructure : function(structure, changes) {
+        var request = {
+          collectionName:'structures',
+          methodName:'update',
+          args:[{email : structure.email}, changes, {safe:true}]
         };
-        updateObj.$set(structureIDStr) = {
-            type : changes.type,
-            owner_id : changes.owner_id,
-            parent: changes.parent,
-            links: changes.links  
-        };
-    
-        var queryObj = {
-            _id : structure._id
-        };
-        this.doRequest('structures', 'update', [queryObj, updateObj], callback);
+        this.doRequest(request, function(error, request, countOfRecords){
+            if (error){
+                this.emit('dbConnectionError', error, request);            
+            }
+            else if (countOfRecords == 0){
+                this.emit('dbStructureNotFoundError', request);            
+            }
+            else{
+                this.emit('structureUpdated', structure);    
+            }   
+        });
+        return this;    
   },
 
-  findStructure : function(structure, callback) {
-        // get the string id of the structure
-        var structureIDStr = structure._id;        
-        var queryObj = {
-            _id : structure._id
-        };
-        // expect to receive the 1st match in return
-        return this.doRequest('structures', 'findOne', [queryObj], callback);
+  findStructure : function(structure) {
+      var request = {
+        collectionName:'structures',
+        methodName:'findOne',
+        args:[{email : structure.email}, {safe:true}]
+      };  
+      this.doRequest(request, function(error, request, docObject){
+          if (error){
+              this.emit('dbConnectionError', error, request);
+          }
+          else if (!docObject){// docObject is not defined
+              this.emit('dbStructureNotFoundError', request);            
+          }
+          else{
+              this.emit('structureFound', docObject);                
+          }
+      });
+      return this;    
   }
 });
 
