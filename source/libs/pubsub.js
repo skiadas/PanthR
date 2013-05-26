@@ -18,7 +18,8 @@ _ = require('underscore');
 
 var Events = (function (){
     var cache = {}
-    ,   doAsync = true;  // Default to asynchronous messaging
+    ,   doAsync = true  // Default to asynchronous messaging
+    ,   logHandler = null;
     async = function() { doAsync = true; return this; };
     sync = function() { doAsync = false; return this; };
     reset = function(topic) {
@@ -28,6 +29,32 @@ var Events = (function (){
         } else if (cache[topic]) {
             delete cache[topic];
         }
+    };
+    // Logging functionality. 
+    // Enable with PubSub.log() or PubSub.log(true).
+    // Disable with PubSub.log(false)
+    log = function(on) { 
+        on = on || true;
+        if (on) {
+            logHandler = this.subscribe('', function logging(args) {
+                var fulltopic = arguments[arguments.length-1]
+                ,   topic = fulltopic
+                ,   listeners = []
+                ,   lastPass = false;
+                do {
+                   if (topic == "") {
+                      lastPass = true;
+                   };
+                   listeners.push([topic, (cache[topic] || []).length]);
+                   topic = topic.substring(0, topic.lastIndexOf("/"));
+                } while ((topic != "") || (!lastPass));
+                console.log("PubSub event. Listeners:", listeners);
+            });
+        } else {
+            Pubsub.unsubscribe(logHandler);
+            logHandler = null;
+        }
+        return this;
     };
     /**
     * Events.publish
@@ -131,7 +158,8 @@ var Events = (function (){
         unsubscribe: unsubscribe,
         sync: sync,
         async: async,
-        reset: reset
+        reset: reset,
+        log: log
     };
 }());
 
