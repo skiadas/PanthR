@@ -108,6 +108,15 @@ function Db(customServer) {
     this.on('dbUserNotDeletedError', function(email){        
         PubSub.publish('error/db/user/notDeleted', [email], this);
     });
+    this.on('dbStructureNotFoundError', function(structure){
+        PubSub.publish('error/db/structure/notFound', [structure], this);
+    });
+    this.on('dbStructureNotCreatedError', function(structure){        
+        PubSub.publish('error/db/structure/notCreated', [structure], this);
+    });
+    this.on('dbStructureNotDeletedError', function(structure){        
+        PubSub.publish('error/db/structure/notDeleted', [structure], this);
+    });
 
     // user methods listeners
     this.on('userUpdated', function(user){
@@ -116,8 +125,8 @@ function Db(customServer) {
     this.on('userCreated', function(user){
         PubSub.publish('db/user/created', [user], this);
     });
-    this.on('userFound', function(email){
-        PubSub.publish('db/user/found', [email], this);
+    this.on('userFound', function(user){
+        PubSub.publish('db/user/found', [user], this);
     });
     this.on('userDeleted', function(email){
         PubSub.publish('db/user/deleted', [email], this);
@@ -303,7 +312,7 @@ _.extend(Db.prototype, {
             this.emit('dbUserNotFoundError', request);            
         }
         else{
-            this.emit('userFound', email);                
+            this.emit('userFound', docObject);                
         }
     });
     return this;    
@@ -467,8 +476,41 @@ _.extend(Db.prototype, {
        return this;
   },
 
-  createStructure : function(structure, callback) {
-        this.doRequest('structures', 'insert', [structure], callback)
+  createStructure : function(structure) {
+    var request1 = {
+      collectionName:'structures',
+      methodName:'findOne',
+      args:[{email : structure.email}, {safe:true}]
+    };
+    var request2 = {
+      collectionName:'structures',
+      methodName:'insert',
+      args:[structure, {safe:true}]
+    };
+    var self = this;
+    this.doRequest(request1, function(error, request, docObject){
+        if (error){
+            self.emit('dbConnectionError', error, request);
+        }
+        else if (!docObject){// structure does not exist
+            this.doRequest(request2, function(error, request, records){                        
+                        if (error){            
+                            self.emit('dbConnectionError', error, request);
+                        }            
+                        else if (!records[0]){// no item is inserted to the records array
+                            self.emit('dbStructureNotCreatedError', structure);            
+                        }
+                        else{
+                            self.emit('structureCreated', structure);                
+                        }
+                    });          
+        }
+        else{ // structure exists
+            console.log(structure, ' already exists!');        
+        }
+    });
+    
+    return this;          
   },
 
   removeStructure : function(structure, callback) {
