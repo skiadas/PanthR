@@ -62,13 +62,13 @@ describe("The PubSub module", function () {
         var bigTopic = [topic, Math.round(10000*Math.random()).toString(16)].join("/");
         PubSub.subscribe(topic, foo.handler);
         PubSub.publish(bigTopic, data);
-        expect(foo.handler).toHaveBeenCalledWith(data[0]);
+        expect(foo.handler).toHaveBeenCalledWith(data[0], bigTopic);
     });
-    it("even allows allows subscribing to an empty topic to listen to all topics", function() {
+    it("even allows subscribing to an empty topic to listen to all topics", function() {
         var bigTopic = [topic, Math.round(10000*Math.random()).toString(16)].join("/");
         PubSub.subscribe("", foo.handler);
         PubSub.publish(bigTopic, data);
-        expect(foo.handler).toHaveBeenCalledWith(data[0]);
+        expect(foo.handler).toHaveBeenCalledWith(data[0], bigTopic);
     });
     it("can go into asynchronous mode", function(done) {
         var that = {};

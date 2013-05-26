@@ -1,3 +1,4 @@
+_ = require('underscore');
 /**
 * Events. Pub/Sub system for Loosely Coupled logic.
 * Based on Peter Higgins' port from Dojo to jQuery
@@ -49,9 +50,15 @@ var Events = (function (){
             async = async || doAsync;
         }
         args = args || [];
-        lastPass = false;
+        var lastPass = false;
+        var fulltopic = topic;
+        var passingArgs;
         // Goes through each subtopic in order, including the empty subtopic;
         do {
+            passingArgs = _.clone(args);
+            if (fulltopic != topic) {
+                passingArgs.push(fulltopic); // If listening to subtopic, pass fulltopic in
+            }
             if (topic == "") {
                 lastPass = true;
             };
@@ -60,14 +67,13 @@ var Events = (function (){
                 i = thisTopic.length - 1;
 
                 if (async) {
-                    var theArgs = args;
                     for (i; i >= 0; i -= 1) {
                         var handler = thisTopic[i];
-                        process.nextTick(function() {handler.apply(scope, theArgs)});
+                        process.nextTick(function() {handler.apply(scope, passingArgs)});
                     }
                 } else {
                     for (i; i >= 0; i -= 1) {
-                        thisTopic[i].apply( scope, args);
+                        thisTopic[i].apply( scope, passingArgs);
                     }
                 }
             }
@@ -84,6 +90,10 @@ var Events = (function (){
     * @param callback {Function}
     * @return Event handler {Array}
     */
+    //
+    // If your handler is listening to a subtopic, it should expect the last argument passed back
+    // to be the full topic published.
+    //
     subscribe = function (topic, callback) {
         if (!cache[topic]) {
             cache[topic] = [];
