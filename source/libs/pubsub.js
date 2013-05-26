@@ -63,9 +63,8 @@ var Events = (function (){
                 lastPass = true;
             };
             if (cache[topic]) {
-                var thisTopic = cache[topic],
-                i = thisTopic.length - 1;
-
+                var thisTopic = cache[topic]
+                ,   i = thisTopic.length - 1;
                 if (async) {
                     for (i; i >= 0; i -= 1) {
                         var handler = thisTopic[i];
