@@ -14,7 +14,7 @@ var Helper = function() {
          }
    };
 
-   User.find = function(email, callback) {
+   User.find = function(email) {
       /*return db.findUser(email, function(err, user) {
          if (!err) {
             user = new User(user);
@@ -25,36 +25,36 @@ var Helper = function() {
          return this;
       });*/
       // PubSub for find()
-      PubSub.subscribe("user/find", function(data) {
+      PubSub.subscribe("user/find", function(email) {
          //it should publish if db.findUser() gets called
          PubSub.publish('db/find/user', [email], this);
       });
-      PubSub.subscribe("db/user/found", function(data) {
+      PubSub.subscribe("db/user/found", function(email) {
       //it should publish if a new structure is created
-         PubSub.publish('user/found', [], this);
+         PubSub.publish('user/found', [email], this);
       });
       return this;
    };
 
    
 
-   User.delete = function(email, callback) {
+   User.delete = function(email) {
       //return db.deleteUser(email, callback);
       // PubSub for delete()
-      PubSub.subscribe("user/delete", function(data) {
+      PubSub.subscribe("user/delete", function(email) {
          //it should publish if db.createStructure() gets called
          PubSub.publish('db/delete/user', [email], this);
       });
-      PubSub.subscribe("db/user/deleted", function(data) {
+      PubSub.subscribe("db/user/deleted", function(email) {
       //it should publish if a new structure is created
-         PubSub.publish('user/deleted', [], this);
+         PubSub.publish('user/deleted', [email], this);
       });
       return this;
    }
 
    
 
-   User.checkExisting = function(user, callback) {
+   User.checkExisting = function(user) {
       /*return db.findUser(user.email, {
          nick: 1,
          email: 1,
@@ -62,13 +62,13 @@ var Helper = function() {
       }, callback);*/
 
       // PubSub for checkExisting()
-      PubSub.subscribe("user/checkExisting", function(data) {
+      PubSub.subscribe("user/checkExisting", function(user) {
          //it should publish if db.createStructure() gets called
          PubSub.publish('db/find/user', [user.email, {nick: 1,email: 1,password: 1}], this);
       });
-      PubSub.subscribe("db/user/found", function(data) {
+      PubSub.subscribe("db/user/found", function(user) {
       //it should publish if a new structure is created
-         PubSub.publish('user/checkedExistence', [], this);
+         PubSub.publish('user/checkedExistence', [user], this);
       });
    }
 
@@ -84,9 +84,9 @@ var Helper = function() {
          var hashpassword = crypto.createHash('sha512').update(salt + password).digest('hex');
          return (this.password.hash === hashpassword);
       },
-      save: function(callback) {
+      save: function() {
          //db.createUser(this, callback);
-         PubSub.publish('user/save', [], this);
+         PubSub.publish('db/create/user', [this], this);
          return this;
       },
       encriptPassword: function() {
@@ -98,22 +98,22 @@ var Helper = function() {
          };
          return this;
       },
-      addFriend: function(friend, circleArray, callback) {
+      addFriend: function(friend, circleArray) {
          //db.addFriend(User, friend, circleArray, callback);
          PubSub.publish('user/add/friend', [friend, circleArray], this);
          return this;
       },
-      tagFriend: function(friend, circleArray, callback) {
+      tagFriend: function(friend, circleArray) {
          //db.tagFriend(User, friend, circleArray, callback);
          PubSub.publish('user/tag/friend', [friend, circleArray], this);
          return this;
       },
-      unTagFriend: function(friend, circleArray, callback) {
+      unTagFriend: function(friend, circleArray) {
          //db.unTagFriend(User, friend, circleArray, callback);
          PubSub.publish('user/untag/friend', [friend, circleArray], this);
          return this;
       },
-      removeFriend: function(friend, circleArray, callback) {
+      removeFriend: function(friend, circleArray) {
          //db.removeFriend(User, friend, circleArray, callback);
          PubSub.publish('user/remove/friend', [friend, circleArray], this);
          return this;
