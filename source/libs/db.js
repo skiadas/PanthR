@@ -249,9 +249,9 @@ _.extend(Db.prototype, {
             if (error) {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRecords) {
-                this.emit('dbUserNotFoundError', user);
+                this.emit('userUpdated', user);                
             } else {
-                this.emit('userUpdated', user);
+                this.emit('dbUserNotFoundError', user);                
             }
         });
         return this;
@@ -312,12 +312,13 @@ _.extend(Db.prototype, {
             args: [email, { safe: true }]
         };
         this.doRequest(request, function (error, request, countOfRemovedRecords) {
+            console.log('countOfRemovedRecords: ', countOfRemovedRecords)
             if (error) {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRemovedRecords) { // no object is removed
-                this.emit('dbUserNotDeletedError', request);
+                this.emit('userDeleted', email);                
             } else {
-                this.emit('userDeleted', email);
+                this.emit('dbUserNotDeletedError', request);
             }
         });
         return this;
@@ -348,9 +349,9 @@ _.extend(Db.prototype, {
             if (error) {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRecords) {
-                this.emit('dbUserNotFoundError', user);
-            } else {
                 this.emit('friendAdded', user);
+            } else {                
+                this.emit('dbUserNotFoundError', user);
             }
         });
         return this;
@@ -377,9 +378,9 @@ _.extend(Db.prototype, {
             if (error) {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRecords) {
-                this.emit('dbUserNotFoundError', user);
-            } else {
                 this.emit('friendRemoved', user);
+            } else {                
+                this.emit('dbUserNotFoundError', user);
             }
         });
         return this;
@@ -405,9 +406,9 @@ _.extend(Db.prototype, {
             if (error) {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRecords) {
-                this.emit('dbUserNotFoundError', user);
-            } else {
                 this.emit('friendTagged', user);
+            } else {                
+                this.emit('dbUserNotFoundError', user);
             }
         });
         return this;
@@ -433,9 +434,9 @@ _.extend(Db.prototype, {
             if (error) {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRecords) {
-                this.emit('dbUserNotFoundError', user);
-            } else {
                 this.emit('friendUnTagged', user);
+            } else {
+                this.emit('dbUserNotFoundError', user);
             }
         });
         return this;
@@ -485,9 +486,9 @@ _.extend(Db.prototype, {
             if (error) {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRemovedRecords) { // no object is removed
-                this.emit('dbStructureNotDeletedError', request);
-            } else {
                 this.emit('structureDeleted', structure);
+            } else {
+                this.emit('dbStructureNotDeletedError', request);
             }
         });
         return this;
@@ -502,9 +503,9 @@ _.extend(Db.prototype, {
             if (error) {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRecords) {
-                this.emit('dbStructureNotFoundError', request);
-            } else {
                 this.emit('structureUpdated', structure);
+            } else {
+                this.emit('dbStructureNotFoundError', request);
             }
         });
         return this;
