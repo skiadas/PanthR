@@ -326,8 +326,12 @@ _.extend(Db.prototype, {
     addFriend: function (user, friend, circlesArray) {
         var friendStr = 'friends.' + friend._id.toHexString(),
             queryObj = { '$set': {} },
-            findStr = { _id: user._id },
-            request;
+            findStr = { email: user.email },
+            request = {
+                collectionName: 'users',
+                methodName: 'update',
+                args: [ findStr, queryObj, { safe: true } ]
+            };
         queryObj.$set[friendStr] = {
             nick: friend.nick,
             email: friend.email,
@@ -340,11 +344,7 @@ _.extend(Db.prototype, {
             };
         });
         findStr[friendStr] = null;
-        request = {
-            collectionName: 'users',
-            methodName: 'update',
-            args: [ findStr, queryObj, { safe: true } ]
-        };
+        
         this.doRequest(request, function (error, request, countOfRecords) {
             if (error) {
                 this.emit('dbConnectionError', error, request);
@@ -359,8 +359,12 @@ _.extend(Db.prototype, {
     removeFriend: function (user, friend, circleArray) {
         var friendStr = 'friends.' + friend._id.toHexString(),
             queryObj = { '$unset': {} },
-            findStr = { _id: user._id },
-            request;
+            findStr = { email: user.email },
+            request = {
+                collectionName: 'users',
+                methodName: 'update',
+                args: [ findStr, queryObj, { safe: true } ]
+            };;
         queryObj.$unset[friendStr] = '';
         circleArray.forEach(function (el) {
             queryObj.$unset['circles.' + el + '.' + friend._id.toHexString()] = {
@@ -369,11 +373,6 @@ _.extend(Db.prototype, {
             };
         });
         findStr[friendStr] = { $ne: null };
-        request = {
-            collectionName: 'users',
-            methodName: 'update',
-            args: [findStr, queryObj, { safe: true }]
-        };
         this.doRequest(request, function (error, request, countOfRecords) {
             if (error) {
                 this.emit('dbConnectionError', error, request);
@@ -388,7 +387,7 @@ _.extend(Db.prototype, {
     tagFriend: function (user, friend, circleArray) {
         var friendStr = 'friends.' + friend._id.toHexString() + '.circles',
             queryObj = { '$set': {}, '$addToSet': {} },
-            findStr = { _id: user._id },
+            findStr = { email: user.email },
             request = {
                 collectionName: 'users',
                 methodName: 'update',
@@ -416,7 +415,7 @@ _.extend(Db.prototype, {
     unTagFriend: function (user, friend, circleArray) {
         var friendStr = 'friends.' + friend._id.toHexString() + '.circles',
             queryObj = { '$pullAll': {}, '$unset': {} },
-            findStr = { _id: user._id },
+            findStr = { email: user.email },
             request = {
                 collectionName: 'users',
                 methodName: 'update',
