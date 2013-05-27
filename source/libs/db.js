@@ -168,11 +168,6 @@ function Db(customServer) {
         PubSub.publish('db/structure/removed', [structure], this);
     });
 
-    PubSub.subscribe('db/add/friend', function (data) {
-        // publish if addFriend() gets called
-        PubSub.publish('db/friend/added', {});
-    });
-
     this.doRequest = function (req, callback) {
         if (!this.db) {
             console.log("Db not found. queueing task for later");
