@@ -453,7 +453,7 @@ _.extend(Db.prototype, {
             } else if (!records[0]) { // no item is inserted to the records array
                 self.emit('dbStructureNotCreatedError', request);
             } else {
-                self.emit('structureCreated', structure);
+                self.emit('structureCreated', records[0]);
             }
         });
             
@@ -473,7 +473,7 @@ _.extend(Db.prototype, {
             if (error) {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRemovedRecords) { // no object is removed
-                this.emit('structureDeleted', structure);
+                this.emit('structureRemoved', structure);
             } else {
                 this.emit('dbStructureNotDeletedError', request);
             }
