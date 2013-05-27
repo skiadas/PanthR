@@ -7,16 +7,16 @@ var util = require('util'),
     assert = require('assert');
 
 function Db(customServer) {
+    if (!(this instanceof Db)) {
+        return new Db(customServer);
+    }
+
     var server, db, failedRequests, // store all requests that haven't been processed
         self = this;
 
     // intitalize function    
     // if known contects database object (ex. testing)
     // if it doesnt find calls function to initialize standard
-
-    if (!(this instanceof Db)) {
-        return new Db(customServer);
-    }
 
     function init(customServer) {
         customServer = customServer || {};
