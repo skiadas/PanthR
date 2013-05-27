@@ -260,7 +260,7 @@ _.extend(Db.prototype, {
         var request1 = {
                 collectionName: 'users',
                 methodName: 'findOne',
-                args: [{ email: user.email }, { safe: true }]
+                args: [{ email: user.email }, {}, { safe: true }]
             },
             request2 = {
                 collectionName: 'users',
@@ -291,7 +291,7 @@ _.extend(Db.prototype, {
         var request = {
             collectionName: 'users',
             methodName: 'findOne',
-            args: [email, { safe: true }]
+            args: [email, {}, { safe: true }]
         };
         this.doRequest(request, function (error, request, docObject) {
             if (error) {
@@ -299,6 +299,7 @@ _.extend(Db.prototype, {
             } else if (!docObject) { // docObject is not defined
                 this.emit('dbUserNotFoundError', request);
             } else {
+                console.log(docObject);
                 this.emit('userFound', docObject);
             }
         });
@@ -443,7 +444,7 @@ _.extend(Db.prototype, {
         var request1 = {
                 collectionName: 'structures',
                 methodName: 'findOne',
-                args: [{ email: structure.email }, { safe: true }]
+                args: [{ email: structure.email }, {}, { safe: true }]
             },
             request2 = {
                 collectionName: 'structures',
@@ -512,7 +513,7 @@ _.extend(Db.prototype, {
         var request = {
             collectionName: 'structures',
             methodName: 'findOne',
-            args: [{ email: structure.email }, { safe: true }]
+            args: [{ email: structure.email }, {}, { safe: true }]
         };
         this.doRequest(request, function (error, request, docObject) {
             if (error) {
