@@ -1,3 +1,4 @@
+'use strict';
 var util = require('util'),
     PubSub = require('./pubsub.js'),
     _ = require('underscore'),
@@ -6,7 +7,6 @@ var util = require('util'),
     assert = require('assert');
 
 function Db(customServer) {
-    'use strict';
     var server, db, failedRequests, // store all requests that haven't been processed
         self = this;
 
@@ -245,7 +245,6 @@ module.exports = Db;
 // creating prototype properties for Db
 _.extend(Db.prototype, {
     updateUser: function (user, changes) {
-        'use strict';
         var request = {
             collectionName: 'users',
             methodName: 'update',
@@ -263,7 +262,6 @@ _.extend(Db.prototype, {
         return this;
     },
     createUser: function (user) {
-        'use strict';
         var request1 = {
                 collectionName: 'users',
                 methodName: 'findOne',
@@ -295,7 +293,6 @@ _.extend(Db.prototype, {
         return this;
     },
     findUser: function (email) {
-        'use strict';
         var request = {
             collectionName: 'users',
             methodName: 'findOne',
@@ -313,7 +310,6 @@ _.extend(Db.prototype, {
         return this;
     },
     deleteUser: function (email) {
-        'use strict';
         var request = {
             collectionName: 'users',
             methodName: 'remove',
@@ -331,7 +327,6 @@ _.extend(Db.prototype, {
         return this;
     },
     addFriend: function (user, friend, circlesArray) {
-        'use strict';
         var friendStr = 'friends.' + friend._id.toHexString(),
             queryObj = { '$set': {} },
             findStr = { _id: user._id },
@@ -365,7 +360,6 @@ _.extend(Db.prototype, {
         return this;
     },
     removeFriend: function (user, friend, circleArray) {
-        'use strict';
         var friendStr = 'friends.' + friend._id.toHexString(),
             queryObj = { '$unset': {} },
             findStr = { _id: user._id },
@@ -395,7 +389,6 @@ _.extend(Db.prototype, {
         return this;
     },
     tagFriend: function (user, friend, circleArray) {
-        'use strict';
         var friendStr = 'friends.' + friend._id.toHexString() + '.circles',
             queryObj = { '$set': {}, '$addToSet': {} },
             findStr = { _id: user._id },
@@ -424,7 +417,6 @@ _.extend(Db.prototype, {
         return this;
     },
     unTagFriend: function (user, friend, circleArray) {
-        'use strict';
         var friendStr = 'friends.' + friend._id.toHexString() + '.circles',
             queryObj = { '$pullAll': {}, '$unset': {} },
             findStr = { _id: user._id },
@@ -453,7 +445,6 @@ _.extend(Db.prototype, {
         return this;
     },
     createStructure: function (structure) {
-        'use strict';
         var request1 = {
                 collectionName: 'structures',
                 methodName: 'findOne',
@@ -485,7 +476,6 @@ _.extend(Db.prototype, {
         return this;
     },
     removeStructure: function (structure) {
-        'use strict';
         /*
         what if we delete something that is an essential part of a structure
         e.g. the x-component of a graph
@@ -507,7 +497,6 @@ _.extend(Db.prototype, {
         return this;
     },
     updateStructure: function (structure, changes) {
-        'use strict';
         var request = {
             collectionName: 'structures',
             methodName: 'update',
@@ -525,7 +514,6 @@ _.extend(Db.prototype, {
         return this;
     },
     findStructure: function (structure) {
-        'use strict';
         var request = {
             collectionName: 'structures',
             methodName: 'findOne',
@@ -544,6 +532,9 @@ _.extend(Db.prototype, {
     }
 });
 
+
+
+
 /*run mongodb: sudo mongod --config /etc/mongodb.conf --nojournal*/
 
 if (require.main === module) {
@@ -554,13 +545,11 @@ if (require.main === module) {
         newDB;
 
     PubSub.subscribe('db/connected', function () {
-        'use strict';
         newDB.createUser(user);
     });
     newDB = new Db(myServer);
 
     PubSub.subscribe('db/user/created', function (user) {
-        'use strict';
         var collection = newDB.db.collection('users');
         collection.findOne({ email: user.email }, function (err, doc) {
             assert.equal(user.email, doc.email);
@@ -572,7 +561,6 @@ if (require.main === module) {
     });
 
     PubSub.subscribe('db/user/updated', function (user) {
-        'use strict';
         var collection = newDB.db.collection('users');
         collection.findOne({ email: user.email }, function (err, doc) {
             assert.equal(user.email, doc.email);
@@ -580,13 +568,11 @@ if (require.main === module) {
     });
 
     PubSub.subscribe('db/user/found', function (email) {
-        'use strict';
         // email is an object
         assert.equal(user.email, email.email);
     });
 
     PubSub.subscribe('db/user/deleted', function (email) {
-        'use strict';
         var collection = newDB.db.collection('users');
         collection.findOne(email, function (err, doc) {
             assert.equal(null, doc);
@@ -595,7 +581,6 @@ if (require.main === module) {
     });
 
     PubSub.subscribe('error/db/user/notFound', function (user) {
-        'use strict';
         console.log(user, ' does not exist');
     });
 }
