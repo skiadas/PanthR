@@ -66,7 +66,7 @@ var Events = (function (){
     * @param args {Array}
     * @param scope {Object} Optional
     */
-    publish = function (topic, args, scope, async) {
+    publish = function (topic, theArgs, scope, async) {
         if ((scope === true) || (scope === false)) {
             // No scope was provided but then third argument will be the async setting
             async = scope;
@@ -76,15 +76,14 @@ var Events = (function (){
         if ((async) !== false) {
             async = async || doAsync;
         }
-        args = args || [];
+        theArgs = theArgs || [];
         var lastPass = false;
         var fulltopic = topic;
-        var passingArgs;
+        var len = theArgs.length;
         // Goes through each subtopic in order, including the empty subtopic;
         do {
-            passingArgs = _.clone(args);
-            if (fulltopic != topic) {
-                passingArgs.push(fulltopic); // If listening to subtopic, pass fulltopic in
+            if ((fulltopic != topic) && (theArgs.length === len)) {
+                theArgs.push(fulltopic); // If listening to subtopic, pass fulltopic in
             }
             if (topic == "") {
                 lastPass = true;
@@ -95,11 +94,11 @@ var Events = (function (){
                 if (async) {
                     for (i; i >= 0; i -= 1) {
                         var handler = thisTopic[i];
-                        process.nextTick(function() {handler.apply(scope, passingArgs)});
+                        process.nextTick(function() {handler.apply(scope, theArgs)});
                     }
                 } else {
                     for (i; i >= 0; i -= 1) {
-                        thisTopic[i].apply( scope, passingArgs);
+                        thisTopic[i].apply( scope, theArgs);
                     }
                 }
             }
