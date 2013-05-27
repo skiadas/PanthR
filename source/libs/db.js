@@ -441,34 +441,22 @@ _.extend(Db.prototype, {
         return this;
     },
     createStructure: function (structure) {
-        var request1 = {
-                collectionName: 'structures',
-                methodName: 'findOne',
-                args: [{ email: structure.email }, {}, { safe: true }]
-            },
-            request2 = {
+        var request = {
                 collectionName: 'structures',
                 methodName: 'insert',
                 args: [structure, { safe: true }]
             },
             self = this;
-        this.doRequest(request1, function (error, request, docObject) {
+        this.doRequest(request, function (error, request, records) {
             if (error) {
                 self.emit('dbConnectionError', error, request);
-            } else if (!docObject) { // structure does not exist
-                this.doRequest(request2, function (error, request, records) {
-                    if (error) {
-                        self.emit('dbConnectionError', error, request);
-                    } else if (!records[0]) { // no item is inserted to the records array
-                        self.emit('dbStructureNotCreatedError', structure);
-                    } else {
-                        self.emit('structureCreated', structure);
-                    }
-                });
-            } else { // structure exists
-                console.log(structure, ' already exists!');
+            } else if (!records[0]) { // no item is inserted to the records array
+                self.emit('dbStructureNotCreatedError', request);
+            } else {
+                self.emit('structureCreated', structure);
             }
         });
+            
         return this;
     },
     removeStructure: function (structure) {
@@ -479,7 +467,7 @@ _.extend(Db.prototype, {
         var request = {
             collectionName: 'structures',
             methodName: 'remove',
-            args: [{ email: structure.email }, { safe: true }]
+            args: [{ _id: structure._id }, { safe: true }]
         };
         this.doRequest(request, function (error, request, countOfRemovedRecords) {
             if (error) {
@@ -496,7 +484,7 @@ _.extend(Db.prototype, {
         var request = {
             collectionName: 'structures',
             methodName: 'update',
-            args: [{ email: structure.email }, changes, { safe: true }]
+            args: [{ _id: structure._id }, changes, { safe: true }]
         };
         this.doRequest(request, function (error, request, countOfRecords) {
             if (error) {
@@ -513,7 +501,7 @@ _.extend(Db.prototype, {
         var request = {
             collectionName: 'structures',
             methodName: 'findOne',
-            args: [{ email: structure.email }, {}, { safe: true }]
+            args: [{ _id: structure._id }, {}, { safe: true }]
         };
         this.doRequest(request, function (error, request, docObject) {
             if (error) {
