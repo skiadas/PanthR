@@ -67,6 +67,11 @@ var Events = (function (){
     * @param scope {Object} Optional
     */
     publish = function (topic, theArgs, scope, async) {
+        var lastPass = false,
+            fulltopic = topic,
+            thisTopic,
+            len,
+            i;
         if ((scope === true) || (scope === false)) {
             // No scope was provided but then third argument will be the async setting
             async = scope;
@@ -77,28 +82,26 @@ var Events = (function (){
             async = async || doAsync;
         }
         theArgs = theArgs || [];
-        var lastPass = false;
-        var fulltopic = topic;
-        var len = theArgs.length;
+        len = theArgs.length;
         // Goes through each subtopic in order, including the empty subtopic;
+        function asyncCaller(handler, origArgs) {
+            process.nextTick(function() { handler.apply(scope, origArgs) });
+        }
         do {
             if ((fulltopic != topic) && (theArgs.length === len)) {
                 theArgs.push(fulltopic); // If listening to subtopic, pass fulltopic in
             }
-            if (topic == "") {
-                lastPass = true;
-            };
+            if (topic == "") { lastPass = true; };
             if (cache[topic]) {
-                var thisTopic = cache[topic]
-                ,   i = thisTopic.length - 1;
+                thisTopic = cache[topic];
+                i = thisTopic.length - 1;
                 if (async) {
                     for (i; i >= 0; i -= 1) {
-                        var handler = thisTopic[i];
-                        process.nextTick(function() {handler.apply(scope, theArgs)});
+                        asyncCaller(thisTopic[i], theArgs.slice());
                     }
                 } else {
                     for (i; i >= 0; i -= 1) {
-                        thisTopic[i].apply( scope, theArgs);
+                        thisTopic[i].apply(scope, theArgs);
                     }
                 }
             }
