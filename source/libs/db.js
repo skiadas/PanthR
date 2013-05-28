@@ -14,7 +14,7 @@ function Db(customServer) {
     var server, db, failedRequests, // store all requests that haven't been processed
         self = this;
 
-    // intitalize function    
+    // intitalize function
     // if known contects database object (ex. testing)
     // if it doesnt find calls function to initialize standard
 
@@ -84,7 +84,7 @@ function Db(customServer) {
 
     // perform only update(), not findOne() anymore
     // reduce from 2 calls to 1 call in the database
-    // need to listen to the callback from update() 
+    // need to listen to the callback from update()
     // to determine if the update() succeeds or not
 
     // user methods
@@ -92,7 +92,7 @@ function Db(customServer) {
     PubSub.subscribe('db/create/user', _.bind(this.createUser, this));
     PubSub.subscribe('db/find/user', _.bind(this.findUser, this));
     PubSub.subscribe('db/delete/user', _.bind(this.deleteUser, this));
-    // friend methods 
+    // friend methods
     PubSub.subscribe('db/add/friend', _.bind(this.addFriend, this));
     PubSub.subscribe('db/remove/friend', _.bind(this.removeFriend, this));
     PubSub.subscribe('db/tag/friend', _.bind(this.tagFriend, this));
@@ -188,13 +188,13 @@ function Db(customServer) {
     // PubSub for addFriend() method
 
     //remove friend - remove them every circle
-    ///circles could have been added 
+    ///circles could have been added
     //need a way to tell it any circles
 
     //tagFriend into a list of circls
     // PubSub for tagFriend() method
 
-    //remove friend  from circle        
+    //remove friend  from circle
 
     this.verifyRequest = function (requestHash, callback) {
         var hash = crypto.createHash('sha512').update(requestHash).digest('hex'),
@@ -249,9 +249,9 @@ _.extend(Db.prototype, {
             if (error) {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRecords) {
-                this.emit('userUpdated', user);                
+                this.emit('userUpdated', user);
             } else {
-                this.emit('dbUserNotFoundError', user);                
+                this.emit('dbUserNotFoundError', user);
             }
         });
         return this;
@@ -316,7 +316,7 @@ _.extend(Db.prototype, {
             if (error) {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRemovedRecords) { // no object is removed
-                this.emit('userDeleted', email);                
+                this.emit('userDeleted', email);
             } else {
                 this.emit('dbUserNotDeletedError', request);
             }
@@ -344,13 +344,12 @@ _.extend(Db.prototype, {
             };
         });
         findStr[friendStr] = null;
-        
         this.doRequest(request, function (error, request, countOfRecords) {
             if (error) {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRecords) {
                 this.emit('friendAdded', user);
-            } else {                
+            } else {
                 this.emit('dbUserNotFoundError', user);
             }
         });
@@ -378,7 +377,7 @@ _.extend(Db.prototype, {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRecords) {
                 this.emit('friendRemoved', user);
-            } else {                
+            } else {
                 this.emit('dbUserNotFoundError', user);
             }
         });
@@ -406,7 +405,7 @@ _.extend(Db.prototype, {
                 this.emit('dbConnectionError', error, request);
             } else if (countOfRecords) {
                 this.emit('friendTagged', user);
-            } else {                
+            } else {
                 this.emit('dbUserNotFoundError', user);
             }
         });
@@ -456,7 +455,6 @@ _.extend(Db.prototype, {
                 self.emit('structureCreated', records[0]);
             }
         });
-            
         return this;
     },
     removeStructure: function (structure) {
