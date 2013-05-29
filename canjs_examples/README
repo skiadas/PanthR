@@ -1,1 +1,9 @@
-Examples of using can.js. Need to be removed at some point in the future
+Examples of using can.js. Need to be removed at some point in the future.
+
+To see the examples in action, open the html files in them on a browser. For instance on my
+computer, the resulting link looks like this:
+
+file:///Users/haris/Sites/PanthR/canjs_examples/example1/todo.html
+
+Double-clicking the file or dragging it onto the browser icon or a browser window might do the
+trick.
