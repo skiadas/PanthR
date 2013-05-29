@@ -1,0 +1,24 @@
+<input id="new-value" {{ (el) -> el.val('').focus() }} placeholder="Add a number!" autofocus="">
+
+<section id="main" class="{{^values}}hidden{{/values}}">
+	<ul id="value-list">
+	{{#values}}
+		<li class="value" {{data 'value'}}>
+			<div class="view">
+				<span>{{value}}</span>
+				<button class="destroy">Remove</button>
+			</div>
+		</li>
+	{{/values}}
+	</ul>
+</section>
+<section id="summaries">
+<h3>Summaries</h3>
+<ul>
+  <li>Sum: {{values.sum}}</li>
+  <li>Count: {{values.count}}</li>
+  <li>Mean: {{values.mean}}</li>
+  <li>Variance: {{values.variance}}</li>
+  <li>Std. Dev.: {{values.sd}}</li>
+</ul>
+</section>
