@@ -2,27 +2,20 @@
 (function (namespace, undefined) {
     'use strict';
 
-    var VariableNumber = can.Model.LocalStorage({
-        name: 'values-canjs'
+    var Variable = can.Model.LocalStorage({
+        name: 'variable-canjs'
     }, {
         // Instance methods for the value would go here.
         // Perhaps for effect, try to make it so that negative numbers show with different color?
-        class: function() {
-            return (this.value < 0) ? 'negative' : 'positive';
-        }
-    });
-
-    // List for Todos
-    VariableNumber.List = can.Model.List({
         sum: function () {
             var total = 0;
-            this.each(function (val) {
-                total += val.attr('value');
+            this.values.each(function (val) {
+                total += val;
             });
             return total;
         },
         count: function() {
-            return this.length;
+            return this.values.length;
         },
         mean: function () {
             // console.log('Asked to compute mean', this.attr('count'))
@@ -31,9 +24,8 @@
         },
         sumSquares: function() {
             var total = 0, current;
-            this.each(function (val) {
-                current = val.attr('value');
-                total += current * current;
+            this.values.each(function (val) {
+                total += val * val;
             });
             return total;
         },
@@ -46,5 +38,5 @@
     });
 
     namespace.Models = namespace.Models || {};
-    namespace.Models.VariableNumber = VariableNumber;
+    namespace.Models.Variable = Variable;
 })(this);

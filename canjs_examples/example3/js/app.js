@@ -19,9 +19,10 @@
             console.log("Here!", val, mean, sd)
             return (val-mean)/sd;
         });
-
+	    console.log("About to look")
 		// Initialize the app
-		Models.VariableNumber.findAll({}, function (variable) {
+		Models.Variable.findAll({}, function (variable) {
+		    console.log("Found: ", variable)
 			new Variable('#myVariable', {
 				values: variable,
 				state: can.route,

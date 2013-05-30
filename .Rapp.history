@@ -1,0 +1,1756 @@
+reshape(survey[, likelyGiftCols], direction = "long", varying=list(1:5), times = likelyGiftNames)
+likelyGift <- reshape(survey[, likelyGiftCols], direction = "long", varying=list(1:5), times = likelyGiftNames)
+names(likelyGift)
+likelyGiftNames <- c(#
+    "Contact From Classmate", "Personal Visit From HC Staff", "Email Solicitations",#
+    "Phone Call from Student", "Event Reception"#
+)#
+likelyGift <- reshape(survey[, likelyGiftCols], direction = "long", varying=list(1:5), times = likelyGiftNames)#
+names(likelyGift) <- c("Form", "Rating", "id")
+barchart(Rating~Form, data=likelyGift)
+with(likelyGift, barchart(table(Rating, Form)))
+with(likelyGift, barchart(table(Rating, Form), groups=FALSE))
+with(likelyGift, barchart(prop.table(table(Rating, Form), 1), ylab = "Rating", xlab = "Solicitation Methods" ))
+with(likelyGift, barchart(t(prop.table(table(Rating, Form), 2)), ylab = "Rating", xlab = "Solicitation Methods" ))
+with(likelyGift, barchart(t(prop.table(table(Rating, Form), 2)), ylab = "Rating", xlab = "Solicitation Methods", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")) ))
+with(likelyGift, barchart(t(prop.table(table(Rating, Form), 2)), ylab = "Rating", xlab = "Solicitation Methods", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))
+with(likelyGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Solicitation Methods", ylab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))
+pdf("Graphs/LikelyToRespondWithGift.pdf", family="Helvetica", width=8, height=5)#
+with(likelyGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Solicitation Methods" ))#
+dev.off()#
+pdf("Graphs/LikelyToRespondWithGift2.pdf", family="Helvetica", width=8, height=5)#
+with(likelyGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Solicitation Methods", ylab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()
+likelyGiftDecade <- reshape(survey[, c(likelyGiftCols, 161)], direction = "long", varying=list(1:5), times = likelyGiftNames)
+likelyGiftDecade
+with(likelyGiftDecade, table(Rating, Form, Decade))
+names(likelyGift) <- c("Decade", "Form", "Rating", "id")#
+with(likelyGiftDecade, table(Rating, Form, Decade))
+names(likelyGiftDecade) <- c("Decade", "Form", "Rating", "id")#
+with(likelyGiftDecade, table(Rating, Form, Decade))
+with(likelyGiftDecade, prop.table(table(Rating, Form, Decade), 2))
+with(likelyGiftDecade, prop.table(table(Rating, Form, Decade), c(2,3)))
+likelyGiftDecade.prop <- with(likelyGiftDecade, prop.table(table(Rating, Form, Decade), c(2,3)))
+barchart(likelyGiftDecade.prop, groups=FALSE)
+barchart(likelyGiftDecade.prop)
+?t
+likelyGiftDecade.prop <- with(likelyGiftDecade, prop.table(table(Form, Rating, Decade), c(1,3)))#
+barchart(likelyGiftDecade.prop)
+likelyGiftDecade.prop <- with(likelyGiftDecade, prop.table(table(Form, Decade, Rating), c(1,2)))#
+barchart(likelyGiftDecade.prop)
+?aperm
+barchart(aperm(likelyGiftDecade.prop, c(2,1,3)))
+names(survey)[124:130]
+names(survey)[124:128]
+whatGiftCols <- 124:128#
+whatGiftNames <- c(#
+    "Academic Programs", "Social Experiences", "Outdoor Athletic Dacilities",#
+    "Student Scholarships", "Building the Hanover Fund"#
+)
+whatGiftCols <- 124:128#
+whatGiftNames <- c(#
+    "Academic Programs", "Social Experiences", "Outdoor Athletic Dacilities",#
+    "Student Scholarships", "Building the Hanover Fund"#
+)#
+whatGift <- reshape(survey[, whatGiftCols], direction = "long", varying=list(1:5), times = whatGiftNames)#
+names(whatGift) <- c("Form", "Rating", "id")
+whatGift
+whatGift <- reshape(survey[, whatGiftCols], direction = "long", varying=list(1:5), times = whatGiftNames)#
+names(whatGift) <- c("Form", "Rating", "id")#
+with(whatGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Funding Directions" ))
+whatGiftCols <- 124:128#
+whatGiftNames <- c(#
+    "Academic Programs", "Social Experiences", "Outdoor Athletic Facilities",#
+    "Student Scholarships", "Building the Hanover Fund"#
+)#
+whatGift <- reshape(survey[, whatGiftCols], direction = "long", varying=list(1:5), times = whatGiftNames)#
+names(whatGift) <- c("Form", "Rating", "id")#
+with(whatGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Funding Directions" ))
+pdf("Graphs/WhatGift.pdf", family="Helvetica", width=8, height=5)#
+with(whatGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Funding Directions" ))#
+dev.off()
+with(whatGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Solicitation Methods", ylab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))
+whatGiftDecade <- reshape(survey[, c(whatGiftCols, 161)], direction = "long", varying=list(1:5), times = whatGiftNames)#
+names(whatGiftDecade) <- c("Decade", "Form", "Rating", "id")#
+whatGiftDecade.prop <- with(whatGiftDecade, prop.table(table(Form, Decade, Rating), c(1,2)))#
+barchart(whatGiftDecade.prop)#
+barchart(aperm(whatGiftDecade.prop, c(2,1,3)))
+barchart(whatGiftDecade.prop)
+whatGiftDecade.prop
+whatGiftDecade
+?xtabs
+?apply
+with(whatGiftDecade, aggregate(Rating, list(Decade, Form), mean, na.rm=TRUE))
+whatGiftMeans <- with(whatGiftDecade, aggregate(Rating, list(Decade, Form), mean, na.rm=TRUE))
+names(whatGiftMeans) <- c("Decade", "Form", "Rating")
+dotplot(Rating~Decade|Form, data = whatGiftMeans)
+dotplot(Decade ~ Rating|Form, data = whatGiftMeans)
+dotplot(Decade ~ Rating|Form, data = whatGiftMeans, type = "o")
+pdf("Graphs/WhatGiftByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(Decade ~ Rating|Form, data = whatGiftMeans, type = "o")#
+dev.off()
+as.character(survey[,129])
+write.table(survey[survey[,129] !="",129], file="OtherGiftSupport.txt", col.names=FALSE, quote=FALSE, row.names=FALSE)
+names(survey)[130:140]
+names(survey)[130:138]
+survey[1:20,130:138]
+summary(survey[,130:138])
+summary(as.numeric(survey[,130:138]))
+summary(apply(survey[,130:138], 2, as.numeric))
+?as.numeric
+summary(apply(survey[,130:138], 2, function(x) as.numeric(as.character(x))))
+table(apply(survey[,130:138], 2, function(x) as.numeric(as.character(x))))
+table(apply(survey[,130], 2, function(x) as.numeric(as.character(x))))
+table(as.numeric(as.character(survey[,130])))
+table(survey[,130])
+names(survey[,130:138])
+survey[,130:138] <- apply(survey[,130:138], 2, function(x) as.numeric(as.character(x)))#
+whatGiftCols <- 130:138#
+whatGiftNames <- c(#
+    "Peer Giving Behavior", "Expression of Gratitude / Donor / Recognition Societies"#
+    "Your Amount of Student Debt", "EmploymentStatus"#
+    "Tax Benefits", "Current Opinion of HC", "Quality of my Student Experience",#
+    "Compelling Stories of Student Achievements", "Compelling Stories of Alumni Achievements"#
+)#
+whatGift <- reshape(survey[, whatGiftCols], direction = "long", varying=list(1:9), times = whatGiftNames)#
+names(whatGift) <- c("Form", "Rating", "id")
+whatGiftNames <- c(#
+    "Peer Giving Behavior", "Expression of Gratitude / Donor / Recognition Societies",#
+    "Your Amount of Student Debt", "EmploymentStatus",#
+    "Tax Benefits", "Current Opinion of HC", "Quality of my Student Experience",#
+    "Compelling Stories of Student Achievements", "Compelling Stories of Alumni Achievements"#
+)#
+whatGift <- reshape(survey[, whatGiftCols], direction = "long", varying=list(1:9), times = whatGiftNames)#
+names(whatGift) <- c("Form", "Rating", "id")
+whatGift <- reshape(survey[, whatGiftCols], direction = "long", varying=list(1:5), times = whatGiftNames)#
+names(whatGift) <- c("Form", "Rating", "id")
+whatGiftCols <- 124:128#
+whatGiftNames <- c(#
+    "Academic Programs", "Social Experiences", "Outdoor Athletic Facilities",#
+    "Student Scholarships", "Building the Hanover Fund"#
+)#
+whatGift <- reshape(survey[, whatGiftCols], direction = "long", varying=list(1:5), times = whatGiftNames)
+influenceWhetherGiftCols <- 130:138#
+influenceWhetherGiftNames <- c(#
+    "Peer Giving Behavior", "Expression of Gratitude / Donor / Recognition Societies",#
+    "Your Amount of Student Debt", "EmploymentStatus",#
+    "Tax Benefits", "Current Opinion of HC", "Quality of my Student Experience",#
+    "Compelling Stories of Student Achievements", "Compelling Stories of Alumni Achievements"#
+)#
+influenceWhetherGift <- reshape(survey[, influenceWhetherGiftCols], direction = "long", varying=list(1:9), times = influenceWhetherGiftNames)#
+names(influenceWhetherGift) <- c("Form", "Rating", "id")
+influenceWhetherGift
+with(influenceWhetherGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Funding Directions" ))
+influenceWhetherGiftNames <- c(#
+    "Peer Giving Behavior", "Expression of Gratitude / Donor / Recognition Societies",#
+    "Your Amount of Student Debt", "Employment Status",#
+    "Tax Benefits", "Current Opinion of HC", "Quality of my Student Experience",#
+    "Compelling Stories of Student Achievements", "Compelling Stories of Alumni Achievements"#
+)#
+influenceWhetherGift <- reshape(survey[, influenceWhetherGiftCols], direction = "long", varying=list(1:9), times = influenceWhetherGiftNames)#
+names(influenceWhetherGift) <- c("Form", "Rating", "id")#
+with(influenceWhetherGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Funding Directions" ))
+pdf("Graphs/InfluenceWhetherGift.pdf", family="Helvetica", width=10, height=8)#
+with(influenceWhetherGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Funding Directions" ))#
+dev.off()
+influenceWhetherGiftNames <- c(#
+    "Peer Giving Behavior", "Gratitude / Donor-Recognition Societies",#
+    "Your Amount of Student Debt", "Employment Status",#
+    "Tax Benefits", "Current Opinion of HC", "Quality of my Student Experience",#
+    "Compelling Stories of Student Achievements", "Compelling Stories of Alumni Achievements"#
+)#
+influenceWhetherGift <- reshape(survey[, influenceWhetherGiftCols], direction = "long", varying=list(1:9), times = influenceWhetherGiftNames)#
+names(influenceWhetherGift) <- c("Form", "Rating", "id")#
+pdf("Graphs/InfluenceWhetherGift.pdf", family="Helvetica", width=10, height=8)#
+with(influenceWhetherGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Funding Directions" ))#
+dev.off()
+with(influenceWhetherGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Solicitation Methods", ylab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))
+with(influenceWhetherGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Rating", ylab = "Factors", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))
+pdf("Graphs/InfluenceWhetherGift2.pdf", family="Helvetica", width=8, height=5)#
+with(influenceWhetherGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Rating", ylab = "Factors", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()
+with(influenceWhetherGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Rating", ylab = "Factors", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))
+influenceWhetherGiftDecade <- reshape(survey[, c(influenceWhetherGiftCols, 161)], direction = "long", varying=list(1:5), times = influenceWhetherGiftNames)#
+names(influenceWhetherGiftDecade) <- c("Decade", "Form", "Rating", "id")#
+influenceWhetherGiftDecade.prop <- with(influenceWhetherGiftDecade, prop.table(table(Form, Decade, Rating), c(1,2)))#
+# barchart(influenceWhetherGiftDecade.prop)#
+# barchart(aperm(influenceWhetherGiftDecade.prop, c(2,1,3)))#
+influenceWhetherGiftMeans <- with(influenceWhetherGiftDecade, aggregate(Rating, list(Decade, Form), mean, na.rm=TRUE))#
+names(influenceWhetherGiftMeans) <- c("Decade", "Form", "Rating")#
+# pdf("Graphs/influenceWhetherGiftByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(Decade ~ Rating|Form, data = influenceWhetherGiftMeans, type = "o")#
+# dev.off()
+influenceWhetherGiftDecade <- reshape(survey[, c(influenceWhetherGiftCols, 161)], direction = "long", varying=list(1:9), times = influenceWhetherGiftNames)#
+names(influenceWhetherGiftDecade) <- c("Decade", "Form", "Rating", "id")#
+influenceWhetherGiftDecade.prop <- with(influenceWhetherGiftDecade, prop.table(table(Form, Decade, Rating), c(1,2)))#
+# barchart(influenceWhetherGiftDecade.prop)#
+# barchart(aperm(influenceWhetherGiftDecade.prop, c(2,1,3)))#
+influenceWhetherGiftMeans <- with(influenceWhetherGiftDecade, aggregate(Rating, list(Decade, Form), mean, na.rm=TRUE))#
+names(influenceWhetherGiftMeans) <- c("Decade", "Form", "Rating")#
+# pdf("Graphs/influenceWhetherGiftByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(Decade ~ Rating|Form, data = influenceWhetherGiftMeans, type = "o")#
+# dev.off()
+pdf("Graphs/influenceWhetherGiftByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(Decade ~ Rating|Form, data = influenceWhetherGiftMeans, type = "o")#
+dev.off()
+names(survey)[138:145]
+names(survey)[139:145]
+names(survey)[139:148]
+names(survey)[139:147]
+survey[,139:147] <- apply(survey[,139:147], 2, function(x) as.numeric(as.character(x)))#
+influenceAmountGiftCols <- 139:147#
+influenceAmountGiftNames <- c(#
+    "Peer Giving Behavior", "Gratitude / Donor-Recognition Societies",#
+    "Your Amount of Student Debt", "Employment Status",#
+    "Tax Benefits", "Current Opinion of HC", "Quality of my Student Experience",#
+    "Compelling Stories of Student Achievements", "Compelling Stories of Alumni Achievements"#
+)#
+influenceAmountGift <- reshape(survey[, influenceAmountGiftCols], direction = "long", varying=list(1:9), times = influenceAmountGiftNames)#
+names(influenceAmountGift) <- c("Form", "Rating", "id")#
+pdf("Graphs/InfluenceAmountGift.pdf", family="Helvetica", width=10, height=8)#
+with(influenceAmountGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Funding Directions" ))#
+dev.off()#
+pdf("Graphs/InfluenceAmountGift2.pdf", family="Helvetica", width=8, height=5)#
+with(influenceAmountGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Rating", ylab = "Factors", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()#
+#
+influenceAmountGiftDecade <- reshape(survey[, c(influenceAmountGiftCols, 161)], direction = "long", varying=list(1:9), times = influenceAmountGiftNames)#
+names(influenceAmountGiftDecade) <- c("Decade", "Form", "Rating", "id")#
+influenceAmountGiftDecade.prop <- with(influenceAmountGiftDecade, prop.table(table(Form, Decade, Rating), c(1,2)))#
+# barchart(influenceAmountGiftDecade.prop)#
+# barchart(aperm(influenceAmountGiftDecade.prop, c(2,1,3)))#
+influenceAmountGiftMeans <- with(influenceAmountGiftDecade, aggregate(Rating, list(Decade, Form), mean, na.rm=TRUE))#
+names(influenceAmountGiftMeans) <- c("Decade", "Form", "Rating")#
+pdf("Graphs/InfluenceAmountGiftByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(Decade ~ Rating|Form, data = influenceAmountGiftMeans, type = "o")#
+dev.off()
+pdf("Graphs/influenceWhetherGiftByDecade.pdf", family="Helvetica", width=8, height=8)#
+dotplot(Decade ~ Rating|Form, data = influenceWhetherGiftMeans, type = "o")#
+dev.off()
+pdf("Graphs/influenceWhetherGiftByDecade.pdf", family="Helvetica", width=10, height=10)#
+dotplot(Decade ~ Rating|Form, data = influenceWhetherGiftMeans, type = "o")#
+dev.off()
+pdf("Graphs/InfluenceAmountGiftByDecade.pdf", family="Helvetica", width=10, height=10)#
+dotplot(Decade ~ Rating|Form, data = influenceAmountGiftMeans, type = "o")#
+dev.off()
+names(survey)[148:155]
+write.table(survey[survey[,148] !="",148], file="Giving.txt", col.names=FALSE, quote=FALSE, row.names=FALSE)
+write.table(survey[survey[,149] !="",149], file="OverallComments.txt", col.names=FALSE, quote=FALSE, row.names=FALSE)
+whatGiftCols <- 124:128#
+whatGiftNames <- c(#
+    "Academic Programs", "Social Experiences", "Outdoor Athletic Facilities",#
+    "Student Scholarships", "Building the Hanover Fund"#
+)#
+whatGift <- reshape(survey[, whatGiftCols], direction = "long", varying=list(1:5), times = whatGiftNames)#
+names(whatGift) <- c("Form", "Rating", "id")#
+pdf("Graphs/WhatGift.pdf", family="Helvetica", width=8, height=5)#
+with(whatGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Funding Directions" ))#
+dev.off()#
+pdf("Graphs/WhatGift2.pdf", family="Helvetica", width=8, height=5)#
+with(whatGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Solicitation Methods", ylab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()
+grep("License", names(survey))
+cor(survey[,c(104,111)])
+table(survey[,c(104,111)])
+54/(54+25)
+names(survey)
+grep("YearNone", names(survey))
+table(survey[,c(109,116)])
+add.margins(table(survey[,c(109,116)]))
+add.margin(table(survey[,c(109,116)]))
+?margins
+Preprocessing done by other script preproc.rb#
+survey <- read.csv("SurveyResponsesProcessed.csv")#
+names(survey) <- scan(file="SurveyVariables.txt", what=character())#
+survey <- subset(survey, subset = CollectorID != 37383862)#
+#
+# Removing duplicates#
+remove <- c(629,  # k.johnson@ymail.com#
+    625, # piperaclark@gmail.com#
+    623, # johnshake@insightbb.com#
+    610, # hahn12@gmail.com#
+    616, # cassiem_15@hotmail.com#
+    614, # drworch@gmail.com#
+    613, # patty.d.smith@comcast.net#
+    622, # camlogreb21@att.net#
+    531, # sprinktu@yahoo.com#
+    532, # abbyterranova@gmail.com#
+    533, # jennifersbuhl@gmail.com#
+    534, # kerrid45@hotmail.com#
+    536, # jhammond@salemschools.com#
+    548, # richbryant6@gmail.com#
+    624, # lindsaygray@gmail.com#
+    592, # Mandy Schnell#
+    558, # jerryschnell@fuse.net, Jerry Schnell#
+    560, # alwaysici@yahoo.com#
+    562, # orrdealrco@yahoo.com#
+    570, # mardon4646@sbcglobal.net#
+    598, # vivian.gaddis@jefferson.kyschools.us#
+    573, # rjecking@sbcglobal.net, Ross J. King#
+    575, # rjecking@sbcglobal.net, Elizabeth King#
+    603, # mcfrye@embarqmail.com#
+    605, # mjohnston1312@gmail.com#
+    608, # sarahmorganhc@hotmail.com#
+    651, # janet.wylie@comcast.net#
+    604, # Shirley Weersing#
+    612, # Sharon Rose Tyahur#
+    621, # Todd Bowers #
+    626, # Daniel Graber#
+    634, # James H. Troyer#
+    601, # Martha Heinrich#
+    602, # Kris Harper Bowers#
+    606, # Richard Johnston#
+    607, # Megan Timberlake#
+    609, # Michael H. Chalk#
+    111, # eerner@yahoo.com#
+    98,   # Lydia Tobian#
+    266, # Ashley Nelson (McIntyre)#
+    292, # Catherine Bengson (Deuber) #
+    637, # Suzanne J. McFall#
+    267 #
+)#
+survey <- survey[-remove,]#
+# More rows to remove: People who haven't really answered anything:#
+toremove <- which(apply(survey[,c(31:37,38:44,46:50,51:53,104:108,118:128,130:147)], 1, function(x) all(is.na(x) | (x==""))))#
+survey <- survey[-toremove,]#
+# Check that the expected duplicates have been removed#
+# n <- nrow(survey)#
+# # n <- 100#
+# for(x in 1:n) {#
+#     for (y in (x+1):n) {#
+#         if (x != y && #
+#               (#
+#                   (survey[x,158] != "" && survey[x,158] == survey[y,158]) ||#
+#                   (survey[x,150] != "" && survey[x,150] == survey[y,150])#
+#               )#
+#           )#
+#             print(c(x,y, as.character(survey[x,150]), as.character(survey[y,150]), as.character(survey[x,158]), length(sum(survey[x,] == survey[y,]))))#
+#     }#
+# }#
+#
+# REAL WORK STARTS HERE#
+#
+colorhue <- hcl(240,35, 5:1*(100/6))#
+#
+##
+# Breaking years up in groups of 10, starting from 2013#
+year.breakpoints <- 2013 - (7:0) * 10#
+x <- sapply(survey$ClassYear, function(x) which(x < year.breakpoints[-1])[1])#
+x[is.na(x)] <- max(x, na.rm=TRUE)#
+x<- ordered(x, labels = paste(year.breakpoints[-length(year.breakpoints)], year.breakpoints[-1]-1, sep = "-"))#
+x[survey$ClassYear== 1800] <- NA#
+#
+survey$ClassDecade <- x#
+survey[survey$Gender == "","Gender"] <- NA #
+survey$Gender <- as.factor(as.character(survey$Gender))#
+#
+addmargins(with(survey, table(ClassDecade, Gender))) # Table of respondents by decade#
+# Twice as many women responding!!#
+#
+pdf("Graphs/GenderByDecade.pdf", family="Helvetica", width=6, height=6)#
+barchart(100*prop.table(with(survey, table(ClassDecade, Gender)),1), col=c("Magenta", "blue2"), #
+    xlab="Percent of Participants per Gender",#
+    panel=function(x,y,...) {#
+        fems <- 1:(length(x)/2)#
+        panel.barchart(x,y, ...)#
+        # panel.text(x[fems],y[fems], y)#
+        panel.text(x[fems]*0.7,y[fems], paste("F:",round(x[fems]),"%",sep=""))#
+        panel.text(100-(x[-fems]*0.5),y[-fems], paste("M:", round(x[-fems]),"%",sep=""))#
+        panel.text(0, y[fems], paste("n=",table(survey$ClassDecade),sep=""), pos=4)#
+    })#
+dev.off()#
+#
+pdf("Graphs/RespondentsByClassYear.pdf", family="Helvetica", width=6, height=4)#
+dotplot(table(survey$ClassDecade), type=c("h","p"),xlim=c(-1,250), scales=list(x=list(at=(0:8)*30)),#
+    ylab="Class Year",#
+    xlab="Number of Respondents",#
+ panel = function(x,y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(round(100*x/sum(x)), "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+#
+# yearCount <- table(survey$ClassYear)#
+# names(which(yearCount==max(yearCount)))   # Years with the most responses#
+#
+# Following columns have words that need to turn into 0/1#
+cols <- c(12:23, 26:30)#
+survey[,cols] <- sapply(survey[,cols], as.numeric)-1#
+#
+# Questions 12-25, organizations#
+##
+# Table of organizations that fell under "other" category, changed manually#
+var.orgs <- c(#
+    "Campus Activities Board", 15, # Student Government#
+    "common interest", 14, # Academic Clubs#
+    "Emerging leaders", 19, # professional or career-related activities#
+    "HC Young Republicans", 21, # Community Service#
+    "Interfraternity Council", 12, # Fraternity/Sorority#
+    "Judicial Board", 15, # student government#
+    "Kennings", 14, # academic club#
+    "Acquaintance Rape Education", 21, # community service#
+    "People for Peace", 21, # community service#
+    "Panhellenic Council", 12, # fraternity/sorority#
+    "Political Clubs", 21, #community service#
+    "Ran the weekend movies", 14, # academic club#
+    "Rec Committee", 15,# student government#
+    "Senior Class Commitee", 15, #student government#
+    "Senior Committee", 15, # student government#
+    "Shoebox", 14, # academic club#
+    "Varsity sports", 13, # intercollegiate athletics#
+    "SNEA", 15, # student government#
+    "Student Activities Budget Committee", 15, # student government#
+    "Student Programming Board", 15, # student government#
+    "Student radio", 22, # Tv/Newspaper#
+    "The literary magazine", 14, # academic club#
+    "Tutoring", 14 # academic club#
+)#
+dim(var.orgs) <- c(2,23)#
+for (i in 1:23) {#
+    item = var.orgs[1,i]#
+    colno = as.numeric(var.orgs[2,i])#
+    survey[grep(item, as.character(survey[,25])),colno] <- 1#
+}#
+#
+countmultiple <- function(data, columns, factorcolumn = NULL, add.totals=TRUE) {#
+    # Treats the data in the columns as 0/1s resulting from a multiple choice question.#
+    # Produces counts by adding up the occurences. Uses names(columns) as column names.#
+    # If factorcolumn is not NULL, it should be a column number for the data frame.#
+    # Used as a grouping variable. The counting will occur separately for each value of#
+    # this column.#
+    # If factorcolumn is not NULL, one row is created for each possible value of the factor.#
+    # Column totals will always be created in this case.#
+    # If add.totals is true, row totals will be appended, corresponding to the #
+    # total number of cases (i.e. not actually the sum of the values).#
+    if (is.null(factorcolumn)) {#
+        tmp <- apply(data[,columns], 2, sum)#
+        names(tmp) <- names(columns)#
+        if (add.totals) {tmp <- c(tmp, Total = nrow(data))}#
+    } else {#
+        tmp <- apply(data[,columns], 2, function(x) tapply(x, data[,factorcolumn], sum))#
+        colnames(tmp) <- names(columns)#
+        rowtotals <- tapply(data[,factorcolumn], data[,factorcolumn], length)#
+        tmp <- rbind(tmp, Total=apply(tmp, 2, sum))#
+        if (add.totals) {#
+            rowtotals <- c(rowtotals,  Total=sum(rowtotals))#
+            tmp <- cbind(tmp, Total=rowtotals)#
+        }#
+    }#
+    tmp#
+}#
+#
+orgnames <- 12:23#
+names(orgnames) <- c("Greek", "IC Athletics", "Academic Clubs", "Stud. Gov.",#
+    "IM/Recr. Clubs", "Music/Theater/Art", "Ethnic/Cultural",#
+     "Prof/Career Orgs", " Religious", "Community Service",#
+    "Campus Newspaper/TV/Yearbook")#
+orgs <- countmultiple(survey, orgnames, 11)  # 11 is the Gender variable#
+#
+orgsp <- round(100*orgs[3,-ncol(orgs)+(0:1)]/orgs[3,ncol(orgs)])
+library(lattice)
+Preprocessing done by other script preproc.rb#
+survey <- read.csv("SurveyResponsesProcessed.csv")#
+names(survey) <- scan(file="SurveyVariables.txt", what=character())#
+survey <- subset(survey, subset = CollectorID != 37383862)#
+#
+# Removing duplicates#
+remove <- c(629,  # k.johnson@ymail.com#
+    625, # piperaclark@gmail.com#
+    623, # johnshake@insightbb.com#
+    610, # hahn12@gmail.com#
+    616, # cassiem_15@hotmail.com#
+    614, # drworch@gmail.com#
+    613, # patty.d.smith@comcast.net#
+    622, # camlogreb21@att.net#
+    531, # sprinktu@yahoo.com#
+    532, # abbyterranova@gmail.com#
+    533, # jennifersbuhl@gmail.com#
+    534, # kerrid45@hotmail.com#
+    536, # jhammond@salemschools.com#
+    548, # richbryant6@gmail.com#
+    624, # lindsaygray@gmail.com#
+    592, # Mandy Schnell#
+    558, # jerryschnell@fuse.net, Jerry Schnell#
+    560, # alwaysici@yahoo.com#
+    562, # orrdealrco@yahoo.com#
+    570, # mardon4646@sbcglobal.net#
+    598, # vivian.gaddis@jefferson.kyschools.us#
+    573, # rjecking@sbcglobal.net, Ross J. King#
+    575, # rjecking@sbcglobal.net, Elizabeth King#
+    603, # mcfrye@embarqmail.com#
+    605, # mjohnston1312@gmail.com#
+    608, # sarahmorganhc@hotmail.com#
+    651, # janet.wylie@comcast.net#
+    604, # Shirley Weersing#
+    612, # Sharon Rose Tyahur#
+    621, # Todd Bowers #
+    626, # Daniel Graber#
+    634, # James H. Troyer#
+    601, # Martha Heinrich#
+    602, # Kris Harper Bowers#
+    606, # Richard Johnston#
+    607, # Megan Timberlake#
+    609, # Michael H. Chalk#
+    111, # eerner@yahoo.com#
+    98,   # Lydia Tobian#
+    266, # Ashley Nelson (McIntyre)#
+    292, # Catherine Bengson (Deuber) #
+    637, # Suzanne J. McFall#
+    267 #
+)#
+survey <- survey[-remove,]#
+# More rows to remove: People who haven't really answered anything:#
+toremove <- which(apply(survey[,c(31:37,38:44,46:50,51:53,104:108,118:128,130:147)], 1, function(x) all(is.na(x) | (x==""))))#
+survey <- survey[-toremove,]#
+# Check that the expected duplicates have been removed#
+# n <- nrow(survey)#
+# # n <- 100#
+# for(x in 1:n) {#
+#     for (y in (x+1):n) {#
+#         if (x != y && #
+#               (#
+#                   (survey[x,158] != "" && survey[x,158] == survey[y,158]) ||#
+#                   (survey[x,150] != "" && survey[x,150] == survey[y,150])#
+#               )#
+#           )#
+#             print(c(x,y, as.character(survey[x,150]), as.character(survey[y,150]), as.character(survey[x,158]), length(sum(survey[x,] == survey[y,]))))#
+#     }#
+# }#
+#
+# REAL WORK STARTS HERE#
+#
+colorhue <- hcl(240,35, 5:1*(100/6))#
+#
+##
+# Breaking years up in groups of 10, starting from 2013#
+year.breakpoints <- 2013 - (7:0) * 10#
+x <- sapply(survey$ClassYear, function(x) which(x < year.breakpoints[-1])[1])#
+x[is.na(x)] <- max(x, na.rm=TRUE)#
+x<- ordered(x, labels = paste(year.breakpoints[-length(year.breakpoints)], year.breakpoints[-1]-1, sep = "-"))#
+x[survey$ClassYear== 1800] <- NA#
+#
+survey$ClassDecade <- x#
+survey[survey$Gender == "","Gender"] <- NA #
+survey$Gender <- as.factor(as.character(survey$Gender))#
+#
+addmargins(with(survey, table(ClassDecade, Gender))) # Table of respondents by decade
+barchart(100*prop.table(with(survey, table(ClassDecade, Gender)),1), col=c("Magenta", "blue2"), #
+    xlab="Percent of Participants per Gender",#
+    panel=function(x,y,...) {#
+        fems <- 1:(length(x)/2)#
+        panel.barchart(x,y, ...)#
+        # panel.text(x[fems],y[fems], y)#
+        panel.text(x[fems]*0.7,y[fems], paste("F:",round(x[fems]),"%",sep=""))#
+        panel.text(100-(x[-fems]*0.5),y[-fems], paste("M:", round(x[-fems]),"%",sep=""))#
+        panel.text(0, y[fems], paste("n=",table(survey$ClassDecade),sep=""), pos=4)#
+    })
+?quartz
+?"ifelse"
+?png
+png("Graphs/GenderByDecade.png", family="Helvetica", width=700, height=700)#
+barchart(100*prop.table(with(survey, table(ClassDecade, Gender)),1), col=c("Magenta", "blue2"), #
+    xlab="Percent of Participants per Gender",#
+    panel=function(x,y,...) {#
+        fems <- 1:(length(x)/2)#
+        panel.barchart(x,y, ...)#
+        # panel.text(x[fems],y[fems], y)#
+        panel.text(x[fems]*0.7,y[fems], paste("F:",round(x[fems]),"%",sep=""))#
+        panel.text(100-(x[-fems]*0.5),y[-fems], paste("M:", round(x[-fems]),"%",sep=""))#
+        panel.text(0, y[fems], paste("n=",table(survey$ClassDecade),sep=""), pos=4)#
+    })#
+dev.off()
+png("Graphs/GenderByDecade.png", family="Helvetica", width=400, height=400)#
+barchart(100*prop.table(with(survey, table(ClassDecade, Gender)),1), col=c("Magenta", "blue2"), #
+    xlab="Percent of Participants per Gender",#
+    panel=function(x,y,...) {#
+        fems <- 1:(length(x)/2)#
+        panel.barchart(x,y, ...)#
+        # panel.text(x[fems],y[fems], y)#
+        panel.text(x[fems]*0.7,y[fems], paste("F:",round(x[fems]),"%",sep=""))#
+        panel.text(100-(x[-fems]*0.5),y[-fems], paste("M:", round(x[-fems]),"%",sep=""))#
+        panel.text(0, y[fems], paste("n=",table(survey$ClassDecade),sep=""), pos=4)#
+    })#
+dev.off()
+png("Graphs/GenderByDecade.png", family="Helvetica", width=800, height=800)#
+barchart(100*prop.table(with(survey, table(ClassDecade, Gender)),1), col=c("Magenta", "blue2"), #
+    xlab="Percent of Participants per Gender",#
+    cex=2,#
+    panel=function(x,y,...) {#
+        fems <- 1:(length(x)/2)#
+        panel.barchart(x,y, ...)#
+        # panel.text(x[fems],y[fems], y)#
+        panel.text(x[fems]*0.7,y[fems], paste("F:",round(x[fems]),"%",sep=""))#
+        panel.text(100-(x[-fems]*0.5),y[-fems], paste("M:", round(x[-fems]),"%",sep=""))#
+        panel.text(0, y[fems], paste("n=",table(survey$ClassDecade),sep=""), pos=4)#
+    })#
+dev.off()
+png("Graphs/GenderByDecade.png", family="Helvetica", width=800, height=800)#
+barchart(100*prop.table(with(survey, table(ClassDecade, Gender)),1), col=c("Magenta", "blue2"), #
+    xlab="Percent of Participants per Gender",#
+    cex=5,#
+    panel=function(x,y,...) {#
+        fems <- 1:(length(x)/2)#
+        panel.barchart(x,y, ...)#
+        # panel.text(x[fems],y[fems], y)#
+        panel.text(x[fems]*0.7,y[fems], paste("F:",round(x[fems]),"%",sep=""))#
+        panel.text(100-(x[-fems]*0.5),y[-fems], paste("M:", round(x[-fems]),"%",sep=""))#
+        panel.text(0, y[fems], paste("n=",table(survey$ClassDecade),sep=""), pos=4)#
+    })#
+dev.off()
+?png
+png("Graphs/GenderByDecade.png", family="Helvetica", width=800, height=800, pointsize = 24)#
+barchart(100*prop.table(with(survey, table(ClassDecade, Gender)),1), col=c("Magenta", "blue2"), #
+    xlab="Percent of Participants per Gender",#
+    panel=function(x,y,...) {#
+        fems <- 1:(length(x)/2)#
+        panel.barchart(x,y, ...)#
+        # panel.text(x[fems],y[fems], y)#
+        panel.text(x[fems]*0.7,y[fems], paste("F:",round(x[fems]),"%",sep=""))#
+        panel.text(100-(x[-fems]*0.5),y[-fems], paste("M:", round(x[-fems]),"%",sep=""))#
+        panel.text(0, y[fems], paste("n=",table(survey$ClassDecade),sep=""), pos=4)#
+    })#
+dev.off()
+png("Graphs/GenderByDecade.png", family="Helvetica", width=800, height=800, pointsize = 48)#
+barchart(100*prop.table(with(survey, table(ClassDecade, Gender)),1), col=c("Magenta", "blue2"), #
+    xlab="Percent of Participants per Gender",#
+    panel=function(x,y,...) {#
+        fems <- 1:(length(x)/2)#
+        panel.barchart(x,y, ...)#
+        # panel.text(x[fems],y[fems], y)#
+        panel.text(x[fems]*0.7,y[fems], paste("F:",round(x[fems]),"%",sep=""))#
+        panel.text(100-(x[-fems]*0.5),y[-fems], paste("M:", round(x[-fems]),"%",sep=""))#
+        panel.text(0, y[fems], paste("n=",table(survey$ClassDecade),sep=""), pos=4)#
+    })#
+dev.off()
+pdf("Graphs/GenderByDecade.pdf", family="Helvetica", width=6, height=6)#
+# png("Graphs/GenderByDecade.png", family="Helvetica", width=800, height=800, pointsize = 48)#
+barchart(100*prop.table(with(survey, table(ClassDecade, Gender)),1), col=c("Magenta", "blue2"), #
+    xlab="Percent of Participants per Gender",#
+    panel=function(x,y,...) {#
+        fems <- 1:(length(x)/2)#
+        panel.barchart(x,y, ...)#
+        # panel.text(x[fems],y[fems], y)#
+        panel.text(x[fems]*0.7,y[fems], paste("F:",round(x[fems]),"%",sep=""))#
+        panel.text(100-(x[-fems]*0.5),y[-fems], paste("M:", round(x[-fems]),"%",sep=""))#
+        panel.text(0, y[fems], paste("n=",table(survey$ClassDecade),sep=""), pos=4)#
+    })#
+dev.off()
+names(survey)
+grep("Gift", names(survey))
+names(survey)[grep("Gift", names(survey))]
+likelyGiftCols <- 118:123#
+likelyGiftNames <- c( "Direct Mail",#
+    "Contact From Classmate", "Personal Visit From HC Staff", "Email Solicitations",#
+    "Phone Call from Student", "Event Reception"#
+)#
+likelyGift <- reshape(survey[, likelyGiftCols], direction = "long", varying=list(1:5), times = likelyGiftNames)#
+names(likelyGift) <- c("Form", "Rating", "id")#
+#
+pdf("Graphs/LikelyToRespondWithGift.pdf", family="Helvetica", width=8, height=5)#
+with(likelyGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Solicitation Methods" ))#
+dev.off()#
+pdf("Graphs/LikelyToRespondWithGift2.pdf", family="Helvetica", width=8, height=5)#
+with(likelyGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Solicitation Methods", ylab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()#
+#
+reluctants <- apply(survey[,c(109,116)]==1, 1, any) # Those that did not contribute in past or current#
+likelyGift2 <- reshape(survey[which(reluctants), likelyGiftCols], direction = "long", varying=list(1:5), times = likelyGiftNames)#
+names(likelyGift2) <- c("Form", "Rating", "id")#
+likelyGift3 <- reshape(survey[-which(reluctants), likelyGiftCols], direction = "long", varying=list(1:5), times = likelyGiftNames)#
+names(likelyGift3) <- c("Form", "Rating", "id")#
+likelyGift2$Reluctant <- "Reluctant"#
+likelyGift3$Reluctant <- "Giver"#
+likelyGift4 <- merge(likelyGift2, likelyGift3, all = TRUE)#
+pdf("Graphs/LikelyToRespondWithGift3.pdf", family="Helvetica", width=8, height=5)#
+with(likelyGift4, barchart(aperm(prop.table(table(Rating, Form, Reluctant), c(2,3)), c(2,3,1)), ylab = "Solicitation Methods", xlab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()#
+pdf("Graphs/LikelyToRespondWithGift3Slide.pdf", family="Helvetica", width=6, height=4)#
+with(likelyGift4, barchart(aperm(prop.table(table(Rating, Form, Reluctant), c(2,3)), c(2,3,1)), ylab = "Solicitation Methods", xlab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()
+likelyGift <- reshape(survey[, likelyGiftCols], direction = "long", varying=list(1:6), times = likelyGiftNames)#
+names(likelyGift) <- c("Form", "Rating", "id")#
+#
+pdf("Graphs/LikelyToRespondWithGift.pdf", family="Helvetica", width=8, height=5)#
+with(likelyGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Solicitation Methods" ))#
+dev.off()#
+pdf("Graphs/LikelyToRespondWithGift2.pdf", family="Helvetica", width=8, height=5)#
+with(likelyGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Solicitation Methods", ylab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()#
+#
+reluctants <- apply(survey[,c(109,116)]==1, 1, any) # Those that did not contribute in past or current#
+likelyGift2 <- reshape(survey[which(reluctants), likelyGiftCols], direction = "long", varying=list(1:6), times = likelyGiftNames)#
+names(likelyGift2) <- c("Form", "Rating", "id")#
+likelyGift3 <- reshape(survey[-which(reluctants), likelyGiftCols], direction = "long", varying=list(1:6), times = likelyGiftNames)#
+names(likelyGift3) <- c("Form", "Rating", "id")#
+likelyGift2$Reluctant <- "Reluctant"#
+likelyGift3$Reluctant <- "Giver"#
+likelyGift4 <- merge(likelyGift2, likelyGift3, all = TRUE)#
+pdf("Graphs/LikelyToRespondWithGift3.pdf", family="Helvetica", width=8, height=5)#
+with(likelyGift4, barchart(aperm(prop.table(table(Rating, Form, Reluctant), c(2,3)), c(2,3,1)), ylab = "Solicitation Methods", xlab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()#
+pdf("Graphs/LikelyToRespondWithGift3Slide.pdf", family="Helvetica", width=6, height=4)#
+with(likelyGift4, barchart(aperm(prop.table(table(Rating, Form, Reluctant), c(2,3)), c(2,3,1)), ylab = "Solicitation Methods", xlab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()
+reluctants
+Preprocessing done by other script preproc.rb#
+library(lattice)#
+survey <- read.csv("SurveyResponsesProcessed.csv")#
+names(survey) <- scan(file="SurveyVariables.txt", what=character())#
+survey <- subset(survey, subset = CollectorID != 37383862)#
+#
+# Removing duplicates#
+remove <- c(629,  # k.johnson@ymail.com#
+    625, # piperaclark@gmail.com#
+    623, # johnshake@insightbb.com#
+    610, # hahn12@gmail.com#
+    616, # cassiem_15@hotmail.com#
+    614, # drworch@gmail.com#
+    613, # patty.d.smith@comcast.net#
+    622, # camlogreb21@att.net#
+    531, # sprinktu@yahoo.com#
+    532, # abbyterranova@gmail.com#
+    533, # jennifersbuhl@gmail.com#
+    534, # kerrid45@hotmail.com#
+    536, # jhammond@salemschools.com#
+    548, # richbryant6@gmail.com#
+    624, # lindsaygray@gmail.com#
+    592, # Mandy Schnell#
+    558, # jerryschnell@fuse.net, Jerry Schnell#
+    560, # alwaysici@yahoo.com#
+    562, # orrdealrco@yahoo.com#
+    570, # mardon4646@sbcglobal.net#
+    598, # vivian.gaddis@jefferson.kyschools.us#
+    573, # rjecking@sbcglobal.net, Ross J. King#
+    575, # rjecking@sbcglobal.net, Elizabeth King#
+    603, # mcfrye@embarqmail.com#
+    605, # mjohnston1312@gmail.com#
+    608, # sarahmorganhc@hotmail.com#
+    651, # janet.wylie@comcast.net#
+    604, # Shirley Weersing#
+    612, # Sharon Rose Tyahur#
+    621, # Todd Bowers #
+    626, # Daniel Graber#
+    634, # James H. Troyer#
+    601, # Martha Heinrich#
+    602, # Kris Harper Bowers#
+    606, # Richard Johnston#
+    607, # Megan Timberlake#
+    609, # Michael H. Chalk#
+    111, # eerner@yahoo.com#
+    98,   # Lydia Tobian#
+    266, # Ashley Nelson (McIntyre)#
+    292, # Catherine Bengson (Deuber) #
+    637, # Suzanne J. McFall#
+    267 #
+)#
+survey <- survey[-remove,]#
+# More rows to remove: People who haven't really answered anything:#
+toremove <- which(apply(survey[,c(31:37,38:44,46:50,51:53,104:108,118:128,130:147)], 1, function(x) all(is.na(x) | (x==""))))#
+survey <- survey[-toremove,]#
+# Check that the expected duplicates have been removed#
+# n <- nrow(survey)#
+# # n <- 100#
+# for(x in 1:n) {#
+#     for (y in (x+1):n) {#
+#         if (x != y && #
+#               (#
+#                   (survey[x,158] != "" && survey[x,158] == survey[y,158]) ||#
+#                   (survey[x,150] != "" && survey[x,150] == survey[y,150])#
+#               )#
+#           )#
+#             print(c(x,y, as.character(survey[x,150]), as.character(survey[y,150]), as.character(survey[x,158]), length(sum(survey[x,] == survey[y,]))))#
+#     }#
+# }#
+#
+# REAL WORK STARTS HERE#
+#
+colorhue <- hcl(240,35, 5:1*(100/6))#
+#
+##
+# Breaking years up in groups of 10, starting from 2013#
+year.breakpoints <- 2013 - (7:0) * 10#
+x <- sapply(survey$ClassYear, function(x) which(x < year.breakpoints[-1])[1])#
+x[is.na(x)] <- max(x, na.rm=TRUE)#
+x<- ordered(x, labels = paste(year.breakpoints[-length(year.breakpoints)], year.breakpoints[-1]-1, sep = "-"))#
+x[survey$ClassYear== 1800] <- NA#
+#
+survey$ClassDecade <- x#
+survey[survey$Gender == "","Gender"] <- NA #
+survey$Gender <- as.factor(as.character(survey$Gender))#
+#
+addmargins(with(survey, table(ClassDecade, Gender))) # Table of respondents by decade#
+# Twice as many women responding!!#
+#
+pdf("Graphs/GenderByDecade.pdf", family="Helvetica", width=6, height=6)#
+barchart(100*prop.table(with(survey, table(ClassDecade, Gender)),1), col=c("Magenta", "blue2"), #
+    xlab="Percent of Participants per Gender",#
+    panel=function(x,y,...) {#
+        fems <- 1:(length(x)/2)#
+        panel.barchart(x,y, ...)#
+        # panel.text(x[fems],y[fems], y)#
+        panel.text(x[fems]*0.7,y[fems], paste("F:",round(x[fems]),"%",sep=""))#
+        panel.text(100-(x[-fems]*0.5),y[-fems], paste("M:", round(x[-fems]),"%",sep=""))#
+        panel.text(0, y[fems], paste("n=",table(survey$ClassDecade),sep=""), pos=4)#
+    })#
+dev.off()#
+#
+pdf("Graphs/RespondentsByClassYear.pdf", family="Helvetica", width=6, height=4)#
+dotplot(table(survey$ClassDecade), type=c("h","p"),xlim=c(-1,250), scales=list(x=list(at=(0:8)*30)),#
+    ylab="Class Year",#
+    xlab="Number of Respondents",#
+ panel = function(x,y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(round(100*x/sum(x)), "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+#
+# yearCount <- table(survey$ClassYear)#
+# names(which(yearCount==max(yearCount)))   # Years with the most responses#
+#
+# Following columns have words that need to turn into 0/1#
+cols <- c(12:23, 26:30)#
+survey[,cols] <- sapply(survey[,cols], as.numeric)-1#
+#
+# Questions 12-25, organizations#
+##
+# Table of organizations that fell under "other" category, changed manually#
+var.orgs <- c(#
+    "Campus Activities Board", 15, # Student Government#
+    "common interest", 14, # Academic Clubs#
+    "Emerging leaders", 19, # professional or career-related activities#
+    "HC Young Republicans", 21, # Community Service#
+    "Interfraternity Council", 12, # Fraternity/Sorority#
+    "Judicial Board", 15, # student government#
+    "Kennings", 14, # academic club#
+    "Acquaintance Rape Education", 21, # community service#
+    "People for Peace", 21, # community service#
+    "Panhellenic Council", 12, # fraternity/sorority#
+    "Political Clubs", 21, #community service#
+    "Ran the weekend movies", 14, # academic club#
+    "Rec Committee", 15,# student government#
+    "Senior Class Commitee", 15, #student government#
+    "Senior Committee", 15, # student government#
+    "Shoebox", 14, # academic club#
+    "Varsity sports", 13, # intercollegiate athletics#
+    "SNEA", 15, # student government#
+    "Student Activities Budget Committee", 15, # student government#
+    "Student Programming Board", 15, # student government#
+    "Student radio", 22, # Tv/Newspaper#
+    "The literary magazine", 14, # academic club#
+    "Tutoring", 14 # academic club#
+)#
+dim(var.orgs) <- c(2,23)#
+for (i in 1:23) {#
+    item = var.orgs[1,i]#
+    colno = as.numeric(var.orgs[2,i])#
+    survey[grep(item, as.character(survey[,25])),colno] <- 1#
+}#
+#
+countmultiple <- function(data, columns, factorcolumn = NULL, add.totals=TRUE) {#
+    # Treats the data in the columns as 0/1s resulting from a multiple choice question.#
+    # Produces counts by adding up the occurences. Uses names(columns) as column names.#
+    # If factorcolumn is not NULL, it should be a column number for the data frame.#
+    # Used as a grouping variable. The counting will occur separately for each value of#
+    # this column.#
+    # If factorcolumn is not NULL, one row is created for each possible value of the factor.#
+    # Column totals will always be created in this case.#
+    # If add.totals is true, row totals will be appended, corresponding to the #
+    # total number of cases (i.e. not actually the sum of the values).#
+    if (is.null(factorcolumn)) {#
+        tmp <- apply(data[,columns], 2, sum)#
+        names(tmp) <- names(columns)#
+        if (add.totals) {tmp <- c(tmp, Total = nrow(data))}#
+    } else {#
+        tmp <- apply(data[,columns], 2, function(x) tapply(x, data[,factorcolumn], sum))#
+        colnames(tmp) <- names(columns)#
+        rowtotals <- tapply(data[,factorcolumn], data[,factorcolumn], length)#
+        tmp <- rbind(tmp, Total=apply(tmp, 2, sum))#
+        if (add.totals) {#
+            rowtotals <- c(rowtotals,  Total=sum(rowtotals))#
+            tmp <- cbind(tmp, Total=rowtotals)#
+        }#
+    }#
+    tmp#
+}#
+#
+orgnames <- 12:23#
+names(orgnames) <- c("Greek", "IC Athletics", "Academic Clubs", "Stud. Gov.",#
+    "IM/Recr. Clubs", "Music/Theater/Art", "Ethnic/Cultural",#
+     "Prof/Career Orgs", " Religious", "Community Service",#
+    "Campus Newspaper/TV/Yearbook")#
+orgs <- countmultiple(survey, orgnames, 11)  # 11 is the Gender variable#
+#
+orgsp <- round(100*orgs[3,-ncol(orgs)+(0:1)]/orgs[3,ncol(orgs)])#
+#
+pdf("Graphs/Organizations.pdf", family="Helvetica", width=6, height=4)#
+print(dotplot(sort(orgsp), type=c("h","p"),xlim=c(-1,87), scales=list(x=list(at=(0:8)*10)),#
+    ylab="Organizations and Activities",#
+    xlab="Percent of Respondents Involved",#
+ panel = function(x,y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(x, "%", sep=""), pos=4, offset=0.8)#
+}))#
+dev.off()#
+#
+# Need to turn these into dotplots or something#
+#
+# Questions 26-30, financial aid#
+finaid <- 26:29#
+names(finaid) <- c("Student Employment", "Federal Loans", "Scholarship from HC",#
+ "Other Scholarship")#
+#
+# Financial Aid, overall and by Gender#
+#
+fin <- countmultiple(survey, finaid, 11)#
+finp <-  apply(fin, 1, function(x) round(100*x[-length(x)]/x[length(x)]))#
+finp.re <- reshape(as.data.frame(finp), direction="long", varying=list(1:3),times=colnames(finp), ids=rownames(finp), idvar="Type")#
+pdf("Graphs/FinancialAid.pdf", family="Helvetica", width=7, height=5)#
+dotplot(Type~Female, data=finp.re, groups= time, #
+    xlim=c(-1,61), scales=list(x=list(at=(0:6)*10)),#
+    xlab="Percent of Respondents that received Financial Aid",#
+    ylab="Type of Aid received",#
+    panel=function(x,y,groups,...) {#
+    panel.dotplot(x[groups=="Total"],y[groups=="Total"], type=c("h","p"), ...)#
+    panel.text(x[groups=="Total"], y[groups=="Total"], paste(x[groups=="Total"], "%", sep=""), pos=4, offset=0.8)#
+#
+    panel.points(x[groups=="Female"], as.numeric(y[groups=="Female"])+.15, pch=19, col="Magenta")#
+    panel.text(x[groups=="Female"], as.numeric(y[groups=="Female"])+.3, paste("F:", x[groups=="Female"], "%", sep=""), col="Magenta")#
+    panel.points(x[groups=="Male"], as.numeric(y[groups=="Male"])+.15, pch=19, col="DarkBlue")#
+    panel.text(x[groups=="Male"], as.numeric(y[groups=="Male"])+.3, paste("M:", x[groups=="Male"], "%", sep=""), col="DarkBlue")#
+})#
+dev.off()#
+#
+# Financial Aid by decade#
+fin2 <- countmultiple(survey, finaid, 161)#
+fin2p <-  apply(fin2, 1, function(x) round(100*x[-length(x)]/x[length(x)]))#
+fin2p <- fin2p[,-ncol(fin2p)]#
+fin2p.re <- reshape(as.data.frame(fin2p), direction="long", varying=list(1:ncol(fin2p)),times=colnames(fin2p), ids=rownames(fin2p), idvar="Type")#
+names(fin2p.re) <- c("ClassYear", "Percent", "Type")#
+#
+pdf("Graphs/FinancialAidByDecade.pdf", family="Helvetica", width=7, height=5)#
+dotplot(ClassYear~Percent|Type, data=fin2p.re, type=c("h","p"), #
+    xlim=c(-1,105), scales=list(x=list(at=(0:9)*10)),#
+    xlab="Percent of Respondents that received Financial Aid",#
+ panel = function(x,y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(x, "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+#
+# Questions 31-37, how you like receiving info about HC#
+# survey[,31:37]  # TODO#
+#
+# table(survey[,32], survey$ClassDecade)#
+#
+cor(survey[,31:37], use="pairwise.complete.obs")#
+#
+likeinfonames <- c("Hanoverian", "HC Website", "Emails", "Social Media", #
+    "News Sources", "Direct Mail", "Annual Phone Call")#
+likeinfo <- reshape(survey[,31:37], direction="long", varying=list(1:7), times=likeinfonames)#
+names(likeinfo) <- c("Type", "Score", "Id")#
+#
+pdf("Graphs/LikeReceivingInfo.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(likeinfo, prop.table(table(Score, Type), 2)), horizontal=FALSE, groups=FALSE,#
+    ylab="Percent")#
+dev.off()#
+pdf("Graphs/LikeReceivingInfo2.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(likeinfo, 100*prop.table(table(Type, Score), 1)), groups=TRUE, col=colorhue, xlab="Percent",key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"))#
+dev.off()#
+#
+likeinfoavg <- round(sapply(31:37, function(i) tapply(survey[,i], survey$ClassDecade, mean, na.rm=TRUE)),1)#
+colnames(likeinfoavg) <- likeinfonames#
+#
+pdf("Graphs/LikeReceivingInfoByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(likeinfoavg, groups=FALSE, type="o", panel= function(x,y,...) {#
+    panel.abline(v=seq(1,5,0.5), col=gray(0.95), lwd=0.5)#
+    panel.dotplot(x,y, ...)#
+})#
+dev.off()#
+#
+# Questions 38-44, quality of the info received from HC#
+# survey[,38:44] # TODO#
+#
+qualinfo <- reshape(survey[,38:44], direction="long", varying=list(1:7), times=likeinfonames)#
+names(qualinfo) <- c("Type", "Score", "Id")#
+qualinfo <- subset(qualinfo, subset= !(Score=="" | Score=="do not receive"))#
+qualinfo[,"Score"] <- as.factor(as.numeric(qualinfo[,"Score"])-1)#
+#
+pdf("Graphs/QualityInfo.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(qualinfo, prop.table(table(Score, Type), 2)), horizontal=FALSE, groups=FALSE,#
+    ylab="Percent")#
+dev.off()#
+pdf("Graphs/QualityInfo2.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(qualinfo, 100*prop.table(table(Type, Score), 1)), groups=TRUE, col=colorhue, xlab="Percent",key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"))#
+dev.off()#
+#
+qualinfoavg <- round(sapply(38:44, function(i) tapply(survey[,i], survey$ClassDecade, function(x) mean(as.numeric(x)-1, na.rm=TRUE))),1)#
+colnames(qualinfoavg) <- likeinfonames#
+#
+pdf("Graphs/QualityInfoByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(qualinfoavg, groups=FALSE, type="o", panel= function(x,y,...) {#
+    panel.abline(v=seq(1,5,0.5), col=gray(0.95), lwd=0.5)#
+    panel.dotplot(x,y, ...)#
+})#
+dev.off()#
+# Question 45, free comments on Communication#
+# write.table(survey[survey[,45] !="",45], file="CommentsCommunication.txt", col.names=FALSE, quote=FALSE, row.names=FALSE)#
+#
+# Question 46-50, How much of Hanoverian read#
+#
+hanoverianreadnames <- c("News Briefs", " Feature Stories", "Capital Campaign Update", "Athletics", "ClassNotes/Obituaries")#
+hanoverianread <- reshape(survey[,46:50], direction="long", varying=list(1:5), times=hanoverianreadnames)#
+names(hanoverianread) <- c("Type", "Score", "Id")#
+hanoverianread <- subset(hanoverianread, subset= !(Score=="" | Score=="do not receive"))#
+#
+pdf("Graphs/ReadHanoverian.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(hanoverianread, prop.table(table(Score, Type), 2)), horizontal=FALSE, groups=FALSE,#
+    ylab="Percent")#
+dev.off()#
+pdf("Graphs/ReadHanoverian2.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(hanoverianread, 100*prop.table(table(Type, Score), 1)), groups=TRUE, col=colorhue, xlab="Percent",key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"))#
+dev.off()#
+#
+hanoverianreadavg <- round(sapply(46:50, function(i) tapply(survey[,i], survey$ClassDecade, function(x) mean(x, na.rm=TRUE))),1)#
+colnames(hanoverianreadavg) <- hanoverianreadnames#
+#
+pdf("Graphs/ReadHanoverianByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(hanoverianreadavg, groups=FALSE, type="o", panel= function(x,y,...) {#
+    panel.abline(v=seq(1,5,0.5), col=gray(0.95), lwd=0.5)#
+    panel.dotplot(x,y, ...)#
+})#
+dev.off()#
+#
+# Question 51-54, Satisfied Hanoverian#
+hanoveriansatisfiednames <- c("Story Content", "Design Layout", "Writing", "Length of Articles")#
+hanoveriansatisfied <- reshape(survey[,51:54], direction="long", varying=list(1:4), times=hanoveriansatisfiednames)#
+names(hanoveriansatisfied) <- c("Type", "Score", "Id")#
+hanoveriansatisfied <- subset(hanoveriansatisfied, subset= !(Score=="" | Score=="do not receive"))#
+#
+pdf("Graphs/SatisfiedHanoverian.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(hanoveriansatisfied, prop.table(table(Score, Type), 2)), horizontal=FALSE, groups=FALSE, ylab="Percent")#
+dev.off()#
+pdf("Graphs/SatisfiedHanoverian2.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(hanoveriansatisfied, 100*prop.table(table(Type, Score), 1)), groups=TRUE, col=colorhue, xlab="Percent",key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"))#
+dev.off()#
+#
+hanoveriansatisfiedavg <- round(sapply(51:54, function(i) tapply(survey[,i], survey$ClassDecade, function(x) mean(x, na.rm=TRUE))),1)#
+colnames(hanoveriansatisfiedavg) <- hanoveriansatisfiednames#
+#
+pdf("Graphs/SatisfiedHanoverianByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(hanoveriansatisfiedavg, groups=FALSE, type="o", panel= function(x,y,...) {#
+    panel.abline(v=seq(1,5,0.5), col=gray(0.95), lwd=0.5)#
+    panel.dotplot(x,y, ...)#
+})#
+dev.off()#
+#
+# Question 55-59, Much Like Hanoverian#
+#
+hanoverianlikenames <- c("Current Student Activities", "Faculty Research Profiles", "Alumni Profiles", "Athletics", "General Interest")#
+hanoverianlike <- reshape(survey[,55:59], direction="long", varying=list(1:5), times=hanoverianlikenames)#
+names(hanoverianlike) <- c("Type", "Score", "Id")#
+hanoverianlike <- subset(hanoverianlike, subset= !(Score=="" | Score=="do not receive"))#
+#
+pdf("Graphs/LikeHanoverian.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(hanoverianlike, prop.table(table(Score, Type), 2)), horizontal=FALSE, groups=FALSE, ylab="Percent")#
+dev.off()#
+pdf("Graphs/LikeHanoverian2.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(hanoverianlike, 100*prop.table(table(Type, Score), 1)), groups=TRUE, col=colorhue, xlab="Percent", key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"))#
+dev.off()#
+#
+hanoverianlikeavg <- round(sapply(55:59, function(i) tapply(survey[,i], survey$ClassDecade, function(x) mean(x, na.rm=TRUE))),1)#
+colnames(hanoverianlikeavg) <- hanoverianlikenames#
+#
+pdf("Graphs/LikeHanoverianByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(hanoverianlikeavg, groups=FALSE, type="o", panel= function(x,y,...) {#
+    panel.abline(v=seq(1,5,0.5), col=gray(0.95), lwd=0.5)#
+    panel.dotplot(x,y, ...)#
+})#
+dev.off()#
+#
+# Question 60, Interest in mobile Hanoverian#
+survey[as.character(survey[, 60]) == "",60] <- NA#
+survey[,60] <- ordered(survey[,60], levels = c("not at all", "not very interested", "neutral", "interested", "very interested"))#
+pdf("Graphs/MobileHanoverianByDecade.pdf", family="Helvetica", width=8, height=5)#
+barchart(prop.table(table(survey$ClassDecade, survey[,60]), 1), col=colorhue,#
+    xlab="Percent",#
+    key=list(text=list(levels(survey[,60])), rectangles=list(col=colorhue, columns=5), space="right"))#
+dev.off()#
+#
+# Question 61, Comments on Hanoverian#
+# write.table(survey[survey[,61] !="",61], file="CommentsHanoverian.txt", col.names=FALSE, quote=FALSE, row.names=FALSE)#
+#
+# Question 62, Email Frequency#
+x <- survey[survey[,62] != "",62]#
+t(t(table(ordered(x, levels = c("Not enough", "Would welcome more", "About right", "A little too much", "Too much", "I do not receive (please skip to page 4)")))))#
+#
+# Questions 63-66, how much read of each Hanover sections.#
+athanovermuchnames <- c("Feature Stories", "Photo Gallery", "Events", "Hanover News" )#
+athanovermuch <- reshape(survey[,63:66], direction="long", varying=list(1:4), times=athanovermuchnames)#
+names(athanovermuch) <- c("Type", "Score", "Id")#
+#
+pdf("Graphs/AtHanoverMuch.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(athanovermuch, prop.table(table(Score, Type), 2)), horizontal=FALSE, groups=FALSE,#
+    ylab="Percent")#
+dev.off()#
+pdf("Graphs/AtHanoverMuch2.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(athanovermuch, 100*prop.table(table(Type, Score), 1)), groups=TRUE, col=colorhue, xlab="Percent",key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"))#
+dev.off()#
+#
+athanovermuchavg <- round(sapply(63:66, function(i) tapply(survey[,i], survey$ClassDecade, function(x) mean(x, na.rm=TRUE))),1)#
+colnames(athanovermuchavg) <- athanovermuchnames#
+#
+pdf("Graphs/AtHanoverMuchByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(athanovermuchavg, groups=FALSE, type="o", panel= function(x,y,...) {#
+    panel.abline(v=seq(1,5,0.5), col=gray(0.95), lwd=0.5)#
+    panel.dotplot(x,y, ...)#
+})#
+dev.off()#
+#
+# Questions 67-70, how much read of each Hanover sections.#
+athanoversatisfiednames <- c("Story Content", "Hanover Design", "Ease of Navigation", "Photo Galleries" )#
+athanoversatisfied <- reshape(survey[,67:70], direction="long", varying=list(1:4), times=athanoversatisfiednames)#
+names(athanoversatisfied) <- c("Type", "Score", "Id")#
+#
+pdf("Graphs/AtHanoverSatisfied.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(athanoversatisfied, prop.table(table(Score, Type), 2)), horizontal=FALSE, groups=FALSE, ylab="Percent")#
+dev.off()#
+pdf("Graphs/AtHanoverSatisfied2.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(athanoversatisfied, 100*prop.table(table(Type, Score), 1)), groups=TRUE, col=colorhue, xlab="Percent",key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"))#
+dev.off()#
+#
+athanoversatisfiedavg <- round(sapply(67:70, function(i) tapply(survey[,i], survey$ClassDecade, function(x) mean(x, na.rm=TRUE))),1)#
+colnames(athanoversatisfiedavg) <- athanoversatisfiednames#
+#
+pdf("Graphs/AtHanoverSatisfiedByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(athanoversatisfiedavg, groups=FALSE, type="o", panel= function(x,y,...) {#
+    panel.abline(v=seq(1,5,0.5), col=gray(0.95), lwd=0.5)#
+    panel.dotplot(x,y, ...)#
+})#
+dev.off()#
+#
+prop.table(table(apply(survey[,67:70], 1, function(x) length(unique(x)))))#
+#
+# Question 71, comments about @hanover#
+# write.table(survey[survey[,71] !="",71], file="CommentsAtHanover.txt", col.names=FALSE, quote=FALSE, row.names=FALSE)#
+# Question 72, Engagement level with HC#
+survey[,72] <- ordered(survey[,72], levels = c("", "Never engaged", "Rarely engaged", "Occasionally engaged", "Regularly engaged", "Very engaged"))#
+levels(survey[,72])[1] = "No answer"#
+pdf("Graphs/EngagementLevel.pdf", family="Helvetica", width=6, height=4)#
+dotplot(table(survey$CurrentRelationshipWithHC), type=c("h","p"),xlim=c(-1,320), scales=list(x=list(at=(0:8)*40)),#
+    ylab="Level of Alumni Engagement",#
+    xlab="Number of Respondents",#
+ panel = function(x,y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(round(100*x/sum(x)), "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+#
+tbl <- table(survey$Gender, survey$CurrentRelationshipWithHC)#
+full.tbl <- round(100 * prop.table(rbind(tbl, Total = table(survey$CurrentRelationshipWithHC)), 1), 1)#
+full.tbl <- t(full.tbl)#
+#
+colorhue2 <- hcl(240,35, 6:1*(100/7))#
+pdf("Graphs/EngagementByGender.pdf", family="Helvetica", width=8, height=5)#
+barchart(t(full.tbl), groups=TRUE, col=colorhue2, xlab="Level of Alumni Engagement",key=list(text=list(rownames(full.tbl)), rectangles=list(col=colorhue2, columns=6), space="right"))#
+dev.off()#
+#
+pdf("Graphs/EngagementByDecade.pdf", family="Helvetica", width=8, height=5)#
+barchart(prop.table(table(survey$ClassDecade, survey$CurrentRelationshipWithHC), 1), groups=TRUE, col=colorhue2, xlab="Level of Alumni Engagement",key=list(text=list(rownames(full.tbl)), rectangles=list(col=colorhue2, columns=6), space="right"))#
+dev.off()#
+#
+# Questions 73:80, what influences your opinion of HC#
+factorsnames <- c("Value/Respect of Degree", "History/Tradition", "Accomplishments of Alumni", "Accomplishments of Current Students", "Accomplishments of Faculty", "Faculty/Student Relationships", "Success of Athletic Teams", "National Rankings")#
+influencesopinion <- reshape(survey[,73:80], direction="long", varying = list(1:8), times = factorsnames)#
+names(influencesopinion) <- c("Type", "Score", "Id")#
+#
+pdf("Graphs/InfluencesOpinion.pdf", family="Helvetica", width=10, height=5)#
+barchart(with(influencesopinion, prop.table(table(Score, Type), 2)), horizontal=FALSE, groups=FALSE, ylab="Percent")#
+dev.off()#
+pdf("Graphs/InfluencesOpinion2.pdf", family="Helvetica", width=8, height=5)#
+barchart(with(influencesopinion, 100*prop.table(table(Type, Score), 1)), groups=TRUE, col=colorhue, xlab="Percent",key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"))#
+dev.off()#
+#
+influencesopinionavg <- round(sapply(73:80, function(i) tapply(survey[,i], survey$ClassDecade, mean, na.rm=TRUE)),1)#
+colnames(influencesopinionavg) <- factorsnames#
+#
+pdf("Graphs/InfluencesOpinionByDecade.pdf", family="Helvetica", width=12, height=5)#
+dotplot(influencesopinionavg, groups=FALSE, type="o", panel= function(x,y,...) {#
+    panel.abline(v=seq(1,5,0.5), col=gray(0.95), lwd=0.5)#
+    panel.dotplot(x,y, ...)#
+})#
+dev.off()#
+influenceopiniontotals <- tapply(influencesopinion$Score, influencesopinion$Type, mean, na.rm=TRUE)#
+pdf("Graphs/InfluencesOpinion3.pdf", family="Helvetica", width=8, height=5)#
+dotplot(sort(influenceopiniontotals), xlim=c(-0.2,5.2), type=c("h", "p"), xlab="Rating")#
+dev.off()#
+#
+# Question 82, Opinion based on Experience as Student#
+# write.table(survey[survey[,82] !="",82], file="ExperienceAsStudent.txt", col.names=FALSE, quote=FALSE, row.names=FALSE)#
+#
+# Question 84, Opinion based on Experience as Alumn#
+# write.table(survey[survey[,84] !="",84], file="ExperienceAsAlumn.txt", col.names=FALSE, quote=FALSE, row.names=FALSE)#
+#
+# Questions 81, 83, Rating Experience as Student/Alumn#
+#
+survey[,81] <- ordered(survey[,81], levels = c("", "very poor" , "poor", "neutral", "good", "excellent"))#
+levels(survey[,81])[1] <- "No answer"#
+survey[,83] <- ordered(survey[,83], levels = c("", "very poor" , "poor", "neutral", "good", "excellent"))#
+levels(survey[,83])[1] <- "No answer"#
+experiencestudent <- table(survey[,81])#
+experiencealumn <- table(survey[,83])#
+experience <- rbind(Student = experiencestudent, Alumn = experiencealumn)#
+experiencenames <- colnames(experience)#
+pdf("Graphs/Experience.pdf", family="Helvetica", width=8, height=5)#
+barchart(prop.table(experience, 1), col=colorhue2, xlab="Percent",key=list(text=list(experiencenames), rectangles=list(col=colorhue2, columns=5), space="right"))#
+dev.off()#
+#
+# reshape()#
+temp <- survey[,c("ClassDecade", "OpinionHCfromExpAsStudent", "OpinionHCfromExpAsAlumn")]#
+experience <- reshape(temp, direction = "long", varying = list(2:3), times = c("Student", "Alumn"))#
+colnames(experience) <- c("Decade", "As", "Rating", "id")#
+# with(experience, table(Rating, As, Decade))#
+pdf("Graphs/ExperienceByDecade.pdf", family="Helvetica", width=10, height=5)#
+barchart(with(experience, prop.table(table(Decade, As, Rating), c(1,2))), col=colorhue2, xlab="Rating",key=list(text=list(experiencenames), rectangles=list(col=colorhue2, columns=5), space="right"))#
+dev.off()#
+#
+temp <- survey[,c("Gender", "OpinionHCfromExpAsStudent", "OpinionHCfromExpAsAlumn")]#
+experience <- reshape(temp, direction = "long", varying = list(2:3), times = c("Student", "Alumn"))#
+colnames(experience) <- c("Gender", "As", "Rating", "id")#
+# with(experience, table(Rating, As, Decade))#
+pdf("Graphs/ExperienceByGender.pdf", family="Helvetica", width=10, height=5)#
+barchart(with(experience, prop.table(table(Gender, As, Rating), c(1,2))), col=colorhue2, xlab="Rating",key=list(text=list(experiencenames), rectangles=list(col=colorhue2, columns=5), space="right"))#
+dev.off()#
+#
+# Questions 85-94 Barriers to participation as Alumns#
+cols <- c(85:94)#
+survey[,cols] <- sapply(survey[,cols], as.numeric)-1#
+#
+typesnames <- 85:94#
+names(typesnames) <- c(#
+    "No Time/Other Commitments", "Value", "Distance", "Don't know anyone", #
+    "Don't know how to get involved", "Don't Know when Events happen",#
+    "Type of Events Don't Appeal to me", "Poor current perception of HC",#
+    "Never been asked", "Poor Communication of Activities"#
+)#
+barriers <- countmultiple(survey, typesnames)#
+barriers.prop <- round(100 * barriers[-length(barriers)]/barriers[length(barriers)], 1)#
+pdf("Graphs/BarriersToParticipation.pdf", family="Helvetica", width=8, height=5)#
+dotplot(sort(barriers.prop), type = c("h", "p"), xlab = "Percent Considering this Barrier", ylab = "Barriers to Participation in Alumn Events", xlim=c(-0.1,81), #
+# scales=list(x=list(at=(0:8)*30), #
+panel = function(x, y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(x, "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+#
+barriersDecade <- countmultiple(survey, typesnames, 161)#
+barriersDecade.prop <- round(100*apply(barriersDecade, 1, function(x) x[-length(x)]/x[length(x)]), 1)[,-ncol(barriersDecade)]#
+barriersDecade.prop <- barriersDecade.prop[order(barriers[-11]),][-1, ] # Removing the smallest percentage#
+#
+pdf("Graphs/BarriersToParticipationByDecade.pdf", family="Helvetica", width=10, height=8)#
+dotplot(t(barriersDecade.prop), groups=FALSE, type = c("o"), xlab = "Percent Considering this Barrier", ylab = "Barriers to Participation in Alumn Events", xlim=c(-0.1,81), #
+# scales=list(x=list(at=(0:8)*30), #
+panel = function(x, y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(x, "%", sep=""), pos=4, offset=0.8)#
+}, layout = c(3, 3))#
+dev.off()#
+#
+# The following code shows that the answers are similar across Genders#
+# barriersGender <- countmultiple(survey, typesnames, 11)#
+# barriersGender.prop <- round(100*apply(barriersGender, 1, function(x) x[-length(x)]/x[length(x)]), 1)[,-ncol(barriersGender)]#
+# barriersGender.prop#
+# Columns 95:101, how they promote HC#
+typesnames <- 95:100  # 101 is the "other" category#
+survey[,typesnames] <- sapply(survey[,typesnames], as.numeric)-1#
+names(typesnames) <- c(#
+    "Word Of Mouth", "Share Through Social Media", "Mentor Students",#
+    "Host Student Interns at Workplace", "Refer Prospective Students",#
+    "Display HC Merchandise"#
+)#
+promote <- countmultiple(survey, typesnames)#
+promote.prop <- round(100 * promote[-length(promote)]/promote[length(promote)], 1)#
+#
+pdf("Graphs/PromoteHC.pdf", family="Helvetica", width=8, height=5)#
+dotplot(sort(promote.prop), type = c("h", "p"), xlab = "Percent of Alumns", ylab = "Ways of Promoting HC", xlim=c(-0.1,95), #
+# scales=list(x=list(at=(0:8)*30), #
+panel = function(x, y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(x, "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+promoteDecade <- countmultiple(survey, typesnames, 161)#
+promoteDecade.prop <- round(100*apply(promoteDecade, 1, function(x) x[-length(x)]/x[length(x)]), 1)[,-ncol(promoteDecade)]#
+promoteDecade.prop <- promoteDecade.prop[order(promote[-length(promote)]),][-1,]#
+pdf("Graphs/PromoteHCByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(t(promoteDecade.prop), groups=FALSE, type = c("o"), xlab = "Percent Promoting", ylab = "Ways Alumns Promote HC", xlim=c(-0.1,111), #
+# scales=list(x=list(at=(0:8)*30), #
+panel = function(x, y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(x, "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+#
+# promoteGender <- countmultiple(survey, typesnames, 11)#
+# promoteGender.prop <- round(100*apply(promoteGender, 1, function(x) x[-length(x)]/x[length(x)]), 1)[,-ncol(promoteGender)]#
+# promoteGender.prop#
+# #
+#
+# Question 102, Comments on Relation with HC#
+# write.table(survey[survey[,102] !="",102], file="RelationWithHC.txt", col.names=FALSE, quote=FALSE, row.names=FALSE)#
+# Question 103, Ranking of HC as a Charitable priority#
+#
+pdf("Graphs/CharitablePriority.pdf", family="Helvetica", width=8, height=5)#
+barchart(table(survey$RankCharitablePriorityHC), xlab = "Rank HC as a Charitable Priority", panel = function(x, y, ...) {#
+    panel.barchart(x, y, ...)#
+    panel.text(x, y, paste(round(100*x/nrow(survey), 1), "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+pdf("Graphs/CharitablePriorityByDecade.pdf", family="Helvetica", width=8, height=5)#
+barchart(t(prop.table(table(survey$RankCharitablePriorityHC, survey$ClassDecade), 2)),col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"), xlab = "Rank HC as a Charitable Priority", ylab = "Decade" )#
+dev.off()#
+pdf("Graphs/CharitablePriorityByDecadeSlide.pdf", family="Helvetica", width=5, height=4)#
+barchart(t(prop.table(table(survey$RankCharitablePriorityHC, survey$ClassDecade), 2)),col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"), xlab = "Rank HC as a Charitable Priority", ylab = "Decade" )#
+dev.off()#
+pdf("Graphs/CharitablePriorityByGender.pdf", family="Helvetica", width=8, height=5)#
+barchart(t(prop.table(table(survey$RankCharitablePriorityHC, survey$Gender), 2)),col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"), xlab = "Rank HC as a Charitable Priority", ylab = "Gender" )#
+dev.off()#
+pdf("Graphs/CharitablePriorityByRelationship.pdf", family="Helvetica", width=8, height=5)#
+barchart(t(prop.table(table(survey$RankCharitablePriorityHC, survey$CurrentRelationshipWithHC), 2))[-1,], col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"), xlab = "Rank HC as a Charitable Priority", ylab = "Engagement Level" )#
+dev.off()#
+pdf("Graphs/CharitablePriorityByRelationshipSlide.pdf", family="Helvetica", width=6, height=4)#
+barchart(t(prop.table(table(survey$RankCharitablePriorityHC, survey$CurrentRelationshipWithHC), 2))[-1,], col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right"), xlab = "Rank HC as a Charitable Priority", ylab = "Engagement Level" )#
+dev.off()#
+#
+# Questions 104:109, Past Year Giving#
+# Question 110: Why not giving#
+typesnames <- 104:109 #
+survey[,typesnames] <- sapply(survey[,typesnames], as.numeric)-1#
+names(typesnames) <- c(#
+    "License Plate", "Hanover Fund", "Restricted Gift",#
+    "Pledge", "Matching Gift", "No contribution"#
+    )#
+pastGiving <- countmultiple(survey, typesnames)#
+pastGiving.prop <- round(100 * pastGiving[-length(pastGiving)]/pastGiving[length(pastGiving)], 1)#
+pdf("Graphs/PastGiving.pdf", family="Helvetica", width=8, height=5)#
+dotplot(sort(pastGiving.prop), type = c("h", "p"), xlab = "Percent of Alumns", ylab = "Past Giving", xlim=c(-0.1,60), #
+panel = function(x, y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(x, "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+#
+pastGivingByDecade <- countmultiple(survey, typesnames, 161)#
+pastGivingByDecade.prop <- round(100*apply(pastGivingByDecade, 1, function(x) x[-length(x)]/x[length(x)]), 1)[,-ncol(pastGivingByDecade)]#
+pastGivingByDecade.prop <- pastGivingByDecade.prop[order(pastGiving[-length(pastGiving)]),]#
+pdf("Graphs/PastGivingByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(t(pastGivingByDecade.prop), groups=FALSE, type = c("o"), xlab = "Past Giving", ylab = "", xlim=c(-0.1,81), #
+# scales=list(x=list(at=(0:8)*30), #
+panel = function(x, y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(x, "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+pdf("Graphs/PastGivingByDecadeSlide.pdf", family="Helvetica", width=7, height=5)#
+dotplot(t(pastGivingByDecade.prop), groups=FALSE, type = c("o"), xlab = "Past Giving", ylab = "", xlim=c(-0.1,81), #
+# scales=list(x=list(at=(0:8)*30), #
+panel = function(x, y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(x, "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+#
+# pastGivingByGender <- countmultiple(survey, typesnames, 11)#
+# pastGivingByGender.prop <- round(100*apply(pastGivingByGender, 1, function(x) x[-length(x)]/x[length(x)]), 1)[,-ncol(pastGivingByGender)]#
+# pastGivingByGender.prop <- pastGivingByGender.prop[order(pastGiving[-length(pastGiving)]),]#
+# pastGivingByGender.prop#
+#
+# Not much difference across Genders#
+# Questions 111:116, Current Year Giving#
+# Question 117: Why not giving#
+typesnames <- 111:116#
+survey[,typesnames] <- sapply(survey[,typesnames], as.numeric)-1#
+names(typesnames) <- c(#
+    "License Plate", "Hanover Fund", "Restricted Gift",#
+    "Pledge", "Matching Gift", "No contribution"#
+    )#
+currentGiving <- countmultiple(survey, typesnames)#
+currentGiving.prop <- round(100 * currentGiving[-length(currentGiving)]/currentGiving[length(currentGiving)], 1)#
+pdf("Graphs/CurrentGiving.pdf", family="Helvetica", width=8, height=5)#
+dotplot(sort(currentGiving.prop), type = c("h", "p"), xlab = "Percent of Alumns", ylab = "Current Giving", xlim=c(-0.1,60), #
+panel = function(x, y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(x, "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+#
+currentGivingByDecade <- countmultiple(survey, typesnames, 161)#
+currentGivingByDecade.prop <- round(100*apply(currentGivingByDecade, 1, function(x) x[-length(x)]/x[length(x)]), 1)[,-ncol(currentGivingByDecade)]#
+currentGivingByDecade.prop <- currentGivingByDecade.prop[order(currentGiving[-length(currentGiving)]),]#
+pdf("Graphs/CurrentGivingByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(t(currentGivingByDecade.prop), groups=FALSE, type = c("o"), xlab = "Current Giving", ylab = "", xlim=c(-0.1,81), #
+# scales=list(x=list(at=(0:8)*30), #
+panel = function(x, y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(x, "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()#
+#
+# currentGivingByGender <- countmultiple(survey, typesnames, 11)#
+# currentGivingByGender.prop <- round(100*apply(currentGivingByGender, 1, function(x) x[-length(x)]/x[length(x)]), 1)[,-ncol(currentGivingByGender)]#
+# currentGivingByGender.prop <- currentGivingByGender.prop[order(currentGiving[-length(currentGiving)]),]#
+# currentGivingByGender.prop#
+#
+# Not much difference across Genders#
+# allGiving <- rbind(Current = currentGiving, Past = pastGiving)#
+# allGiving.prop <- apply(allGiving, 1, function(x) x[-length(x)]/x[length(x)])#
+# dotplot(allGiving.prop, groups=TRUE)#
+# Not much difference#
+pastGivingByDecade.prop <- t(round(100*apply(pastGivingByDecade, 1, function(x) x[-length(x)]/x[length(x)]), 1)[,-ncol(pastGivingByDecade)])[-7,]#
+pastGivingByDecade.prop <- data.frame(pastGivingByDecade.prop, Decade = rownames(pastGivingByDecade.prop), Year = "Past")#
+currentGivingByDecade.prop <- t(round(100*apply(currentGivingByDecade, 1, function(x) x[-length(x)]/x[length(x)]), 1)[,-ncol(currentGivingByDecade)])[-7,]#
+currentGivingByDecade.prop <- data.frame(currentGivingByDecade.prop, Decade = rownames(currentGivingByDecade.prop), Year = "Current")#
+allGivingByDecade <- merge(currentGivingByDecade.prop, pastGivingByDecade.prop, all=TRUE)#
+#
+allGivingByDecade.df <- reshape(allGivingByDecade, direction = "long", varying = list(1:6), times = names(typesnames))#
+names(allGivingByDecade.df) <- c("Decade", "Year", "Type", "Percent", "id")#
+#
+pdf("Graphs/AllGivingByDecade.pdf", family="Helvetica", width=8, height=6)#
+dotplot(Decade~Percent|Type, groups = Year, pch = 19, data=allGivingByDecade.df, auto.key=TRUE, panel = function(x,y, ...) {#
+    panel.abline(v=seq(10, 80, 10), col=gray(0.95), lwd = 0.5)#
+    panel.dotplot(x,y, ...)#
+})#
+dev.off()#
+pdf("Graphs/AllGivingByDecadeSlide.pdf", family="Helvetica", width=6, height=4)#
+dotplot(Decade~Percent|Type, groups = Year, pch = 19, data=allGivingByDecade.df, auto.key=TRUE, panel = function(x,y, ...) {#
+    panel.abline(v=seq(10, 80, 10), col=gray(0.95), lwd = 0.5)#
+    panel.dotplot(x,y, ...)#
+})#
+dev.off()#
+#
+# Questions 118:123, likely to respond with a gift#
+# cor(survey[,118:123], use="pairwise.complete.obs")#
+likelyGiftCols <- 118:123#
+likelyGiftNames <- c( "Direct Mail",#
+    "Contact From Classmate", "Personal Visit From HC Staff", "Email Solicitations",#
+    "Phone Call from Student", "Event Reception"#
+)#
+likelyGift <- reshape(survey[, likelyGiftCols], direction = "long", varying=list(1:6), times = likelyGiftNames)#
+names(likelyGift) <- c("Form", "Rating", "id")#
+#
+pdf("Graphs/LikelyToRespondWithGift.pdf", family="Helvetica", width=8, height=5)#
+with(likelyGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Solicitation Methods" ))#
+dev.off()#
+pdf("Graphs/LikelyToRespondWithGift2.pdf", family="Helvetica", width=8, height=5)#
+with(likelyGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Solicitation Methods", ylab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()#
+#
+reluctants <- apply(survey[,c(109,116)]==1, 1, any) # Those that did not contribute in past or current#
+likelyGift2 <- reshape(survey[which(reluctants), likelyGiftCols], direction = "long", varying=list(1:6), times = likelyGiftNames)#
+names(likelyGift2) <- c("Form", "Rating", "id")#
+likelyGift3 <- reshape(survey[-which(reluctants), likelyGiftCols], direction = "long", varying=list(1:6), times = likelyGiftNames)#
+names(likelyGift3) <- c("Form", "Rating", "id")#
+likelyGift2$Reluctant <- "Reluctant"#
+likelyGift3$Reluctant <- "Giver"#
+likelyGift4 <- merge(likelyGift2, likelyGift3, all = TRUE)#
+pdf("Graphs/LikelyToRespondWithGift3.pdf", family="Helvetica", width=8, height=5)#
+with(likelyGift4, barchart(aperm(prop.table(table(Rating, Form, Reluctant), c(2,3)), c(2,3,1)), ylab = "Solicitation Methods", xlab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()#
+pdf("Graphs/LikelyToRespondWithGift3Slide.pdf", family="Helvetica", width=6, height=4)#
+with(likelyGift4, barchart(aperm(prop.table(table(Rating, Form, Reluctant), c(2,3)), c(2,3,1)), ylab = "Solicitation Methods", xlab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()#
+#
+# The following shows that there is not much difference within different decades#
+##
+# likelyGiftDecade <- reshape(survey[, c(likelyGiftCols, 161)], direction = "long", varying=list(1:5), times = likelyGiftNames)#
+# names(likelyGiftDecade) <- c("Decade", "Form", "Rating", "id")#
+# likelyGiftDecade.prop <- with(likelyGiftDecade, prop.table(table(Form, Decade, Rating), c(1,2)))#
+# barchart(likelyGiftDecade.prop)#
+# barchart(aperm(likelyGiftDecade.prop, c(2,1,3)))#
+#
+# Questions 124:128, What likely to support with gift#
+# Question 129: Other TODO: Print#
+# write.table(survey[survey[,129] !="",129], file="OtherGiftSupport.txt", col.names=FALSE, quote=FALSE, row.names=FALSE)#
+whatGiftCols <- 124:128#
+whatGiftNames <- c(#
+    "Academic Programs", "Social Experiences", "Outdoor Athletic Facilities",#
+    "Student Scholarships", "Building the Hanover Fund"#
+)#
+whatGift <- reshape(survey[, whatGiftCols], direction = "long", varying=list(1:5), times = whatGiftNames)#
+names(whatGift) <- c("Form", "Rating", "id")#
+pdf("Graphs/WhatGift.pdf", family="Helvetica", width=8, height=5)#
+with(whatGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Funding Directions" ))#
+dev.off()#
+pdf("Graphs/WhatGift2.pdf", family="Helvetica", width=8, height=5)#
+with(whatGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Solicitation Methods", ylab = "Rating", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()#
+whatGiftDecade <- reshape(survey[, c(whatGiftCols, 161)], direction = "long", varying=list(1:5), times = whatGiftNames)#
+names(whatGiftDecade) <- c("Decade", "Form", "Rating", "id")#
+whatGiftDecade.prop <- with(whatGiftDecade, prop.table(table(Form, Decade, Rating), c(1,2)))#
+# barchart(whatGiftDecade.prop)#
+# barchart(aperm(whatGiftDecade.prop, c(2,1,3)))#
+whatGiftMeans <- with(whatGiftDecade, aggregate(Rating, list(Decade, Form), mean, na.rm=TRUE))#
+names(whatGiftMeans) <- c("Decade", "Form", "Rating")#
+pdf("Graphs/WhatGiftByDecade.pdf", family="Helvetica", width=8, height=5)#
+dotplot(Decade ~ Rating|Form, data = whatGiftMeans, type = "o")#
+dev.off()#
+pdf("Graphs/WhatGiftByDecadeSlide.pdf", family="Helvetica", width=8, height=5)#
+dotplot(Decade ~ Rating|Form, data = whatGiftMeans, type = "o")#
+dev.off()#
+#
+whatGiftGender <- reshape(survey[, c(whatGiftCols, 11)], direction = "long", varying=list(1:5), times = whatGiftNames)#
+names(whatGiftGender) <- c("Gender", "Form", "Rating", "id")#
+whatGiftGender.prop <- with(whatGiftGender, prop.table(table(Form, Gender, Rating), c(1,2)))#
+# barchart(whatGiftDecade.prop)#
+# barchart(aperm(whatGiftDecade.prop, c(2,1,3)))#
+whatGiftGenderMeans <- with(whatGiftGender, aggregate(Rating, list(Gender, Form), mean, na.rm=TRUE))#
+names(whatGiftGenderMeans) <- c("Gender", "Form", "Rating")#
+pdf("Graphs/WhatGiftByGender.pdf", family="Helvetica", width=8, height=5)#
+dotplot(Form ~ Rating, groups=Gender, data = whatGiftGenderMeans, pch=19, col=c("Magenta", "Blue"), key =list(text = list(c("Female", "Male")), points = list(col = c("Magenta", "Blue"), columns=2, pch=19), space="right"))#
+dev.off()#
+# Questions 130:138 Influences Whether Gift#
+survey[,130:138] <- apply(survey[,130:138], 2, function(x) as.numeric(as.character(x)))#
+influenceWhetherGiftCols <- 130:138#
+influenceWhetherGiftNames <- c(#
+    "Peer Giving Behavior", "Gratitude / Donor-Recognition Societies",#
+    "Your Amount of Student Debt", "Employment Status",#
+    "Tax Benefits", "Current Opinion of HC", "Quality of my Student Experience",#
+    "Compelling Stories of Student Achievements", "Compelling Stories of Alumni Achievements"#
+)#
+influenceWhetherGift <- reshape(survey[, influenceWhetherGiftCols], direction = "long", varying=list(1:9), times = influenceWhetherGiftNames)#
+names(influenceWhetherGift) <- c("Form", "Rating", "id")#
+pdf("Graphs/InfluenceWhetherGift.pdf", family="Helvetica", width=10, height=8)#
+with(influenceWhetherGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Funding Directions" ))#
+dev.off()#
+pdf("Graphs/InfluenceWhetherGift2.pdf", family="Helvetica", width=8, height=5)#
+with(influenceWhetherGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Rating", ylab = "Factors", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()#
+#
+influenceWhetherGiftDecade <- reshape(survey[, c(influenceWhetherGiftCols, 161)], direction = "long", varying=list(1:9), times = influenceWhetherGiftNames)#
+names(influenceWhetherGiftDecade) <- c("Decade", "Form", "Rating", "id")#
+influenceWhetherGiftDecade.prop <- with(influenceWhetherGiftDecade, prop.table(table(Form, Decade, Rating), c(1,2)))#
+# barchart(influenceWhetherGiftDecade.prop)#
+# barchart(aperm(influenceWhetherGiftDecade.prop, c(2,1,3)))#
+influenceWhetherGiftMeans <- with(influenceWhetherGiftDecade, aggregate(Rating, list(Decade, Form), mean, na.rm=TRUE))#
+names(influenceWhetherGiftMeans) <- c("Decade", "Form", "Rating")#
+pdf("Graphs/InfluenceWhetherGiftByDecade.pdf", family="Helvetica", width=10, height=10)#
+dotplot(Decade ~ Rating|Form, data = influenceWhetherGiftMeans, type = "o")#
+dev.off()#
+pdf("Graphs/InfluenceWhetherGiftByDecadeSlide.pdf", family="Helvetica", width=9, height=7)#
+dotplot(Decade ~ Rating|Form, data = influenceWhetherGiftMeans, type = "o")#
+dev.off()#
+#
+# influenceWhetherGiftDecade2 <- reshape(survey[-which(reluctants), c(influenceWhetherGiftCols, 161)], direction = "long", varying=list(1:9), times = influenceWhetherGiftNames)#
+# names(influenceWhetherGiftDecade2) <- c("Decade", "Form", "Rating", "id")#
+# influenceWhetherGiftDecade2.prop <- with(influenceWhetherGiftDecade2, prop.table(table(Form, Decade, Rating), c(1,2)))#
+# # barchart(influenceWhetherGiftDecade.prop)#
+# # barchart(aperm(influenceWhetherGiftDecade.prop, c(2,1,3)))#
+# influenceWhetherGiftMeans2 <- with(influenceWhetherGiftDecade2, aggregate(Rating, list(Decade, Form), mean, na.rm=TRUE))#
+# names(influenceWhetherGiftMeans2) <- c("Decade", "Form", "Rating")#
+# dotplot(Decade ~ Rating|Form, data = influenceWhetherGiftMeans2, type = "o")#
+# Questions 139:147 Influences Amount Gift#
+survey[,139:147] <- apply(survey[,139:147], 2, function(x) as.numeric(as.character(x)))#
+influenceAmountGiftCols <- 139:147#
+influenceAmountGiftNames <- c(#
+    "Peer Giving Behavior", "Gratitude / Donor-Recognition Societies",#
+    "Your Amount of Student Debt", "Employment Status",#
+    "Tax Benefits", "Current Opinion of HC", "Quality of my Student Experience",#
+    "Compelling Stories of Student Achievements", "Compelling Stories of Alumni Achievements"#
+)#
+influenceAmountGift <- reshape(survey[, influenceAmountGiftCols], direction = "long", varying=list(1:9), times = influenceAmountGiftNames)#
+names(influenceAmountGift) <- c("Form", "Rating", "id")#
+pdf("Graphs/InfluenceAmountGift.pdf", family="Helvetica", width=10, height=8)#
+with(influenceAmountGift, barchart(table(Rating, Form), groups=FALSE, ylab = "Rating", xlab = "Funding Directions" ))#
+dev.off()#
+pdf("Graphs/InfluenceAmountGift2.pdf", family="Helvetica", width=8, height=5)#
+with(influenceAmountGift, barchart(t(prop.table(table(Rating, Form), 2)), xlab = "Rating", ylab = "Factors", col=colorhue, key=list(text=list(as.character(1:5)), rectangles=list(col=colorhue, columns=5), space="right")))#
+dev.off()#
+#
+influenceAmountGiftDecade <- reshape(survey[, c(influenceAmountGiftCols, 161)], direction = "long", varying=list(1:9), times = influenceAmountGiftNames)#
+names(influenceAmountGiftDecade) <- c("Decade", "Form", "Rating", "id")#
+influenceAmountGiftDecade.prop <- with(influenceAmountGiftDecade, prop.table(table(Form, Decade, Rating), c(1,2)))#
+# barchart(influenceAmountGiftDecade.prop)#
+# barchart(aperm(influenceAmountGiftDecade.prop, c(2,1,3)))#
+influenceAmountGiftMeans <- with(influenceAmountGiftDecade, aggregate(Rating, list(Decade, Form), mean, na.rm=TRUE))#
+names(influenceAmountGiftMeans) <- c("Decade", "Form", "Rating")#
+pdf("Graphs/InfluenceAmountGiftByDecade.pdf", family="Helvetica", width=10, height=10)#
+dotplot(Decade ~ Rating|Form, data = influenceAmountGiftMeans, type = "o")#
+dev.off()#
+#
+# Question 148: Comments about giving#
+# write.table(survey[survey[,148] !="",148], file="Giving.txt", col.names=FALSE, quote=FALSE, row.names=FALSE)#
+#
+# Question 149: Overall Comments#
+# write.table(survey[survey[,149] !="",149], file="OverallComments.txt", col.names=FALSE, quote=FALSE, row.names=FALSE)
+26:29
+103
+survey[,c(26:29, 103)]
+table(survey[,c(26, 103)])
+prop.table(table(survey[,c(26, 103)]),1)
+barchart(prop.table(table(survey[,c(26, 103)]),1))
+barchart(prop.table(table(survey[,c(27, 103)]),1))
+barchart(prop.table(table(survey[,c(28, 103)]),1))
+barchart(prop.table(table(survey[,c(29, 103)]),1))
+barchart(prop.table(table(survey[,c(12, 103)]),1))
+barchart(prop.table(table(survey[,c(13, 103)]),1))
+barchart(prop.table(table(survey[,c(14, 103)]),1))
+barchart(prop.table(table(survey[,c(15, 103)]),1))
+15
+barchart(prop.table(table(survey[,c(16, 103)]),1))
+barchart(prop.table(table(survey[,c(17, 103)]),1))
+barchart(prop.table(table(survey[,c(18, 103)]),1))
+barchart(prop.table(table(survey[,c(19, 103)]),1))
+barchart(prop.table(table(survey[,c(20, 103)]),1))
+barchart(prop.table(table(survey[,c(21, 103)]),1))
+barchart(prop.table(table(survey[,c(22, 103)]),1))
+22
+barchart(prop.table(table(survey[,c(23, 103)]),1))
+names(c(15,22,23))
+names(survey)[c(15,22,23)]
+names(survey)[15:30]
+names(survey)[12:30]
+barchart(prop.table(table(survey[,c(12, 103)]),1))
+barchart(prop.table(table(survey[,c(15, 103)]),1))
+barchart(prop.table(table(survey[,c(23, 103)]),1))
+names(survey)
+nrow(survey)
+x<-sample(1:639, 6)
+x
+survey[x,150:160]
+survey[x,150:161]
+survey[x,c(10,150:161)]
+pdf("Graphs/FinancialAidSlide.pdf", family="Helvetica", width=5, height=4)#
+dotplot(Type~Female, data=finp.re, groups= time, #
+    xlim=c(-1,61), scales=list(x=list(at=(0:6)*10)),#
+    xlab="Percent of Respondents that received Financial Aid",#
+    ylab="Type of Aid received",#
+    panel=function(x,y,groups,...) {#
+    panel.dotplot(x[groups=="Total"],y[groups=="Total"], type=c("h","p"), ...)#
+    panel.text(x[groups=="Total"], y[groups=="Total"], paste(x[groups=="Total"], "%", sep=""), pos=4, offset=0.8)#
+#
+    panel.points(x[groups=="Female"], as.numeric(y[groups=="Female"])+.15, pch=19, col="Magenta")#
+    panel.text(x[groups=="Female"], as.numeric(y[groups=="Female"])+.3, paste("F:", x[groups=="Female"], "%", sep=""), col="Magenta")#
+    panel.points(x[groups=="Male"], as.numeric(y[groups=="Male"])+.15, pch=19, col="DarkBlue")#
+    panel.text(x[groups=="Male"], as.numeric(y[groups=="Male"])+.3, paste("M:", x[groups=="Male"], "%", sep=""), col="DarkBlue")#
+})#
+dev.off()
+pdf("Graphs/FinancialAidByDecadeSlide.pdf", family="Helvetica", width=6, height=4)#
+dotplot(ClassYear~Percent|Type, data=fin2p.re, type=c("h","p"), #
+    xlim=c(-1,105), scales=list(x=list(at=(0:9)*10)),#
+    xlab="Percent of Respondents that received Financial Aid",#
+ panel = function(x,y, ...) {#
+    panel.dotplot(x,y, ...)#
+    panel.text(x, y, paste(x, "%", sep=""), pos=4, offset=0.8)#
+})#
+dev.off()
+dotplot(Decade~Percent|Type, groups = Year, pch = 19, data=allGivingByDecade.df, auto.key=TRUE, panel = function(x,y, ...) {#
+    panel.abline(v=seq(10, 80, 10), col=gray(0.95), lwd = 0.5)#
+    panel.dotplot(x,y, ...)#
+})
+dotplot(Decade~Percent|Type, groups = Year, pch = c(19, 20), data=allGivingByDecade.df, auto.key=TRUE, panel = function(x,y, ...) {#
+    panel.abline(v=seq(10, 80, 10), col=gray(0.95), lwd = 0.5)#
+    panel.dotplot(x,y, ...)#
+})
+dotplot(Decade~Percent|Type, groups = Year, pch = c(19, 21), data=allGivingByDecade.df, auto.key=TRUE, panel = function(x,y, ...) {#
+    panel.abline(v=seq(10, 80, 10), col=gray(0.95), lwd = 0.5)#
+    panel.dotplot(x,y, ...)#
+})
+dotplot(Decade~Percent|Type, groups = Year, pch = c(19, 22), data=allGivingByDecade.df, auto.key=TRUE, panel = function(x,y, ...) {#
+    panel.abline(v=seq(10, 80, 10), col=gray(0.95), lwd = 0.5)#
+    panel.dotplot(x,y, ...)#
+})
+dotplot(Decade~Percent|Type, groups = Year, pch = c(19, 22), data=allGivingByDecade.df, key=list(text=list(c("Current", "Past")), points=list(pch=c(19,22), columns=2), space="top"))), panel = function(x,y, ...) {#
+    panel.abline(v=seq(10, 80, 10), col=gray(0.95), lwd = 0.5)#
+    panel.dotplot(x,y, ...)#
+})
+dotplot(Decade~Percent|Type, groups = Year, pch = c(19, 22), data=allGivingByDecade.df, key=list(text=list(c("Current", "Past")), points=list(pch=c(19,22), columns=2), space="top"), panel = function(x,y, ...) {#
+    panel.abline(v=seq(10, 80, 10), col=gray(0.95), lwd = 0.5)#
+    panel.dotplot(x,y, ...)#
+})
+dotplot(Decade~Percent|Type, groups = Year, pch = c(19, 22), col="black", data=allGivingByDecade.df, key=list(text=list(c("Current", "Past")), points=list(pch=c(19,22), columns=2), space="top"), panel = function(x,y, ...) {#
+    panel.abline(v=seq(10, 80, 10), col=gray(0.95), lwd = 0.5)#
+    panel.dotplot(x,y, ...)#
+})
+pdf("Graphs/AllGivingByDecadeSlide.pdf", family="Helvetica", width=6, height=4)#
+dotplot(Decade~Percent|Type, groups = Year, pch = c(19, 22), col="black", data=allGivingByDecade.df, key=list(text=list(c("Current", "Past")), points=list(pch=c(19,22), columns=2), space="top"), panel = function(x,y, ...) {#
+    panel.abline(v=seq(10, 80, 10), col=gray(0.95), lwd = 0.5)#
+    panel.dotplot(x,y, ...)#
+})#
+dev.off()
+install.packages("Rserve")
+1/2^30
+1/2^(1:20)
+1+1/2^(1:20)
+1+1/2^(1:10)
+1+1/2^(1:12)
+1+1/2^(12)
+1;2
+null
+Null
+NULL
+1,2
+t.test
+?t.test
+t.test(1:5)
+table(1:4,1:4)
+8*16
+a = 1
+a
+attr(a, 'b') = 'c'
+a
+attr(a, 'b')
+96/3
+5*16
+list(NA, 1:3)
+str(list(a="john"))
+?str
+attr(list(a="john"))
+?attr
+attributes(list(a="john"))
+a = "john"; attr(a, 'a') = 'jack';a
+0x7f
+0x7f & 52
+0x7f && 52
+1;
+1;2
+I(1)
+str(t.test(1:5))
+install.packages('xGD',,'http://www.rforge.net/')
+library(xGD)
+version()
+R.version()
+R.version
+?xGD
+setwd("/Users/haris/Sites/PanthR")
+dir()
+dir("tmp")
+png("tmp/expipe")
+plot(1:10, 1:10)
+dev.off()
+png("tmp/expipe")
+plot(1:10, 1:10)
+dev.off()
+dir("/tmp")
+dir("tmp")
+1.01^3-0.99^3
+(1.01^3-0.99^3)/0.02
+3*(1.01^3-0.99^3)/0.02
+992/4
+(11*60+36)/35
+35*12
+35*12/60
+6*60+26
+18*10
+19+27
+78+10
+46/3
+5*8
+48*3
+19+16+27+104+8+12+10+6+ 8
+210*2
+420/60
+210*1.7/60
+(18+26+20+37+8+35+7+6+8+28)*1.6
+(18+26+20+37+8+35+7+6+8+28)*1.7
+(18+26+20+37+8+35+7+6+8+28)*1.7/60
+q()

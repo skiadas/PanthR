@@ -5,7 +5,7 @@
 	// Basic Todo entry model
 	// { text: 'todo', complete: false }
 	var Todo = can.Model.LocalStorage({
-		storageName: 'todos-canjs'
+		name: 'todos-canjs'
 	}, {
 		// Returns if this instance matches a given filter
 		// (currently `active` and `complete`)
