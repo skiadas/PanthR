@@ -4,7 +4,12 @@ var util = require('util'),
     _ = require('underscore'),
     mongodb = require('mongodb'),
     crypto = require('crypto'),
-    assert = require('assert');
+    assert = require('assert'),
+    when = require('when'),
+    nodefn = require("when/node/function"),
+    timeout = require('when/timeout'),
+    pipeline = require('when/pipeline'),
+    poll = require('when/poll');
 
 function Db(customServer) {
     if (!(this instanceof Db)) {
@@ -168,23 +173,6 @@ function Db(customServer) {
         PubSub.publish('db/structure/removed', [structure], this);
     });
 
-    this.doRequest = function (req, callback) {
-        if (!this.db) {
-            console.log("Db not found. queueing task for later");
-            PubSub.publish('warning/db/requestQueueForLater');
-            this.failedRequests.push([req, callback]);
-        } else {
-            //console.log("Asked to perform: ", req);
-            var that = this,
-                ourCallBack = function (err, result) {
-                    callback.call(that, err, req, result);
-                };
-            req.args.push(ourCallBack); // push our callback, instead of the original callback
-            this.db.collection(req.collectionName, function (err, collection) {
-                collection[req.methodName].apply(collection, req.args);
-            });
-        }
-    };
     // PubSub for addFriend() method
 
     //remove friend - remove them every circle
@@ -239,6 +227,32 @@ module.exports = Db;
 
 // creating prototype properties for Db
 _.extend(Db.prototype, {
+    dbPromise: function() {
+        // Attempts to reach the database, stops trying after 10 seconds
+        var fun = function getDb() { return this.db; }.bind(this),
+            isDbOn = function isDbOn(theDb) { return (theDb !== null); }
+        return timeout(10000, poll(fun, 100, isDbOn));
+    },
+    doUserRequest: function(methodName, args) {
+        return this.doRequest({
+            collectionName: 'users',
+            methodName: methodName,
+            args: args
+        });
+    },
+    doRequest: function (req) {
+        var self = this,
+            getCollection = function(db) {
+                return nodefn.call(db.collection.bind(db), req.collectionName); 
+            },
+            makeQuery = function(collection) {
+                return nodefn.apply(collection[req.methodName].bind(collection), req.args);
+            };
+        return pipeline([this.dbPromise.bind(this), getCollection, makeQuery]).otherwise(function(error) {
+            self.emit('dbConnectionError', error, req);
+            throw new Error('Database Connection Error');
+        });
+    },
     updateUser: function (user, changes) {
         var request = {
             collectionName: 'users',
@@ -257,53 +271,24 @@ _.extend(Db.prototype, {
         return this;
     },
     createUser: function (user) {
-        var request1 = {
-                collectionName: 'users',
-                methodName: 'findOne',
-                args: [{ email: user.email }, {}, { safe: true }]
-            },
-            request2 = {
-                collectionName: 'users',
-                methodName: 'insert',
-                args: [user, { safe: true }]
-            },
-            self = this;
-        this.doRequest(request1, function (error, request, docObject) {
-            if (error) {
-                self.emit('dbConnectionError', error, request);
-            } else if (!docObject) { // user is not existed
-                this.doRequest(request2, function (error, request, records) {
-                    if (error) {
-                        self.emit('dbConnectionError', error, request);
-                    } else if (!records[0]) { // no item is inserted to the record array
-                        self.emit('dbUserNotCreatedError', user);
-                    } else {
-                        self.emit('userCreated', user);
-                    }
-                });
-            } else { // user exists
-                console.log(user, ' already exists!');
-            }
+        var self = this;
+        return self.doUserRequest('findOne',
+            [{ email: user.email }, {email: 1}, { safe: true }]
+        ).then(function(found) {
+            if (found) { throw new Error('user/exists'); }
+            return self.doUserRequest('insert', [user, { safe: true }] );
+        }).then(function(records) {
+            if (!records[0]) { throw new Error('user/notFound');  }
+            return user;
         });
-        return this;
     },
-    findUser: function (email) {
-        var request = {
-            collectionName: 'users',
-            methodName: 'findOne',
-            args: [email, {}, { safe: true }]
-        };
-        this.doRequest(request, function (error, request, docObject) {
-            if (error) {
-                this.emit('dbConnectionError', error, request);
-            } else if (!docObject) { // docObject is not defined
-                this.emit('dbUserNotFoundError', request);
-            } else {
-                console.log(docObject);
-                this.emit('userFound', docObject);
-            }
-        });
-        return this;
+    findUser: function (user) {
+        var self = this;
+        return self.doUserRequest('findOne', [{email: user.email}, {}, { safe: true }])
+            .then(function(result) {
+                if (!result) { throw new Error('user/notFound'); }
+                return result;
+            });
     },
     deleteUser: function (email) {
         var request = {
@@ -526,43 +511,60 @@ if (require.main === module) {
         myServer = { host: "localhost", port: "27017", dbName: "foodb" },
         newDB;
 
-    PubSub.subscribe('db/connected', function () {
-        newDB.createUser(user);
-    });
+    // PubSub.subscribe('db/connected', function () {
+    //     newDB.createUser(user);
+    // });
     newDB = new Db(myServer);
-
-    PubSub.subscribe('db/user/created', function (user) {
-        var collection = newDB.db.collection('users');
-        collection.findOne({ email: user.email }, function (err, doc) {
-            assert.equal(user.email, doc.email);
-            assert.equal(user.name, doc.name);
-            newDB.updateUser(user1, changes);
-            newDB.findUser({ email: user.email });
-            newDB.deleteUser({ email: user.email });
-        });
-    });
-
-    PubSub.subscribe('db/user/updated', function (user) {
-        var collection = newDB.db.collection('users');
-        collection.findOne({ email: user.email }, function (err, doc) {
-            assert.equal(user.email, doc.email);
-        });
-    });
-
-    PubSub.subscribe('db/user/found', function (email) {
-        // email is an object
-        assert.equal(user.email, email.email);
-    });
-
-    PubSub.subscribe('db/user/deleted', function (email) {
-        var collection = newDB.db.collection('users');
-        collection.findOne(email, function (err, doc) {
-            assert.equal(null, doc);
-            process.exit(0);
-        });
-    });
-
-    PubSub.subscribe('error/db/user/notFound', function (user) {
-        console.log(user, ' does not exist');
-    });
+    // newDB.doRequest({collectionName: 'users', methodName: 'insert', args: [user]})
+    newDB.createUser(user)
+    .then(function(result) {
+        console.log("Result: ",  result);
+    }, function(error) {
+        console.log("Error: ", error);
+    })
+    .ensure(function() {console.log("here!"); testFindUser(); });
+    var testFindUser = function testFindUser() {
+        console.log("testing...")
+        newDB.findUser(user1)
+        .then(function(result) {
+            console.log("Found: ",  result);
+        }, function(error) {
+            console.log("Error: ", error);
+        }).ensure(function() { process.exit(0); })
+    }
+    // 
+    // PubSub.subscribe('db/user/created', function (user) {
+    //     var collection = newDB.db.collection('users');
+    //     collection.findOne({ email: user.email }, function (err, doc) {
+    //         assert.equal(user.email, doc.email);
+    //         assert.equal(user.name, doc.name);
+    //         newDB.updateUser(user1, changes);
+    //         newDB.findUser({ email: user.email });
+    //         newDB.deleteUser({ email: user.email });
+    //     });
+    // });
+    // 
+    // PubSub.subscribe('db/user/updated', function (user) {
+    //     var collection = newDB.db.collection('users');
+    //     collection.findOne({ email: user.email }, function (err, doc) {
+    //         assert.equal(user.email, doc.email);
+    //     });
+    // });
+    // 
+    // PubSub.subscribe('db/user/found', function (email) {
+    //     // email is an object
+    //     assert.equal(user.email, email.email);
+    // });
+    // 
+    // PubSub.subscribe('db/user/deleted', function (email) {
+    //     var collection = newDB.db.collection('users');
+    //     collection.findOne(email, function (err, doc) {
+    //         assert.equal(null, doc);
+    //         process.exit(0);
+    //     });
+    // });
+    // 
+    // PubSub.subscribe('error/db/user/notFound', function (user) {
+    //     console.log(user, ' does not exist');
+    // });
 }
