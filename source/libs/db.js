@@ -254,21 +254,12 @@ _.extend(Db.prototype, {
         });
     },
     updateUser: function (user, changes) {
-        var request = {
-            collectionName: 'users',
-            methodName: 'update',
-            args: [{ email: user.email }, changes, { safe: true }]
-        };
-        this.doRequest(request, function (error, request, countOfRecords) {
-            if (error) {
-                this.emit('dbConnectionError', error, request);
-            } else if (countOfRecords) {
-                this.emit('userUpdated', user);
-            } else {
-                this.emit('dbUserNotFoundError', user);
-            }
+        return this.doUserRequest('update', [{ email: user.email }, changes, { safe: true }])
+        .then(function(found) { 
+            console.log(found)
+            if (!found[0]) { throw new Error('user/notFound'); }
+            return user;
         });
-        return this;
     },
     createUser: function (user) {
         var self = this;
@@ -285,10 +276,10 @@ _.extend(Db.prototype, {
     findUser: function (user) {
         var self = this;
         return self.doUserRequest('findOne', [{email: user.email}, {}, { safe: true }])
-            .then(function(result) {
-                if (!result) { throw new Error('user/notFound'); }
-                return result;
-            });
+        .then(function(result) {
+            if (!result) { throw new Error('user/notFound'); }
+            return result;
+        });
     },
     deleteUser: function (email) {
         var request = {
