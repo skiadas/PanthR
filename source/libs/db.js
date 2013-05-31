@@ -94,26 +94,6 @@ function Db(customServer) {
         this.emit('connect');
     });
     
-
-    this.verifyRequest = function (requestHash) {
-        var findStr = {_id: _makeHash(requestHash) };
-        return this.doRequest('resetRequests', 'findOne', [findStr]);
-    };
-    this.resetRequest = function (email) {
-        var salt = _makeSalt(),
-            requestHash = _makeHash(salt),
-            hash = _makeHash(requestHash);
-        return this.doRequest('resetRequests', 'insert', [{
-            _id: hash, email: email, date: new Date()
-        }]).then(function() { return requestHash; });
-    };
-    this.changePassword = function (email, password) {
-        var salt = _makeSalt(),
-            hashpassword = _makeHash(salt + this.password),
-            pwd = { salt: salt, hash: hashpassword };
-        return this.doUserRequest('update', [ { email: email }, { $set: { password: pwd } } ]);
-    };
-
     this.setUpRouter();
     this.db = null;
     this.failedRequests = [];
@@ -404,6 +384,24 @@ _.extend(Db.prototype, {
             }
         });
         return this;
+    },
+    verifyRequest: function (requestHash) {
+        var findStr = {_id: _makeHash(requestHash) };
+        return this.doRequest('resetRequests', 'findOne', [findStr]);
+    },
+    resetRequest: function (email) {
+        var salt = _makeSalt(),
+            requestHash = _makeHash(salt),
+            hash = _makeHash(requestHash);
+        return this.doRequest('resetRequests', 'insert', [{
+            _id: hash, email: email, date: new Date()
+        }]).then(function() { return requestHash; });
+    },
+    changePassword: function (email, password) {
+        var salt = _makeSalt(),
+            hashpassword = _makeHash(salt + this.password),
+            pwd = { salt: salt, hash: hashpassword };
+        return this.doUserRequest('update', [ { email: email }, { $set: { password: pwd } } ]);
     }
 });
 
