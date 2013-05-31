@@ -194,7 +194,6 @@ _.extend(Db.prototype, {
     updateUser: function (user, changes) {
         return this.doUserRequest('update', [{ email: user.email }, changes, { safe: true }])
         .then(function(found) { 
-            console.log(found)
             if (!found[0]) { throw new Error('user/notFound'); }
             return user;
         });
@@ -212,8 +211,7 @@ _.extend(Db.prototype, {
         });
     },
     findUser: function (user) {
-        var self = this;
-        return self.doUserRequest('findOne', [{email: user.email}, {}, { safe: true }])
+        return this.doUserRequest('findOne', [{email: user.email}, {}, { safe: true }])
         .then(function(result) {
             if (!result) { throw new Error('user/notFound'); }
             return result;
@@ -222,7 +220,7 @@ _.extend(Db.prototype, {
     deleteUser: function (user) {
         return this.doUserRequest('remove', [{email: user.email}, { safe: true }])
         .then(function(result) {
-            if (!result) { throw new Error('user/noteDeleted'); }
+            if (!result) { throw new Error('user/notDeleted'); }
             return user;
         });
     },
