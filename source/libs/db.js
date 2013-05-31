@@ -11,6 +11,13 @@ var util = require('util'),
     pipeline = require('when/pipeline'),
     poll = require('when/poll');
 
+function _makeHash(text) {
+    return crypto.createHash('sha512').update(text).digest('hex');
+}
+function _makeSalt() {
+    return Math.round((new Date().valueOf() * Math.random())).toString();
+}
+
 function Db(customServer) {
     if (!(this instanceof Db)) {
         return new Db(customServer);
@@ -88,38 +95,23 @@ function Db(customServer) {
     });
     
 
-    this.verifyRequest = function (requestHash, callback) {
-        var hash = crypto.createHash('sha512').update(requestHash).digest('hex'),
-            findStr = {
-                _id: hash
-            };
-        this.doRequest('resetRequests', 'findOne', [findStr], callback);
+    this.verifyRequest = function (requestHash) {
+        var findStr = {_id: _makeHash(requestHash) };
+        return this.doRequest('resetRequests', 'findOne', [findStr]);
     };
-    this.resetRequest = function (email, callback) {
-        //store it
-        console.log('starting reset request');
-        var salt = Math.round((new Date().valueOf() * Math.random())).toString(),
-            requestHash = crypto.createHash('sha512').update(salt).digest('hex'),
-            hash = crypto.createHash('sha512').update(requestHash).digest('hex');
-        this.doRequest('resetRequests', 'insert', [{
-            _id: hash,
-            email: email,
-            date: new Date()
-        }], callback);
-        return requestHash;
+    this.resetRequest = function (email) {
+        var salt = _makeSalt(),
+            requestHash = _makeHash(salt),
+            hash = _makeHash(requestHash);
+        return this.doRequest('resetRequests', 'insert', [{
+            _id: hash, email: email, date: new Date()
+        }]).then(function() { return requestHash; });
     };
-    this.changePassword = function (email, password, callback) {
-        var salt = Math.round((new Date().valueOf() * Math.random())).toString(),
-            hashpassword = crypto.createHash('sha512').update(salt + this.password).digest('hex'),
-            pwd = {
-                salt: salt,
-                hash: hashpassword
-            };
-        this.doRequest('users', 'update', [{
-            email: email
-        }, {
-            $set: { password: pwd }
-        }], callback);
+    this.changePassword = function (email, password) {
+        var salt = _makeSalt(),
+            hashpassword = _makeHash(salt + this.password),
+            pwd = { salt: salt, hash: hashpassword };
+        return this.doUserRequest('update', [ { email: email }, { $set: { password: pwd } } ]);
     };
 
     this.setUpRouter();
