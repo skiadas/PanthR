@@ -86,103 +86,7 @@ function Db(customServer) {
         PubSub.publish('db/disconnected', [db], this);
         this.emit('connect');
     });
-
-    // perform only update(), not findOne() anymore
-    // reduce from 2 calls to 1 call in the database
-    // need to listen to the callback from update()
-    // to determine if the update() succeeds or not
-
-    // user methods
-    PubSub.subscribe('db/update/user', _.bind(this.updateUser, this));
-    PubSub.subscribe('db/create/user', _.bind(this.createUser, this));
-    PubSub.subscribe('db/find/user', _.bind(this.findUser, this));
-    PubSub.subscribe('db/delete/user', _.bind(this.deleteUser, this));
-    // friend methods
-    PubSub.subscribe('db/add/friend', _.bind(this.addFriend, this));
-    PubSub.subscribe('db/remove/friend', _.bind(this.removeFriend, this));
-    PubSub.subscribe('db/tag/friend', _.bind(this.tagFriend, this));
-    PubSub.subscribe('db/unTag/friend', _.bind(this.unTagFriend, this));
-    // structure methods
-    PubSub.subscribe('db/create/structure', _.bind(this.createStructure, this));
-    PubSub.subscribe('db/remove/structure', _.bind(this.removeStructure, this));
-    PubSub.subscribe('db/update/structure', _.bind(this.updateStructure, this));
-    PubSub.subscribe('db/find/structure', _.bind(this.findStructure, this));
-
-    // error listeners
-    this.on('dbConnectionError', function (user) {
-        PubSub.publish('error/db/connection/undefined', [user], this);
-    });
-    this.on('dbUserNotFoundError', function (user) {
-        PubSub.publish('error/db/user/notFound', [user], this);
-    });
-    this.on('dbUserNotCreatedError', function (user) {
-        PubSub.publish('error/db/user/notCreated', [user], this);
-    });
-    this.on('dbUserNotDeletedError', function (email) {
-        PubSub.publish('error/db/user/notDeleted', [email], this);
-    });
-    this.on('dbStructureNotFoundError', function (structure) {
-        PubSub.publish('error/db/structure/notFound', [structure], this);
-    });
-    this.on('dbStructureNotCreatedError', function (structure) {
-        PubSub.publish('error/db/structure/notCreated', [structure], this);
-    });
-    this.on('dbStructureNotDeletedError', function (structure) {
-        PubSub.publish('error/db/structure/notDeleted', [structure], this);
-    });
-
-    // user methods listeners
-    this.on('userUpdated', function (user) {
-        PubSub.publish('db/user/updated', [user], this);
-    });
-    this.on('userCreated', function (user) {
-        PubSub.publish('db/user/created', [user], this);
-    });
-    this.on('userFound', function (user) {
-        PubSub.publish('db/user/found', [user], this);
-    });
-    this.on('userDeleted', function (email) {
-        PubSub.publish('db/user/deleted', [email], this);
-    });
-
-    // friend methods listeners
-    this.on('friendAdded', function (user) {
-        PubSub.publish('db/friend/added', [user], this);
-    });
-    this.on('friendRemoved', function (user) {
-        PubSub.publish('db/friend/removed', [user], this);
-    });
-    this.on('friendTagged', function (user) {
-        PubSub.publish('db/friend/tagged', [user], this);
-    });
-    this.on('friendUnTagged', function (user) {
-        PubSub.publish('db/user/untagged', [user], this);
-    });
-
-    // structure methods listeners
-    this.on('structureUpdated', function (structure) {
-        PubSub.publish('db/structure/updated', [structure], this);
-    });
-    this.on('structureCreated', function (structure) {
-        PubSub.publish('db/structure/created', [structure], this);
-    });
-    this.on('structureFound', function (structure) {
-        PubSub.publish('db/structure/found', [structure], this);
-    });
-    this.on('structureRemoved', function (structure) {
-        PubSub.publish('db/structure/removed', [structure], this);
-    });
-
-    // PubSub for addFriend() method
-
-    //remove friend - remove them every circle
-    ///circles could have been added
-    //need a way to tell it any circles
-
-    //tagFriend into a list of circls
-    // PubSub for tagFriend() method
-
-    //remove friend  from circle
+    
 
     this.verifyRequest = function (requestHash, callback) {
         var hash = crypto.createHash('sha512').update(requestHash).digest('hex'),
@@ -218,6 +122,7 @@ function Db(customServer) {
         }], callback);
     };
 
+    this.setUpRouter();
     this.db = null;
     this.failedRequests = [];
     init(customServer);
@@ -225,8 +130,41 @@ function Db(customServer) {
 util.inherits(Db, require('events').EventEmitter);
 module.exports = Db;
 
+_.mixin({
+  capitalize : function(string) {
+    return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase();
+  }
+});
 // creating prototype properties for Db
 _.extend(Db.prototype, {
+    setUpRouter: function() {
+        var verbs = ['create', 'delete', 'update', 'find', 'add', 'remove', 'tag', 'untag'],
+            handler = this.router.bind(this);
+        this.handlers = _(verbs).map(function(verb) { 
+            return PubSub.subscribe('db/' + verb, handler); 
+        });
+    },
+    router: function(data) {
+        console.log('routing!!!')
+        var args = _.toArray(arguments),
+            topic = args.pop().split('/'),
+            dbName = topic.shift(),
+            action = topic.shift(),
+            target = topic.shift(),
+            pastAction = (action == 'find') ? found : (action + 'd'),
+            method = this[action + _.capitalize(target)],
+            successTopic = [dbName, target, pastAction].join('/'),
+            errorTopic = ['error', dbName, target, 'not' + _.capitalize(pastAction)].join('/');
+        console.log(args);
+        method.apply(this, args).then(
+            function(result) { PubSub.publish(successTopic, [result]); },
+            function(error) { 
+                // console.log(_.pairs(error));
+                // console.error(error);
+                PubSub.publish(errorTopic, [error]); 
+            }
+        );
+    },
     dbPromise: function() {
         // Attempts to reach the database, stops trying after 10 seconds
         var fun = function getDb() { return this.db; }.bind(this),
