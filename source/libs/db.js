@@ -281,23 +281,12 @@ _.extend(Db.prototype, {
             return result;
         });
     },
-    deleteUser: function (email) {
-        var request = {
-            collectionName: 'users',
-            methodName: 'remove',
-            args: [email, { safe: true }]
-        };
-        this.doRequest(request, function (error, request, countOfRemovedRecords) {
-            console.log('countOfRemovedRecords: ', countOfRemovedRecords)
-            if (error) {
-                this.emit('dbConnectionError', error, request);
-            } else if (countOfRemovedRecords) { // no object is removed
-                this.emit('userDeleted', email);
-            } else {
-                this.emit('dbUserNotDeletedError', request);
-            }
+    deleteUser: function (user) {
+        return this.doUserRequest('remove', [{email: user.email}, { safe: true }])
+        .then(function(result) {
+            if (!result) { throw new Error('user/noteDeleted'); }
+            return user;
         });
-        return this;
     },
     addFriend: function (user, friend, circlesArray) {
         var friendStr = 'friends.' + friend._id.toHexString(),
