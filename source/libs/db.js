@@ -9,7 +9,9 @@ var util = require('util'),
     nodefn = require("when/node/function"),
     timeout = require('when/timeout'),
     pipeline = require('when/pipeline'),
-    poll = require('when/poll');
+    poll = require('when/poll'),
+    delay = require('when/delay'),
+    unfold = require('when/unfold');
 
 function _makeHash(text) {
     return crypto.createHash('sha512').update(text).digest('hex');
@@ -23,15 +25,10 @@ function Db(customServer) {
 
     customServer = customServer || {};
     _.defaults(customServer, { host: "localhost", port: "27017", dbName: "panthrdb" });
-    this.server = new mongodb.Server(customServer.host, customServer.port, { auto_reconnect: true });
-    var failedRequests, // store all requests that haven't been processed
-        self = this;
-
-
-    this._db = new mongodb.Db(customServer.dbName, this.server, { safe: false });
-    this._db.on('close', this.disconnected.bind(this) );
-
-    this.db = null;
+    this.server = customServer;
+    this.dbName = customServer.dbName;
+    this.handler = this.disconnected.bind(this);
+    this.connected = false;
     this.failedRequests = [];
 
     this.setUpRouter();
@@ -48,14 +45,64 @@ _.mixin({
 _.extend(Db.prototype, {
     disconnected: function() {
         console.error('Disconnected!!!');
-        this.db = null;
-        this.connect();
+        if (this.connected) {
+            this.db.removeListener('close', this.handler);
+            this.connected = false;
+            this.connect();
+        }
     },
     connect: function () {
-        var self = this;
-        return nodefn.call(this._db.open.bind(this._db)).then(function(db) {
-            self.db = db;
-            return db;
+        var self = this,
+            singleAttempt = function() {
+                // Single attempt at connection. 
+                // Returns true if connection achieved, false otherwise.
+                console.log('Attempting to connect')
+                self.db = new mongodb.Db(
+                    self.dbName,
+                    new mongodb.Server(
+                        self.server.host,
+                        self.server.port,
+                        { auto_reconnect: true }
+                    ),
+                    { safe: false }
+                );
+                return nodefn.call(self.db.open.bind(self.db))
+                .then(function() {
+                    console.log('Established Connection');
+                    self.db.on('close', self.handler);
+                    self.connected = true;
+                    return true;
+                })
+                .otherwise(function() {
+                    console.log('Failed to connect. Next attempt in 1 second.');
+                    return false;
+                });
+            },
+            attemptWithRetries = function() {
+                // Tries every second
+                // Resolves to self.db if connection achieved
+                // Rejects if 100 tries go by without achieving connection
+                console.log("AttemptWithRetries started.")
+                var i = 30;
+                return unfold(
+                    function unspool(seed) { console.log("unspooling"); return [i--, self.connected]; },
+                    function condition(result) { console.log("condition: ", result); return result; },
+                    function handler(i) {
+                        console.log("handling", i); 
+                        if (!i) {
+                            throw new Error("Failed. Will try again.");
+                        } else {
+                            console.log('delaying')
+                            return delay(1000, singleAttempt());
+                        }
+                    },
+                    null // Seed is ignored
+                )
+                .then(function() { console.log('attemptWithRetries resolved'); return self.db; });
+            };
+        return attemptWithRetries().otherwise(function() {
+            console.log("Failed to connect. Next attempt in 2 minutes.");
+            return delay(120000, attemptWithRetries());
         });
     },
     setUpRouter: function() {
