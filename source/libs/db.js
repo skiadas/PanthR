@@ -150,6 +150,13 @@ _.extend(Db.prototype, {
             args: args
         });
     },
+    doStructureRequest: function(methodName, args) {
+        return this.doRequest({
+            collectionName: 'structures',
+            methodName: methodName,
+            args: args
+        });
+    },
     doRequest: function (req) {
         var self = this,
             getCollection = function(db) {
@@ -199,118 +206,76 @@ _.extend(Db.prototype, {
     addFriend: function (user, friend, circlesArray) {
         var friendStr = 'friends.' + friend._id.toHexString(),
             queryObj = { '$set': {} },
-            findStr = { email: user.email },
-            request = {
-                collectionName: 'users',
-                methodName: 'update',
-                args: [ findStr, queryObj, { safe: true } ]
-            };
+            findStr = { email: user.email };
         queryObj.$set[friendStr] = {
-            nick: friend.nick,
-            email: friend.email,
-            circles: circlesArray
+            nick: friend.nick, email: friend.email, circles: circlesArray
         };
         circlesArray.forEach(function (el) {
             queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
-                nick: friend.nick,
-                email: friend.email
+                nick: friend.nick, email: friend.email
             };
         });
         findStr[friendStr] = null;
-        this.doRequest(request, function (error, request, countOfRecords) {
-            if (error) {
-                this.emit('dbConnectionError', error, request);
-            } else if (countOfRecords) {
-                this.emit('friendAdded', user);
-            } else {
-                this.emit('dbUserNotFoundError', user);
-            }
+        return this.doUserRequest('update', [ findStr, queryObj, { safe: true } ])
+        .then(function(count) {
+            if (!count) { throw new Error('user/notFound'); }
+            return user;
         });
-        return this;
     },
     removeFriend: function (user, friend, circleArray) {
         var friendStr = 'friends.' + friend._id.toHexString(),
             queryObj = { '$unset': {} },
-            findStr = { email: user.email },
-            request = {
-                collectionName: 'users',
-                methodName: 'update',
-                args: [ findStr, queryObj, { safe: true } ]
-            };;
+            findStr = { email: user.email };
         queryObj.$unset[friendStr] = '';
         circleArray.forEach(function (el) {
             queryObj.$unset['circles.' + el + '.' + friend._id.toHexString()] = {
-                nick: friend.nick,
-                email: friend.email
+                nick: friend.nick, email: friend.email
             };
         });
         findStr[friendStr] = { $ne: null };
-        this.doRequest(request, function (error, request, countOfRecords) {
-            if (error) {
-                this.emit('dbConnectionError', error, request);
-            } else if (countOfRecords) {
-                this.emit('friendRemoved', user);
-            } else {
-                this.emit('dbUserNotFoundError', user);
-            }
+        return this.doUserRequest('update', [ findStr, queryObj, { safe: true } ])
+        .then(function(count) {
+            if (!count) { throw new Error('user/notFound'); }
+            return user;
         });
-        return this;
     },
     tagFriend: function (user, friend, circleArray) {
         var friendStr = 'friends.' + friend._id.toHexString() + '.circles',
             queryObj = { '$set': {}, '$addToSet': {} },
-            findStr = { email: user.email },
+            findStr = { email: user.email };
+        queryObj.$addToSet[friendStr] = { $each: circleArray };
+        circleArray.forEach(function (el) {
+            queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
+                nick: friend.nick, email: friend.email
+            };
+        });
+        findStr['friends.' + friend._id.toHexString()] = { $ne: null };
             request = {
                 collectionName: 'users',
                 methodName: 'update',
                 args: [findStr, queryObj, { safe: true }]
             };
-        queryObj.$addToSet[friendStr] = { $each: circleArray };
-        circleArray.forEach(function (el) {
-            queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
-                nick: friend.nick,
-                email: friend.email
-            };
+        return this.doUserRequest('update', [findStr, queryObj, { safe: true }])
+        .then(function(count) {
+            if (!count) { throw new Error('user/notFound'); }
         });
-        findStr['friends.' + friend._id.toHexString()] = { $ne: null };
-        this.doRequest(request, function (error, request, countOfRecords) {
-            if (error) {
-                this.emit('dbConnectionError', error, request);
-            } else if (countOfRecords) {
-                this.emit('friendTagged', user);
-            } else {
-                this.emit('dbUserNotFoundError', user);
-            }
-        });
-        return this;
     },
     unTagFriend: function (user, friend, circleArray) {
         var friendStr = 'friends.' + friend._id.toHexString() + '.circles',
             queryObj = { '$pullAll': {}, '$unset': {} },
-            findStr = { email: user.email },
-            request = {
-                collectionName: 'users',
-                methodName: 'update',
-                args: [findStr, queryObj, { safe: true }]
-            };
+            findStr = { email: user.email };
         queryObj.$pullAll[friendStr] = circleArray;
         circleArray.forEach(function (el) {
             queryObj.$unset['circles.' + el + '.' + friend._id.toHexString()] = {
-                nick: friend.nick,
-                email: friend.email
+                nick: friend.nick, email: friend.email
             };
         });
         findStr['friends.' + friend._id.toHexString()] = { $ne: null};
-        this.doRequest(request, function (error, request, countOfRecords) {
-            if (error) {
-                this.emit('dbConnectionError', error, request);
-            } else if (countOfRecords) {
-                this.emit('friendUnTagged', user);
-            } else {
-                this.emit('dbUserNotFoundError', user);
-            }
+        return this.doUserRequest('update', [findStr, queryObj, { safe: true }])
+        .then(function(count) {
+            if (!count) { throw new Error('user/notFound'); }
+            return user;
         });
-        return this;
     },
     createStructure: function (structure) {
         var request = {
@@ -319,54 +284,25 @@ _.extend(Db.prototype, {
                 args: [structure, { safe: true }]
             },
             self = this;
-        this.doRequest(request, function (error, request, records) {
-            if (error) {
-                self.emit('dbConnectionError', error, request);
-            } else if (!records[0]) { // no item is inserted to the records array
-                self.emit('dbStructureNotCreatedError', request);
-            } else {
-                self.emit('structureCreated', records[0]);
-            }
+        return this.doStructureRequest('insert', [structure, { safe: true }])
+        .then(function(records) {
+            if (!records[0]) { throw new Error('structure/notCreated'); }
+            return structure;
         });
-        return this;
     },
     removeStructure: function (structure) {
-        /*
-        what if we delete something that is an essential part of a structure
-        e.g. the x-component of a graph
-        */
-        var request = {
-            collectionName: 'structures',
-            methodName: 'remove',
-            args: [{ _id: structure._id }, { safe: true }]
-        };
-        this.doRequest(request, function (error, request, countOfRemovedRecords) {
-            if (error) {
-                this.emit('dbConnectionError', error, request);
-            } else if (countOfRemovedRecords) { // no object is removed
-                this.emit('structureRemoved', structure);
-            } else {
-                this.emit('dbStructureNotDeletedError', request);
-            }
+        return this.doStructureRequest('remove', [{ _id: structure._id }, { safe: true }])
+        .then(function(count) {
+            if (!count) { throw new Error('structure/notRemoved'); }
+            return structure;
         });
-        return this;
     },
     updateStructure: function (structure, changes) {
-        var request = {
-            collectionName: 'structures',
-            methodName: 'update',
-            args: [{ _id: structure._id }, changes, { safe: true }]
-        };
-        this.doRequest(request, function (error, request, countOfRecords) {
-            if (error) {
-                this.emit('dbConnectionError', error, request);
-            } else if (countOfRecords) {
-                this.emit('structureUpdated', structure);
-            } else {
-                this.emit('dbStructureNotFoundError', request);
-            }
+        return this.doStructureRequest('update', [{ _id: structure._id }, changes, { safe: true }])
+        .then(function(count) {
+            if (!count) { throw new Error('structure/notFound'); }
+            return structure;
         });
-        return this;
     },
     findStructure: function (structure) {
         var request = {
@@ -374,16 +310,11 @@ _.extend(Db.prototype, {
             methodName: 'findOne',
             args: [{ _id: structure._id }, {}, { safe: true }]
         };
-        this.doRequest(request, function (error, request, docObject) {
-            if (error) {
-                this.emit('dbConnectionError', error, request);
-            } else if (!docObject) { // docObject is not defined
-                this.emit('dbStructureNotFoundError', request);
-            } else {
-                this.emit('structureFound', docObject);
-            }
+        return this.doStructureRequest('findOne', [{ _id: structure._id }, {}, { safe: true }])
+        .then(function(found) {
+            if (!found) {throw new Error('structure/notFound'); }
+            return found;
         });
-        return this;
     },
     verifyRequest: function (requestHash) {
         var findStr = {_id: _makeHash(requestHash) };
