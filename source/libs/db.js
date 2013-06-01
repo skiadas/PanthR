@@ -117,7 +117,6 @@ _.extend(Db.prototype, {
         });
     },
     router: function(data) {
-        console.log('routing!!!')
         var args = _.toArray(arguments),
             topic = args.pop().split('/'),
             dbName = topic.shift(),
@@ -127,14 +126,9 @@ _.extend(Db.prototype, {
             method = this[action + _.capitalize(target)],
             successTopic = [dbName, target, pastAction].join('/'),
             errorTopic = ['error', dbName, target, 'not' + _.capitalize(pastAction)].join('/');
-        console.log(args);
         method.apply(this, args).then(
             function(result) { PubSub.publish(successTopic, [result]); },
-            function(error) { 
-                // console.log(_.pairs(error));
-                // console.error(error);
-                PubSub.publish(errorTopic, [error]); 
-            }
+            function(error) {  PubSub.publish(errorTopic, [error]); }
         );
     },
     dbPromise: function() {
@@ -165,10 +159,7 @@ _.extend(Db.prototype, {
             makeQuery = function(collection) {
                 return nodefn.apply(collection[req.methodName].bind(collection), req.args);
             };
-        return pipeline([this.dbPromise.bind(this), getCollection, makeQuery]).otherwise(function(error) {
-            self.emit('dbConnectionError', error, req);
-            throw new Error('Database Connection Error');
-        });
+        return pipeline([this.dbPromise.bind(this), getCollection, makeQuery]).otherwise(function(error) { throw new Error('connection'); });
     },
     updateUser: function (user, changes) {
         return this.doUserRequest('update', [{ email: user.email }, changes, { safe: true }])
