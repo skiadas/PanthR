@@ -19,85 +19,22 @@ function _makeSalt() {
 }
 
 function Db(customServer) {
-    if (!(this instanceof Db)) {
-        return new Db(customServer);
-    }
+    if (!(this instanceof Db)) { return new Db(customServer); }
 
-    var server, db, failedRequests, // store all requests that haven't been processed
+    customServer = customServer || {};
+    _.defaults(customServer, { host: "localhost", port: "27017", dbName: "panthrdb" });
+    this.server = new mongodb.Server(customServer.host, customServer.port, { auto_reconnect: true });
+    var failedRequests, // store all requests that haven't been processed
         self = this;
 
-    // intitalize function
-    // if known contects database object (ex. testing)
-    // if it doesnt find calls function to initialize standard
 
-    function init(customServer) {
-        customServer = customServer || {};
-        _.defaults(customServer, {
-            host: "localhost",
-            port: "27017",
-            dbName: "panthrdb"
-        });
-        self.emit('initializing', customServer);
-        return self;
-    }
+    this._db = new mongodb.Db(customServer.dbName, this.server, { safe: false });
+    this._db.on('close', this.disconnected.bind(this) );
 
-    this.on('initializing', function (Server) {
-        PubSub.publish('db/initializing', [Server], this);
-        server = new mongodb.Server(Server.host, Server.port, {
-            auto_reconnect: true
-        });
-        db = new mongodb.Db(Server.dbName, server, {
-            safe: false
-        });
-        var that = this;
-        db.on('close', function () {
-            that.emit('disconnected');
-        });
-        this.emit('initialized');
-    });
-
-    // a new instance of mongodb is initialized
-    this.on('initialized', function () {
-        this.emit('connect');
-    });
-
-    // connect to the database, call open()
-    this.on('connect', function () {
-        PubSub.publish('db/connect', [], this);
-        db.open(function (err, db) {
-            if (err) {
-                PubSub.publish('error/db/connection/undefined', [err], self);
-            } else {
-                self.db = db;
-                PubSub.publish('db/initialized', [db], self);
-                self.emit('connected', db);
-            }
-        });
-    });
-
-    // connection is set up
-    this.on('connected', function (db) {
-        // send all failed requests to doRequest
-        if (failedRequests) {
-            var now;
-            while (failedRequests.length !== 0) {
-                now = failedRequests.shift();
-                this.doRequest.apply(this, now);
-            }
-        }
-        PubSub.publish('db/connected', [db], this);
-    });
-
-    // connection is not yet up
-    this.on('disconnected', function () {
-        PubSub.publish('db/disconnected', [db], this);
-        this.emit('connect');
-    });
-    
-    this.setUpRouter();
     this.db = null;
     this.failedRequests = [];
-    init(customServer);
+
+    this.setUpRouter();
 }
 util.inherits(Db, require('events').EventEmitter);
 module.exports = Db;
@@ -109,6 +46,18 @@ _.mixin({
 });
 // creating prototype properties for Db
 _.extend(Db.prototype, {
+    disconnected: function() {
+        console.error('Disconnected!!!');
+        this.db = null;
+        this.connect();
+    },
+    connect: function () {
+        var self = this;
+        return nodefn.call(this._db.open.bind(this._db)).then(function(db) {
+            self.db = db;
+            return db;
+        });
+    },
     setUpRouter: function() {
         var verbs = ['create', 'delete', 'update', 'find', 'add', 'remove', 'tag', 'untag'],
             handler = this.router.bind(this);
