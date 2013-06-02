@@ -317,66 +317,37 @@ _.extend(Db.prototype, {
 /*run mongodb: sudo mongod --config /etc/mongodb.conf --nojournal*/
 
 if (require.main === module) {
+    // This only gets executed when you do something like: node db.js
+    // Will be ignored when using 'require'
     var user = { email: "h5@hu.com", name: "John Doer" },
         user1 = { email: "h4@hu.com", name: "hi" },
         changes = { email: "h5@hu.com", name: "hello" },
         myServer = { host: "localhost", port: "27017", dbName: "foodb" },
         newDB;
 
-    // PubSub.subscribe('db/connected', function () {
-    //     newDB.createUser(user);
-    // });
+    PubSub.log(); // Shows sequence of steps taken
+    // Connect returns a promise that gets resolved when a connection happens
     newDB = new Db(myServer);
-    // newDB.doRequest({collectionName: 'users', methodName: 'insert', args: [user]})
-    newDB.createUser(user)
-    .then(function(result) {
-        console.log("Result: ",  result);
+    newDB.connect().then(function(db) {
+        console.log("connected");
     }, function(error) {
-        console.log("Error: ", error);
-    })
-    .ensure(function() {console.log("here!"); testFindUser(); });
-    var testFindUser = function testFindUser() {
-        console.log("testing...")
-        newDB.findUser(user1)
-        .then(function(result) {
-            console.log("Found: ",  result);
-        }, function(error) {
-            console.log("Error: ", error);
-        }).ensure(function() { process.exit(0); })
-    }
-    // 
-    // PubSub.subscribe('db/user/created', function (user) {
-    //     var collection = newDB.db.collection('users');
-    //     collection.findOne({ email: user.email }, function (err, doc) {
-    //         assert.equal(user.email, doc.email);
-    //         assert.equal(user.name, doc.name);
-    //         newDB.updateUser(user1, changes);
-    //         newDB.findUser({ email: user.email });
-    //         newDB.deleteUser({ email: user.email });
-    //     });
-    // });
-    // 
-    // PubSub.subscribe('db/user/updated', function (user) {
-    //     var collection = newDB.db.collection('users');
-    //     collection.findOne({ email: user.email }, function (err, doc) {
-    //         assert.equal(user.email, doc.email);
-    //     });
-    // });
-    // 
-    // PubSub.subscribe('db/user/found', function (email) {
-    //     // email is an object
-    //     assert.equal(user.email, email.email);
-    // });
-    // 
-    // PubSub.subscribe('db/user/deleted', function (email) {
-    //     var collection = newDB.db.collection('users');
-    //     collection.findOne(email, function (err, doc) {
-    //         assert.equal(null, doc);
-    //         process.exit(0);
-    //     });
-    // });
-    // 
-    // PubSub.subscribe('error/db/user/notFound', function (user) {
-    //     console.log(user, ' does not exist');
-    // });
+        console.error("Failed!", error);
+    });
+    // You can communicate through publish and subscribe
+    // But no guarantees in the order in which they will run
+    //
+    PubSub.publish('db/create/user', [user]);
+    PubSub.publish('db/find/user', [user]);  // This might fail to locate user
+    PubSub.publish('db/delete/user', [user]); // This too might run before create
+
+    // Or you can use promises
+    // But promises won't trigger PubSub topics
+    newDB.connect()
+    .then(function() { console.log('creating'); return newDB.createUser(user1); })
+    .otherwise(function(error) { console.log(error); })
+    .then(function() { console.log('finding'); return newDB.findUser(user1); })
+    .then(function() { console.log('updating'); return newDB.updateUser(user1, { $set: { dances: 'with wolves' } }); })
+    .then(function() { return newDB.findUser(user1); })
+    .then(function(usr) { console.log(usr); return newDB.deleteUser(user1); });
+
 }
