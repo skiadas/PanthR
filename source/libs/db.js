@@ -117,10 +117,7 @@ _.extend(Db.prototype, {
         );
     },
     dbPromise: function() {
-        // Attempts to reach the database, stops trying after 10 seconds
-        var fun = function getDb() { return this.db; }.bind(this),
-            isDbOn = function isDbOn(theDb) { return (theDb !== null); }
-        return timeout(10000, poll(fun, 100, isDbOn));
+        return this.connecting || this.connect();
     },
     doUserRequest: function(methodName, args) {
         return this.doRequest({
