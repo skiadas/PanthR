@@ -25,12 +25,13 @@ function Db(customServer) {
 
     customServer = customServer || {};
     _.defaults(customServer, { host: "localhost", port: "27017", dbName: "panthrdb" });
-    this.server = customServer;
-    this.dbName = customServer.dbName;
-    this.handler = this.disconnected.bind(this);
-    this.connected = false;
-    this.failedRequests = [];
-
+    _.extend(this, {
+        server: customServer,
+        connected: false,
+        connecting: false,
+        failedRequests: [],
+        handler: this.disconnected.bind(this)
+    });
     this.setUpRouter();
 }
 util.inherits(Db, require('events').EventEmitter);
