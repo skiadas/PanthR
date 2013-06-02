@@ -53,58 +53,46 @@ _.extend(Db.prototype, {
         }
     },
     connect: function () {
+        // The promise is never rejected, and is resolved with the 
+        // open database connection when it happens.
+        //
+        //
+        // Prevent multiple calls to connnect
+        if (this.connecting) { return this.connecting; }
         var self = this,
-            singleAttempt = function() {
-                // Single attempt at connection. 
-                // Returns true if connection achieved, false otherwise.
-                console.log('Attempting to connect')
-                self.db = new mongodb.Db(
-                    self.dbName,
-                    new mongodb.Server(
-                        self.server.host,
-                        self.server.port,
-                        { auto_reconnect: true }
-                    ),
-                    { safe: false }
-                );
-                return nodefn.call(self.db.open.bind(self.db))
-                .then(function() {
-                    console.log('Established Connection');
-                    self.db.on('close', self.handler);
-                    self.connected = true;
-                    return true;
-                })
-                .otherwise(function() {
-                    console.log('Failed to connect. Next attempt in 1 second.');
-                    return false;
-                });
-            },
-            attemptWithRetries = function() {
-                // Tries every second
-                // Resolves to self.db if connection achieved
-                // Rejects if 100 tries go by without achieving connection
-                console.log("AttemptWithRetries started.")
-                var i = 30;
-                return unfold(
-                    function unspool(seed) { console.log("unspooling"); return [i--, self.connected]; },
-                    function condition(result) { console.log("condition: ", result); return result; },
-                    function handler(i) {
-                        console.log("handling", i); 
-                        if (!i) {
-                            throw new Error("Failed. Will try again.");
-                        } else {
-                            console.log('delaying')
-                            return delay(1000, singleAttempt());
-                        }
-                    },
-                    null // Seed is ignored
-                )
-                .then(function() { console.log('attemptWithRetries resolved'); return self.db; });
-            };
-        return attemptWithRetries().otherwise(function() {
-            console.log("Failed to connect. Next attempt in 2 minutes.");
-            return delay(120000, attemptWithRetries());
-        });
+            counter = 30,
+            deferred = when.defer(),
+            promise = deferred.promise,
+            attempt = function attempt() {
+                return nodefn.call(open)
+                .then(connected)
+                .otherwise(failed);
+            }.bind(this),
+            connected = function connected() {
+                this.db.on('close', this.handler);
+                this.connected = true;
+                this.connecting = false;
+                deferred.resolve(this.db);
+            }.bind(this),
+            failed = function failed() {
+                var timeout = (counter--) ? 1000 : 120000;
+                if (!counter) {
+                    console.log('Failed to connect. Next attempt in '+ timeout / 1000 + ' seconds.');
+                }
+                setTimeout(attempt, timeout);
+            }.bind(this),
+            open;
+        // Establish our return value so future calls to connecting can find it
+        this.connecting = promise;
+        // Reset database
+        this.db = new mongodb.Db(
+            this.server.dbName,
+            new mongodb.Server( this.server.host, this.server.port, { auto_reconnect: true } ),
+            { safe: false }
+        );
+        open = this.db.open.bind(this.db);
+        attempt();
+        return promise;
     },
     setUpRouter: function() {
         var verbs = ['create', 'delete', 'update', 'find', 'add', 'remove', 'tag', 'untag'],
