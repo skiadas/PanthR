@@ -47,12 +47,14 @@ _.extend(Db.prototype, {
     disconnected: function() {
         console.error('Disconnected!!!');
         if (this.connected) {
+            // Need to reset and start a connection
             this.db.removeListener('close', this.handler);
             this.connected = false;
             this.connect();
         }
     },
     connect: function () {
+        // (Re-)establishes connection with database. Returns a promise.
         // The promise is never rejected, and is resolved with the 
         // open database connection when it happens.
         //
@@ -107,7 +109,7 @@ _.extend(Db.prototype, {
             dbName = topic.shift(),
             action = topic.shift(),
             target = topic.shift(),
-            pastAction = (action == 'find') ? found : (action + 'd'),
+            pastAction = (action == 'find') ? 'found' : (action + 'd'),
             method = this[action + _.capitalize(target)],
             successTopic = [dbName, target, pastAction].join('/'),
             errorTopic = ['error', dbName, target, 'not' + _.capitalize(pastAction)].join('/');
