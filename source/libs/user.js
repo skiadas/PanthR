@@ -1,8 +1,10 @@
-var util = require('util');
-var events = require('events');
-var db = require('./db.js');
-var PubSub = require('./pubsub.js');
-var crypto = require('crypto');
+var util = require('util'),
+    events = require('events'),
+    db = require('./db.js'),
+    PubSub = require('./pubsub.js'),
+    crypto = require('crypto'),
+    _ = require('underscore');
+
 
 var User = function(obj) {
       for (i in obj) {
