@@ -53,7 +53,7 @@ _.extend(Db.prototype, {
             this.connect();
         }
     },
-    connect: function () {
+    connect: function() {
         // (Re-)establishes connection with database. Returns a promise.
         // The promise is never rejected, and is resolved with the 
         // open database connection when it happens.
@@ -135,7 +135,7 @@ _.extend(Db.prototype, {
             args: args
         });
     },
-    doRequest: function (req) {
+    doRequest: function(req) {
         var self = this,
             getCollection = function(db) {
                 return nodefn.call(db.collection.bind(db), req.collectionName); 
@@ -145,14 +145,14 @@ _.extend(Db.prototype, {
             };
         return pipeline([this.dbPromise.bind(this), getCollection, makeQuery]).otherwise(function(error) { throw new Error('connection'); });
     },
-    updateUser: function (user, changes) {
+    updateUser: function(user, changes) {
         return this.doUserRequest('update', [{ email: user.email }, changes, { safe: true }])
         .then(function(found) { 
             if (!found[0]) { throw new Error('user/notFound'); }
             return user;
         });
     },
-    createUser: function (user) {
+    createUser: function(user) {
         var self = this;
         return self.doUserRequest('findOne',
             [{ email: user.email }, {email: 1}, { safe: true }]
@@ -164,28 +164,28 @@ _.extend(Db.prototype, {
             return user;
         });
     },
-    findUser: function (user) {
+    findUser: function(user) {
         return this.doUserRequest('findOne', [{email: user.email}, {}, { safe: true }])
         .then(function(result) {
             if (!result) { throw new Error('user/notFound'); }
             return result;
         });
     },
-    deleteUser: function (user) {
+    deleteUser: function(user) {
         return this.doUserRequest('remove', [{email: user.email}, { safe: true }])
         .then(function(result) {
             if (!result) { throw new Error('user/notDeleted'); }
             return user;
         });
     },
-    addFriend: function (user, friend, circlesArray) {
+    addFriend: function(user, friend, circlesArray) {
         var friendStr = 'friends.' + friend._id.toHexString(),
             queryObj = { '$set': {} },
             findStr = { email: user.email };
         queryObj.$set[friendStr] = {
             nick: friend.nick, email: friend.email, circles: circlesArray
         };
-        circlesArray.forEach(function (el) {
+        circlesArray.forEach(function(el) {
             queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
                 nick: friend.nick, email: friend.email
             };
@@ -197,12 +197,12 @@ _.extend(Db.prototype, {
             return user;
         });
     },
-    removeFriend: function (user, friend, circleArray) {
+    removeFriend: function(user, friend, circleArray) {
         var friendStr = 'friends.' + friend._id.toHexString(),
             queryObj = { '$unset': {} },
             findStr = { email: user.email };
         queryObj.$unset[friendStr] = '';
-        circleArray.forEach(function (el) {
+        circleArray.forEach(function(el) {
             queryObj.$unset['circles.' + el + '.' + friend._id.toHexString()] = {
                 nick: friend.nick, email: friend.email
             };
@@ -214,12 +214,12 @@ _.extend(Db.prototype, {
             return user;
         });
     },
-    tagFriend: function (user, friend, circleArray) {
+    tagFriend: function(user, friend, circleArray) {
         var friendStr = 'friends.' + friend._id.toHexString() + '.circles',
             queryObj = { '$set': {}, '$addToSet': {} },
             findStr = { email: user.email };
         queryObj.$addToSet[friendStr] = { $each: circleArray };
-        circleArray.forEach(function (el) {
+        circleArray.forEach(function(el) {
             queryObj.$set['circles.' + el + '.' + friend._id.toHexString()] = {
                 nick: friend.nick, email: friend.email
             };
@@ -235,12 +235,12 @@ _.extend(Db.prototype, {
             if (!count) { throw new Error('user/notFound'); }
         });
     },
-    unTagFriend: function (user, friend, circleArray) {
+    unTagFriend: function(user, friend, circleArray) {
         var friendStr = 'friends.' + friend._id.toHexString() + '.circles',
             queryObj = { '$pullAll': {}, '$unset': {} },
             findStr = { email: user.email };
         queryObj.$pullAll[friendStr] = circleArray;
-        circleArray.forEach(function (el) {
+        circleArray.forEach(function(el) {
             queryObj.$unset['circles.' + el + '.' + friend._id.toHexString()] = {
                 nick: friend.nick, email: friend.email
             };
@@ -252,7 +252,7 @@ _.extend(Db.prototype, {
             return user;
         });
     },
-    createStructure: function (structure) {
+    createStructure: function(structure) {
         var request = {
                 collectionName: 'structures',
                 methodName: 'insert',
@@ -265,21 +265,21 @@ _.extend(Db.prototype, {
             return structure;
         });
     },
-    removeStructure: function (structure) {
+    removeStructure: function(structure) {
         return this.doStructureRequest('remove', [{ _id: structure._id }, { safe: true }])
         .then(function(count) {
             if (!count) { throw new Error('structure/notRemoved'); }
             return structure;
         });
     },
-    updateStructure: function (structure, changes) {
+    updateStructure: function(structure, changes) {
         return this.doStructureRequest('update', [{ _id: structure._id }, changes, { safe: true }])
         .then(function(count) {
             if (!count) { throw new Error('structure/notFound'); }
             return structure;
         });
     },
-    findStructure: function (structure) {
+    findStructure: function(structure) {
         var request = {
             collectionName: 'structures',
             methodName: 'findOne',
@@ -291,11 +291,11 @@ _.extend(Db.prototype, {
             return found;
         });
     },
-    verifyRequest: function (requestHash) {
+    verifyRequest: function(requestHash) {
         var findStr = {_id: _makeHash(requestHash) };
         return this.doRequest('resetRequests', 'findOne', [findStr]);
     },
-    resetRequest: function (email) {
+    resetRequest: function(email) {
         var salt = _makeSalt(),
             requestHash = _makeHash(salt),
             hash = _makeHash(requestHash);
@@ -303,7 +303,7 @@ _.extend(Db.prototype, {
             _id: hash, email: email, date: new Date()
         }]).then(function() { return requestHash; });
     },
-    changePassword: function (email, password) {
+    changePassword: function(email, password) {
         var salt = _makeSalt(),
             hashpassword = _makeHash(salt + this.password),
             pwd = { salt: salt, hash: hashpassword };
