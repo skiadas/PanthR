@@ -5,6 +5,7 @@ var util = require('util'),
     mongodb = require('mongodb'),
     crypto = require('crypto'),
     assert = require('assert'),
+    routing = require('./pubsubRouting.js'),
     when = require('when'),
     nodefn = require("when/node/function"),
     timeout = require('when/timeout'),
@@ -32,7 +33,11 @@ function Db(customServer) {
         failedRequests: [],
         handler: this.disconnected.bind(this)
     });
-    this.setUpRouter();
+    this.pubsubHandler = routing.register(this, {
+        subscribe: 'db/:action/:target',
+        success: 'db/:target/past:action',
+        error: 'error/db/:target/pastneg:action'
+    })
 }
 util.inherits(Db, require('events').EventEmitter);
 module.exports = Db;
@@ -95,28 +100,6 @@ _.extend(Db.prototype, {
         open = this.db.open.bind(this.db);
         attempt();
         return promise;
-    },
-    setUpRouter: function() {
-        var verbs = ['create', 'delete', 'update', 'find', 'add', 'remove', 'tag', 'untag'],
-            handler = this.router.bind(this);
-        this.handlers = _(verbs).map(function(verb) { 
-            return PubSub.subscribe('db/' + verb, handler); 
-        });
-    },
-    router: function(data) {
-        var args = _.toArray(arguments),
-            topic = args.pop().split('/'),
-            dbName = topic.shift(),
-            action = topic.shift(),
-            target = topic.shift(),
-            pastAction = (action == 'find') ? 'found' : (action + 'd'),
-            method = this[action + _.capitalize(target)],
-            successTopic = [dbName, target, pastAction].join('/'),
-            errorTopic = ['error', dbName, target, 'not' + _.capitalize(pastAction)].join('/');
-        method.apply(this, args).then(
-            function(result) { PubSub.publish(successTopic, [result]); },
-            function(error) {  PubSub.publish(errorTopic, [error]); }
-        );
     },
     dbPromise: function() {
         return this.connecting || this.connect();

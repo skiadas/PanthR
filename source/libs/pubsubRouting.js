@@ -136,6 +136,7 @@ function _pastTense(verb) {
 addFilter('capitalize', _capitalize);
 addFilter('camelCase', _camelCase);
 addFilter('past', _pastTense);
+addFilter('pastneg', function(string) {return _camelCase(['not', _pastTense(string)].join('-')) });
 addFilter('', function(x) { return x; }); // Default method, used when no filter name
 
 module.exports = {
