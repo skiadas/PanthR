@@ -1,30 +1,29 @@
 var util = require('util'),
     events = require('events'),
     db = require('./db.js'),
-    PubSub = require('./pubsub.js'),
+    routing = require('./pubsub.js'),
     crypto = require('crypto'),
     _ = require('underscore');
 
 
-var User = function(obj) {
-      for (i in obj) {
-         if (obj.hasOwnProperty(i)) {
-            this[i] = obj[i];
-         }
-      }
-};
+var User = function(obj) { _.extend(this, obj); };
+
+User.pubsubHandler = routing.register(User, {
+    subscribe: 'user/:action',
+    success: 'user/past:action',
+    error: 'error/user/pastneg:action'
+});
+
+
+
+
+// User.passwordHash(email)    ->   Returns hash pair for the user with that email. Cache it
+// User.passwordHash(email, pass)  -> true/false whether valid password for that email
+// _passwordHash(pass)  ->  Produces a hash pair from pass
+// User.passwordReset(email)   ->  Create request for password resetting
+// User.passwordReset(email, reqStr, newPass)   -> Verify request is valid, and change password
 
 User.find = function(email) {
-   /*return db.findUser(email, function(err, user) {
-      if (!err) {
-         user = new User(user);
-      }
-      if (callback) {
-         callback(err, user);
-      }
-      return this;
-   });*/
-   // PubSub for find()
    PubSub.subscribe("user/find", function(email) {
       //it should publish if db.findUser() gets called
       PubSub.publish('db/find/user', [email], this);
@@ -35,7 +34,6 @@ User.find = function(email) {
    });
    return this;
 };
-
 
 
 User.delete = function(email) {
@@ -55,12 +53,6 @@ User.delete = function(email) {
 
 
 User.checkExisting = function(user) {
-   /*return db.findUser(user.email, {
-      nick: 1,
-      email: 1,
-      password: 1
-   }, callback);*/
-
    // PubSub for checkExisting()
    PubSub.subscribe("user/checkExisting", function(user) {
       //it should publish if db.createStructure() gets called
