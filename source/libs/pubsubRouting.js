@@ -129,7 +129,7 @@ function _camelCase(string) {
 function _pastTense(verb) {
     // Converts a verb to its past tense
     // Need to add more irregular verbs
-    var irregular = {'find': 'found'};
+    var irregular = {'find': 'found', 'add': 'added', 'tag': 'tagged'};
     return irregular[verb] || (verb + 'd');
 }
 
