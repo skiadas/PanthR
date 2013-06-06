@@ -1,4 +1,3 @@
-
 !!! 5
 html
   head
@@ -12,7 +11,8 @@ html
     include header
     h1 Forgot Password?
     form(name="reset",
-      action="reset")
+      action="reset",
+      method="post")
       <br \>
       label(for="email") Enter Email  
         input(type="text", 
@@ -21,10 +21,10 @@ html
       <br \> 
       label(for="sub")
         <br \>
-        input(type="reset", 
-          name="res", 
+        input(type="submit", 
+          name="reset", 
            value="Reset", 
-           id="res")
+           id="reset")
   include footer
   include scripts
    

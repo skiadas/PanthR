@@ -1,13 +1,74 @@
 {
-  "name": "application-name",
+  "name": "panthr",
   "version": "0.0.1",
+  "author": "PanthR Development Team <panthrteam@hanover.edu",
+  "description": "A Web-based Statistics Suite using R backend",
+  "contributors" : [
+    {
+        "name": "Haris Skiadas",
+        "email": "skiadas@hanover.edu"
+    },
+    {
+        "name": "Barb Wahl"
+    },
+    {
+        "name": "Bill Altermatt"
+    },
+    {
+        "name": "John Krantz"
+    }
+  ],
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "jasmine-node specs/",
+    "predeploy": "echo This will be run before deploying the app",
+    "postdeploy": "echo This will be run after deploying the app"
   },
+  "repository": {
+     "type": "git",
+     "url": "https://github.com/skiadas/PanthR.git"
+   },
+   "keywords": [
+       "statistics", "R", "webapp", "interactive"
+   ],
+  "main": "./app.js",
   "dependencies": {
     "express": "3.2.1",
     "jade": "*",
-    "sass": "*"
-  }
+    "underscore": "*",
+    "mongodb-native": "*",
+    "passport": "*",
+    "passport-local": "*"
+  },
+  "devDependencies": {
+      "grunt": "~0.4.1",
+      "grunt-contrib-copy": "~0.4.1",
+      "grunt-contrib-concat": "~0.1.3",
+      "grunt-contrib-coffee": "~0.6.5",
+      "grunt-contrib-uglify": "~0.2.0",
+      "grunt-contrib-compass": "~0.2.0",
+      "grunt-contrib-jshint": "~0.4.1",
+      "grunt-contrib-cssmin": "~0.6.0",
+      "grunt-contrib-connect": "~0.2.0",
+      "grunt-contrib-clean": "~0.4.0",
+      "grunt-contrib-htmlmin": "~0.1.3",
+      "grunt-bower-requirejs": "~0.4.1",
+      "grunt-contrib-requirejs": "~0.4.0",
+      "grunt-contrib-imagemin": "~0.1.3",
+      "grunt-contrib-watch": "~0.4.0",
+      "grunt-rev": "~0.1.0",
+      "grunt-usemin": "~0.1.10",
+      "grunt-mocha": "~0.3.0",
+      "grunt-open": "~0.2.0",
+      "grunt-svgmin": "~0.1.0",
+      "grunt-concurrent": "~0.1.0",
+      "matchdep": "~0.1.1",
+      "connect-livereload": "~0.1.1",
+      "jasmine-node": "*"
+  },
+  "license": "MIT",
+   "engines": {
+     "node": ">=0.10"
+   }
 }

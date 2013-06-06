@@ -1,7 +1,8 @@
+_ = require('underscore');
 /**
 * Events. Pub/Sub system for Loosely Coupled logic.
 * Based on Peter Higgins' port from Dojo to jQuery
-* https://github.com/phiggins42/bloody-jquery-plugins/blob/master/pubsub.js
+* Original code from: https://github.com/phiggins42/bloody-jquery-plugins/blob/master/pubsub.js
 *
 * Re-adapted to vanilla Javascript
 *
@@ -11,10 +12,50 @@
 //
 // Adjusted by skiadas@hanover.edu to be loaded as a node package
 //
-//
+// Further adjusted to allow "namespacing" of the form "db/subject/verb" etc
+// Added synchronous/asynchronous option
+// Added a "reset" option
 
 var Events = (function (){
-    var cache = {},
+    var cache = {}
+    ,   doAsync = true  // Default to asynchronous messaging
+    ,   logHandler = null;
+    async = function() { doAsync = true; return this; };
+    sync = function() { doAsync = false; return this; };
+    reset = function(topic) {
+        // Removes all handlers for a specific topic. If topic is undefined, removes all handlers
+        if (topic == undefined) {
+            cache = {};
+        } else if (cache[topic]) {
+            delete cache[topic];
+        }
+    };
+    // Logging functionality. 
+    // Enable with PubSub.log() or PubSub.log(true).
+    // Disable with PubSub.log(false)
+    log = function(on) { 
+        on = on || true;
+        if (on) {
+            logHandler = this.subscribe('', function logging(args) {
+                var fulltopic = arguments[arguments.length-1]
+                ,   topic = fulltopic
+                ,   listeners = []
+                ,   lastPass = false;
+                do {
+                   if (topic == "") {
+                      lastPass = true;
+                   };
+                   listeners.push([topic, (cache[topic] || []).length]);
+                   topic = topic.substring(0, topic.lastIndexOf("/"));
+                } while ((topic != "") || (!lastPass));
+                console.log("PubSub event. Listeners:", listeners);
+            });
+        } else {
+            Pubsub.unsubscribe(logHandler);
+            logHandler = null;
+        }
+        return this;
+    };
     /**
     * Events.publish
     * e.g.: Events.publish("/Article/added", [article], this);
@@ -25,15 +66,47 @@ var Events = (function (){
     * @param args {Array}
     * @param scope {Object} Optional
     */
-    publish = function (topic, args, scope) {
-        if (cache[topic]) {
-            var thisTopic = cache[topic],
-            i = thisTopic.length - 1;
-
-            for (i; i >= 0; i -= 1) {
-                thisTopic[i].apply( scope || this, args || []);
-            }
+    publish = function (topic, theArgs, scope, async) {
+        var lastPass = false,
+            fulltopic = topic,
+            thisTopic,
+            len,
+            i;
+        if ((scope === true) || (scope === false)) {
+            // No scope was provided but then third argument will be the async setting
+            async = scope;
+            scope = this;
         }
+        scope = scope || this;
+        if ((async) !== false) {
+            async = async || doAsync;
+        }
+        theArgs = theArgs || [];
+        len = theArgs.length;
+        // Goes through each subtopic in order, including the empty subtopic;
+        function asyncCaller(handler, origArgs) {
+            process.nextTick(function() { handler.apply(scope, origArgs) });
+        }
+        do {
+            if ((fulltopic != topic) && (theArgs.length === len)) {
+                theArgs.push(fulltopic); // If listening to subtopic, pass fulltopic in
+            }
+            if (topic == "") { lastPass = true; };
+            if (cache[topic]) {
+                thisTopic = cache[topic];
+                i = thisTopic.length - 1;
+                if (async) {
+                    for (i; i >= 0; i -= 1) {
+                        asyncCaller(thisTopic[i], theArgs.slice());
+                    }
+                } else {
+                    for (i; i >= 0; i -= 1) {
+                        thisTopic[i].apply(scope, theArgs);
+                    }
+                }
+            }
+            topic = topic.substring(0, topic.lastIndexOf("/"));
+        } while ((topic != "") || (!lastPass));
     },
     /**
     * Events.subscribe
@@ -45,6 +118,10 @@ var Events = (function (){
     * @param callback {Function}
     * @return Event handler {Array}
     */
+    //
+    // If your handler is listening to a subtopic, it should expect the last argument passed back
+    // to be the full topic published.
+    //
     subscribe = function (topic, callback) {
         if (!cache[topic]) {
             cache[topic] = [];
@@ -80,7 +157,11 @@ var Events = (function (){
     return {
         publish: publish,
         subscribe: subscribe,
-        unsubscribe: unsubscribe
+        unsubscribe: unsubscribe,
+        sync: sync,
+        async: async,
+        reset: reset,
+        log: log
     };
 }());
 

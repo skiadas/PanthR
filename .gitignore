@@ -1,5 +1,8 @@
 .DS_Store
 .sass-cache/
 .project
-
+source/node_modules/
+source/public/bower_components/
+dist/
+source/dist/
 *.log

@@ -4,8 +4,8 @@
 
 var express = require('express')
   , routes = require('./routes')
-  , passport = require('passport')
-  , LocalStrategy = require('passport-local').Strategy
+  // , passport = require('passport')
+  // , LocalStrategy = require('passport-local').Strategy
   , flash = require('connect-flash')
   , path = require('path')
   , http = require('http')
@@ -13,10 +13,9 @@ var express = require('express')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server)
   , PubSub = require('./libs/pubsub')
-  , rserve = require('node-rserve')
-  , User = require('./libs/user')
-  , db = require('./libs/db');
-
+  , RClient = require('node-rserve');
+  // , User = require('./libs/user')
+  // , db = require('./libs/db');
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -28,8 +27,8 @@ app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser('your secret here'));
 app.use(express.session());
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
 app.use(flash());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
@@ -42,40 +41,40 @@ if ('development' == app.get('env')) {
 //
 // PASSPORT AUTHORIZATION SETUP
 //
-passport.use(new LocalStrategy({
-  usernameField: 'email',
-  passwordField: 'password'
-  },
-  function(email, password, done) {
-    User.find(email, function(err, user) {
-      if (err) { return done(err); }
-      if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
-      }
-      if (!user.validPassword(password)) {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
-      return done(null, user);
-    });
-  }
-));
-passport.serializeUser(function(user, done) {
-  done(null, user.email);
-});
-passport.deserializeUser(function(email, done) {
-  User.find(email, function(err, user) {
-    done(err, user);
-  });
-});
-passport.ensureAuthenticated = function(req, res, next) {
-  if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
-}
+// passport.use(new LocalStrategy({
+//   usernameField: 'email',
+//   passwordField: 'password'
+//   },
+//   function(email, password, done) {
+//     User.find(email, function(err, user) {
+//       if (err) { return done(err); }
+//       if (!user) {
+//         return done(null, false, { message: 'Incorrect username.' });
+//       }
+//       if (!user.validPassword(password)) {
+//         return done(null, false, { message: 'Incorrect password.' });
+//       }
+//       return done(null, user);
+//     });
+//   }
+// ));
+// passport.serializeUser(function(user, done) {
+//   done(null, user.email);
+// });
+// passport.deserializeUser(function(email, done) {
+//   User.find(email, function(err, user) {
+//     done(err, user);
+//   });
+// });
+// passport.ensureAuthenticated = function(req, res, next) {
+//   if (req.isAuthenticated()) { return next(); }
+//   res.redirect('/login')
+// }
 
 //
 // ROUTES
 //
-app.get('/', routes.index);
+app.get('/', routes.console);
 app.get('/check', routes.checkAvailable);
 app.get('/register', routes.register);
 app.post('/register', routes.createUser);
@@ -88,12 +87,13 @@ app.post('/reset', routes.requestReset);
 app.post('/performReset', routes.performReset);
 app.get('/login', routes.login);
 app.post('/login', 
-    passport.authenticate('local', { successRedirect: '/user',
-                                     failureRedirect: '/login',
-                                     failureFlash: true })
+    // passport.authenticate('local', { successRedirect: '/user',
+    //                                  failureRedirect: '/login',
+    //                                  failureFlash: true })
+    routes.login
 );
 app.get('/user', 
-    passport.ensureAuthenticated,
+    // passport.ensureAuthenticated,
     routes.index
 );
 
@@ -102,9 +102,13 @@ app.get('/user',
 // 
 io.sockets.on('connection', function (socket) {
     // TODO change this code
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
+  socket.rclient = new RClient();
+  socket.rclient.on('data', function(data) {
+      socket.emit('reply', (data || '').toString());
+  });
+  socket.on('command', function (data) {
+      console.log('Received command for:', data)
+    socket.rclient.send(data);
   });
   PubSub.subscribe('/Test/new', function(msg) {
       socket.send(msg);
