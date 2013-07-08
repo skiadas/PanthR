@@ -16,13 +16,13 @@ define(['backbone'], function(Backbone) {
             
         },
         defaultRoute: function() {
-            console.log("Defaulting!!");
+            console.log("Router default route.");
         },
         initialize: function() {
-            console.log("Initializing!")
+            console.log("Router initializing.")
         },
         startListening: function() {
-            console.log("Starting to listen.")
+            console.log("Router starting to listen.")
             Backbone.history.start();
         }
     });

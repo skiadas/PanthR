@@ -4,6 +4,6 @@ define(['backbone', 'epoxy'], function(Backbone) {
             this.structures = models;
             console.log("models: ", models);
             Backbone.Epoxy.Model.apply(this, arguments);
-        },
+        }
     });
 });

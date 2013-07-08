@@ -12,8 +12,8 @@ define({
             ]
         },
     },
-    //
-    // 
+    
+    
     topbar: {
         render: {
             template: { module: 'text!templates/topBar.html' },
@@ -21,10 +21,14 @@ define({
         }
     },
     sidebar: {
-        render: {
+        create: 'js/views/workspace',
+        properties: {
             template: { module: 'text!templates/sideBar.html' },
-            at: { $ref: 'first!#sideBar' }
-        }
+            el: { $ref: 'first!#sideBar' }
+        },
+        // after: {
+        //     'theapp.getWorkspace': 'renderSidebar'
+        // }
     },
     variableView: {
         render: {
@@ -50,10 +54,15 @@ define({
     },
 
     // Putting things together
-    app: {
+    theapp: {
         create: 'js/controllers/app',
         properties: {
-            router: { $ref: 'mainRouter' }
+            router: { $ref: 'mainRouter' },
+            structures: { $ref: 'structures.structures' }
+        },
+        ready: 'getWorkspace',
+        after: {
+            'getWorkspace': 'sidebar.renderSidebar'
         }
     },
     //
