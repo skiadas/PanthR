@@ -1,0 +1,16 @@
+{
+  "name": "example-cujo-guide",
+  "version": "0.0.1",
+  "dependencies": {
+    "curl": "~0.7",
+    "wire": "~0.10",
+    "jquery": "~1.10",
+    "jquery-ui": "~1.10",
+    "lodash": "~1.3.1",
+    "backbone-amd": "~1.0.0",
+    "backbone": "~1.0.0"
+  },
+  "ignore": [
+    "node_modules/"
+  ]
+}
