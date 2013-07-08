@@ -1,0 +1,89 @@
+[
+    {
+        "name": "AwesomeWorkspace",
+        "label": "My main workspace",
+        "description": "A longer description of what the workspace is about",
+        "id": 1,
+        "type": "workspace",
+        "links": [
+            {
+                "id": 2,
+                "name": "studentsFolder",
+                "label": "Students Related",
+                "description": "Folder containing stuff related to Students dataset",
+                "type": "folder",
+                "links": [
+                    {
+                        "id": 3,
+                        "name": "students",
+                        "label": "Students",
+                        "description": "The Students dataset contains directory information about our students",
+                        "type": "dataset",
+                        "links": [
+                            {
+                                "id": 4,
+                                "name": "name",
+                                "label": "Name",
+                                "description": "The student's name, in the form 'first last'.",
+                                "type": "variable",
+                                "mode": "string"
+                            },
+                            {
+                                "id": 5,
+                                "name": "dob",
+                                "label": "Date of Birth",
+                                "description": "The student's date of birth",
+                                "type": "variable",
+                                "mode": "date"
+                            },
+                            {
+                                "id": 6,
+                                "name": "height",
+                                "label": "Height",
+                                "description": "The student's height",
+                                "type": "variable",
+                                "mode": "scalar",
+                                "format": "feetinches"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "name": "students",
+        "label": "Students",
+        "description": "The Students dataset contains directory information about our students",
+        "type": "dataset",
+        "links": [
+            {
+                "id": 4,
+                "name": "name",
+                "label": "Name",
+                "description": "The student's name, in the form 'first last'.",
+                "type": "variable",
+                "mode": "string"
+            },
+            {
+                "id": 5,
+                "name": "dob",
+                "label": "Date of Birth",
+                "description": "The student's date of birth",
+                "type": "variable",
+                "mode": "date"
+            },
+            {
+                "id": 6,
+                "name": "height",
+                "label": "Height",
+                "description": "The student's height",
+                "type": "variable",
+                "mode": "scalar",
+                "format": "feetinches"
+            }
+        ]
+    }
+]
+

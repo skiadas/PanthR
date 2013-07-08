@@ -1,0 +1,14 @@
+.num-var {
+	text-align: right;
+	width: 20%;
+}
+.edit {
+	text-align: right;
+	display: none;
+}
+.edit.editing {
+	display: block;
+}
+.editing + span, .editing + button {
+	display: none;
+}

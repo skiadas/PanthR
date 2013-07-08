@@ -1,0 +1,31 @@
+{
+	"name": "panthr-mockups",
+	"version": "0.0.1",
+	"description": "Hi there!",
+	"licenses": [
+		{
+			"type": "MIT",
+			"url": "http://www.opensource.org/licenses/mit-license.php"
+		}
+	],
+	"maintainers": [
+		{
+			"name": "Haris Skiadas",
+			"web": "https://github.com/skiadas"
+		}
+	],
+	"repository": [
+		{
+			"type": "git",
+			"url": "https://github.com/skiadas/example-cujo-guide"
+		}
+	],
+	"dependencies": {},
+	"devDependencies": {
+		"serv": "0.0.x",
+		"bower": "0.9.x"
+	},
+	"scripts": {
+		"start": "serv --port 8000"
+	}
+}
