@@ -7,6 +7,7 @@
         "type": "workspace",
         "isContainer": true,
         "icon": "drawer",
+        "parents": [],
         "links": [
             {
                 "id": 2,
@@ -16,6 +17,7 @@
                 "type": "folder",
                 "isContainer": true,
                 "icon": "folder",
+                "parents": ["AwesomeWorkspace"],
                 "links": [
                     {
                         "id": 3,
@@ -25,6 +27,7 @@
                         "type": "dataset",
                         "isContainer": true,
                         "icon": "table-2",
+                        "parents": ["AwesomeWorkspace", "studentsFolder"],
                         "links": [
                             {
                                 "id": 4,
@@ -34,6 +37,7 @@
                                 "type": "variable",
                                 "isContainer": false,
                                 "icon": "bars-2",
+                                "parents": ["AwesomeWorkspace", "studentsFolder", "students"],
                                 "mode": "string"
                             },
                             {
@@ -44,6 +48,7 @@
                                 "type": "variable",
                                 "isContainer": false,
                                 "icon": "calendar",
+                                "parents": ["AwesomeWorkspace", "studentsFolder", "students"],
                                 "mode": "date"
                             },
                             {
@@ -55,9 +60,66 @@
                                 "mode": "scalar",
                                 "isContainer": false,
                                 "icon": "bars",
+                                "parents": ["AwesomeWorkspace", "studentsFolder", "students"],
                                 "format": "feetinches"
                             }
                         ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "studentsFolder",
+        "label": "Students Related",
+        "description": "Folder containing stuff related to Students dataset",
+        "type": "folder",
+        "isContainer": true,
+        "icon": "folder",
+        "parents": [
+            { "name": "AwesomeWorkspace", "id": 1 }
+        ],
+        "links": [
+            {
+                "id": 3,
+                "name": "students",
+                "label": "Students",
+                "description": "The Students dataset contains directory information about our students",
+                "type": "dataset",
+                "isContainer": true,
+                "icon": "table-2",
+                "links": [
+                    {
+                        "id": 4,
+                        "name": "name",
+                        "label": "Name",
+                        "description": "The student's name, in the form 'first last'.",
+                        "type": "variable",
+                        "isContainer": false,
+                        "icon": "bars-2",
+                        "mode": "string"
+                    },
+                    {
+                        "id": 5,
+                        "name": "dob",
+                        "label": "Date of Birth",
+                        "description": "The student's date of birth",
+                        "type": "variable",
+                        "isContainer": false,
+                        "icon": "calendar",
+                        "mode": "date"
+                    },
+                    {
+                        "id": 6,
+                        "name": "height",
+                        "label": "Height",
+                        "description": "The student's height",
+                        "type": "variable",
+                        "mode": "scalar",
+                        "isContainer": false,
+                        "icon": "bars",
+                        "format": "feetinches"
                     }
                 ]
             }
@@ -69,6 +131,12 @@
         "label": "Students",
         "description": "The Students dataset contains directory information about our students",
         "type": "dataset",
+        "isContainer": true,
+        "icon": "table-2",
+        "parents": [
+            { "name": "AwesomeWorkspace", "id": 1 },
+            { "name": "studentsFolder", "id": 2 }
+        ],
         "links": [
             {
                 "id": 4,
@@ -76,6 +144,8 @@
                 "label": "Name",
                 "description": "The student's name, in the form 'first last'.",
                 "type": "variable",
+                "isContainer": false,
+                "icon": "bars-2",
                 "mode": "string"
             },
             {
@@ -84,6 +154,8 @@
                 "label": "Date of Birth",
                 "description": "The student's date of birth",
                 "type": "variable",
+                "isContainer": false,
+                "icon": "calendar",
                 "mode": "date"
             },
             {
@@ -93,9 +165,57 @@
                 "description": "The student's height",
                 "type": "variable",
                 "mode": "scalar",
+                "isContainer": false,
+                "icon": "bars",
                 "format": "feetinches"
             }
         ]
+    },
+    {
+        "id": 4,
+        "name": "name",
+        "label": "Name",
+        "description": "The student's name, in the form 'first last'.",
+        "type": "variable",
+        "isContainer": false,
+        "icon": "bars-2",
+        "parents": [
+            { "name": "AwesomeWorkspace", "id": 1 },
+            { "name": "studentsFolder", "id": 2 },
+            { "name": "students", "id": 3 }
+        ],
+        "mode": "string"
+    },
+    {
+        "id": 5,
+        "name": "dob",
+        "label": "Date of Birth",
+        "description": "The student's date of birth",
+        "type": "variable",
+        "isContainer": false,
+        "icon": "calendar",
+        "parents": [
+            { "name": "AwesomeWorkspace", "id": 1 },
+            { "name": "studentsFolder", "id": 2 },
+            { "name": "students", "id": 3 }
+        ],
+        "mode": "date"
+    },
+    {
+        "id": 6,
+        "name": "height",
+        "label": "Height",
+        "description": "The student's height",
+        "type": "variable",
+        "mode": "scalar",
+        "isContainer": false,
+        "icon": "bars",
+        "parents": [
+            { "name": "AwesomeWorkspace", "id": 1 },
+            { "name": "studentsFolder", "id": 2 },
+            { "name": "students", "id": 3 }
+        ],
+        "format": "feetinches"
     }
 ]
 

@@ -9,6 +9,10 @@ define([
             Handlebars.registerPartial('sidebarMain', partialMain);
             $(this.el).html(Handlebars.compile(this.template)(workspace));
             $('[data-toggle="popover"]').popover();
+        },
+        highlightActive: function(id) {
+            $('li', this.el).removeClass('active');
+            $('#sidebarItem' + id).addClass('active');
         }
     });
 });

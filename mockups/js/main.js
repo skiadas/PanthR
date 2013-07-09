@@ -20,9 +20,19 @@ define({
             template: { module: 'text!templates/sideBar.hbs' },
             el: { $ref: 'first!#sideBar' }
         },
-        // after: {
-        //     'theapp.getWorkspace': 'renderSidebar'
-        // }
+        connect: {
+            'mainRouter.getStructure': 'highlightActive'
+        }
+    },
+    breadcrumbs: {
+        create: 'js/views/breadcrumbs',
+        properties: {
+            template: { module: 'text!templates/breadcrumbs.hbs' },
+            el: { $ref: 'first!#breadcrumbs' }
+        },
+        after: {
+            'theapp.activeStructure': 'render'
+        }
     },
     variableView: {
         render: {
@@ -53,7 +63,7 @@ define({
     },
     mainRouter: {
         create: 'js/routers/main',
-        ready: 'startListening'
+        ready: 'startListening',
     },
     theapp: {
         create: 'js/controllers/app',
@@ -62,6 +72,9 @@ define({
             structures: { $ref: 'structures.structures' }
         },
         ready: 'getWorkspace',
+        connect: {
+            'mainRouter.getStructure': 'activeStructure'
+        },
         after: {
             'getWorkspace': 'sidebar.renderSidebar'
         }

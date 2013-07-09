@@ -8,6 +8,9 @@ define(['backbone', 'epoxy'], function(Backbone) {
             // Just a mockup for now
             console.log("getting workspace", this.structures)
             return this.structures[0];
+        },
+        activeStructure: function(id) {
+            return _.findWhere(this.structures, { id: parseInt(id) });
         }
     });
     return AppController;

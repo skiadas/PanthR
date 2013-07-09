@@ -36,8 +36,7 @@
 	]).then(success, fail);
 
 	// Success! curl.js indicates that your app loaded successfully!
-	function success(Backbone) {
-        Backbone.history.start(); // Should place this elsewhere later
+	function success() {
 		console.log("curl loaded");
 	}
 	// Oops. curl.js indicates that your app failed to load correctly.
