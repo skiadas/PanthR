@@ -1,0 +1,10 @@
+<li id="sidebarItem{{id}}">
+    {{> sidebarItem}}
+</li>
+{{#if isContainer}}
+  <ul id="sidebarGroup{{id}}" class="nav nav-list collapse">
+      {{#each links}}
+      {{> sidebarMain}}
+      {{/each}}
+  </ul>
+{{/if}}

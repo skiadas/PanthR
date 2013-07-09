@@ -1,0 +1,11 @@
+<a href="#structure/{{id}}" class="hasPopover"
+    data-toggle="popover" data-original-title="{{label}}"
+    data-trigger="hover" data-placement="right"
+    data-content="{{description}}">
+    <i class="icon-{{icon}} add-on"></i>
+    {{name}}
+    {{#if isContainer}}
+        <i class="icon-plus pull-right add-on" data-toggle="collapse" data-target="#sidebarGroup{{id}}"></i>
+    {{/if}}
+    
+</a>

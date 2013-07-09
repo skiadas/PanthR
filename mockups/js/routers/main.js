@@ -10,7 +10,7 @@ define(['backbone'], function(Backbone) {
             
         },
         getStructure: function(id) {
-            
+            console.log("Structure: ", id);
         },
         editStructure: function(id) {
             

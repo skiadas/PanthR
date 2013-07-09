@@ -1,8 +1,4 @@
 define({
-    mainRouter: {
-        create: 'js/routers/main',
-        ready: 'startListening'
-    },
     // Mockup data to use for now
     structures: {
         create: { 
@@ -12,8 +8,6 @@ define({
             ]
         },
     },
-    
-    
     topbar: {
         render: {
             template: { module: 'text!templates/topBar.html' },
@@ -23,7 +17,7 @@ define({
     sidebar: {
         create: 'js/views/workspace',
         properties: {
-            template: { module: 'text!templates/sideBar.html' },
+            template: { module: 'text!templates/sideBar.hbs' },
             el: { $ref: 'first!#sideBar' }
         },
         // after: {
@@ -54,6 +48,13 @@ define({
     },
 
     // Putting things together
+    jqueryStuff: {
+        module: 'js/jQueryStartup'
+    },
+    mainRouter: {
+        create: 'js/routers/main',
+        ready: 'startListening'
+    },
     theapp: {
         create: 'js/controllers/app',
         properties: {

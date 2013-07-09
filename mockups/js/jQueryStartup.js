@@ -1,10 +1,9 @@
 define(function() {
     $(function () {
-        // Empower popovers
-        $('[data-toggle="popover"]').popover();
         // Collapsable sections should toggle sign
-        $('[data-toggle="collapse"]').on('click', function() {
+        $(document).on('click', '[data-toggle="collapse"]', function(ev) {
             $(this).toggleClass('icon-minus icon-plus');
+            ev.preventDefault();
         });
     
     });
