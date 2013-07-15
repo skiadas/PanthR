@@ -6,11 +6,11 @@ define(['backbone', 'epoxy'], function(Backbone) {
         getWorkspace: function() {
             // "structures" is injected
             // Just a mockup for now
-            console.log("getting workspace", this.structures)
-            return this.structures[0];
+            console.log("getting workspace")
+            return this.structures.structures[0];
         },
         activeStructure: function(id) {
-            return _.findWhere(this.structures, { id: parseInt(id) });
+            return this.structures.getById(id);
         }
     });
     return AppController;

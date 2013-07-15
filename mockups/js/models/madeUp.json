@@ -146,7 +146,8 @@
                 "type": "variable",
                 "isContainer": false,
                 "icon": "bars-2",
-                "mode": "string"
+                "mode": "string",
+                "values": ["John Doe", "Peter Doe", "Molly Doe", "John Doe", "Peter Doe", "Molly Doe", "John Doe", "Peter Doe", "Molly Doe"]
             },
             {
                 "id": 5,
@@ -156,7 +157,9 @@
                 "type": "variable",
                 "isContainer": false,
                 "icon": "calendar",
-                "mode": "date"
+                "mode": "date",
+                "format": "yyyy/mm/dd",
+                "values": [1373490585673, 1373490824961, 1373490845185, 1373490862272, 1373490585673, 1373490824961, 1373490845185, 1373490862272, 1373490824961]
             },
             {
                 "id": 6,
@@ -167,7 +170,8 @@
                 "mode": "scalar",
                 "isContainer": false,
                 "icon": "bars",
-                "format": "feetinches"
+                "format": "feetinches",
+                "values": [61, 58, 45, 70, 68, 61, 58, 45, 70]
             }
         ]
     },
@@ -184,7 +188,8 @@
             { "name": "studentsFolder", "id": 2 },
             { "name": "students", "id": 3 }
         ],
-        "mode": "string"
+        "mode": "string",
+        "values": ["John Doe", "Peter Doe", "Molly Doe", "John Doe", "Peter Doe", "Molly Doe", "John Doe", "Peter Doe", "Molly Doe"]
     },
     {
         "id": 5,
@@ -199,7 +204,9 @@
             { "name": "studentsFolder", "id": 2 },
             { "name": "students", "id": 3 }
         ],
-        "mode": "date"
+        "mode": "date",
+        "format": "yyyy/mm/dd",
+        "values": [1373490585673, 1373490824961, 1373490845185, 1373490862272, 1373490585673, 1373490824961, 1373490845185, 1373490862272, 1373490824961]
     },
     {
         "id": 6,
@@ -215,7 +222,8 @@
             { "name": "studentsFolder", "id": 2 },
             { "name": "students", "id": 3 }
         ],
-        "format": "feetinches"
+        "format": "feetinches",
+        "values": [61, 58, 45, 70, 68, 61, 58, 45, 70]
     }
 ]
 
