@@ -1,1 +1,25 @@
-<div>TODO</div>
+<div>
+    <div class="form-inline">
+        <label class="control-label" for="variableName">Name <input class="controls input-small" id="variableName" type="text" value="{{name}}"></input></label>
+        
+        <label class="control-label" for="labelName">Label <input class="controls input-large" id="labelName" type="text" value="{{label}}"></input></label>
+    </div>
+    <div>
+        <label class="control-label" for="variableDescription">Description 
+        <textarea class="controls" id="variableDesciption">{{description}}</textarea></label>
+    </div>
+    <div class="form-inline">
+        <label class="control-label" for="variableMode">Mode 
+            <select id="variableMode">
+                <option value="scalar" selected>Scalar</option>
+                <option value="nominal">Nominal</option>
+                <option value="ordinal">Ordinal</option>
+                <option value="datetime">Date/Time</option>
+                <option value="string">String</option>
+            </select>
+        </label>
+        <label class="control-label" for="variableDecimals">Decimals 
+            <input class="controls input-small" id="variableDecimals" type="number" value="{{format.decimals}}"></input>
+        </label>
+    </div>
+</div>

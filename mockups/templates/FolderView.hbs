@@ -1,3 +1,9 @@
 <div>
-    TODO
+    <h4>{{label}} ({{name}})</h4>
+    <p>{{description}}</p>
+    <ul>
+        {{#each links}}
+            <li><a href="#structure/{{id}}">{{label}} ({{name}})</a></li>
+        {{/each}}
+    </ul>
 </div>
